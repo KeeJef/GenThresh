@@ -1,0 +1,19 @@
+{
+  "name": "genthresh",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "arithmetic": "^1.0.1",
+    "babelify": "^10.0.0",
+    "gulp-install": "^1.1.0",
+    "noble-bls12-381": "^0.5.0",
+    "tweetnacl": "^1.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
