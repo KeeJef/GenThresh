@@ -18,20 +18,32 @@
 </div>
 </div>
 
-<div class="buttonbox">
+<div id= "pubKeyDisplay">
 
-    <div id="button1" >
-            <button class="emojibutton">&nbsp;✨ Generate
-          </button>
-    </div>
-    <div id="button2" >
-        <button class="emojibutton">&nbsp;✍️ Sign
-          </button>
-    </div>
+Your Public key: 
 
 </div>
 <body>
-  <script src="js/scripts.js"></script>
+  <script src="bundle.js"></script>
+
+<script>
+
+function bufferToHex (buffer) {
+    return [...new Uint8Array (buffer)]
+        .map (b => b.toString (16).padStart (2, "0"))
+        .join ("");
+}
+
+var array = new Uint8Array(64);
+privKey = window.crypto.getRandomValues(array) // This needs to be review for security
+pubKey = myBundle.generatePubKey(privKey); // calling code from the bundle
+hexPubKey = bufferToHex(pubKey)
+
+document.getElementById("pubKeyDisplay").innerHTML += hexPubKey;
+
+</script>
+
+</script>
 </body>
 </html>
 
