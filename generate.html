@@ -25,7 +25,7 @@
   <div class="buttonbox">
 
     <div id="button1">
-      <button onclick="generateNewKeypair()" class="emojibutton">&nbsp;✨ Generate New Keypair
+      <button onclick="generateNewKeypair()" class="emojibutton">&nbsp;✨ Generate Keypair
       </button>
     </div>
 
@@ -39,10 +39,9 @@
   <div class="keycontainer">
 
     <div class="keys" id="pubKeyText">
-      Your Public key
+      Your Public key <button class="copyButton" onclick="copyClipboard()">📋</button>
     </div>
     <div class="keysdisplay" id="pubKeyDisplay"></div>
-
   </div>
 
 </body>
@@ -65,14 +64,19 @@
   }
 
   function download_txt() {
-  var textToSave = bufferToHex(privKey);
-  var hiddenElement = document.createElement('a');
-  hiddenElement.href = 'data:attachment/text,' + encodeURI(textToSave);
-  hiddenElement.target = '_blank';
-  let today = new Date().toISOString().slice(0, 10)
-  hiddenElement.download = 'BLSKEY'+ today + '.txt';
-  hiddenElement.click();
-}
+    var textToSave = bufferToHex(privKey);
+    var hiddenElement = document.createElement('a');
+    hiddenElement.href = 'data:attachment/text,' + encodeURI(textToSave);
+    hiddenElement.target = '_blank';
+    let today = new Date().toISOString().slice(0, 10)
+    hiddenElement.download = 'BLSKEY' + today + '.txt';
+    hiddenElement.click();
+  }
+
+  function copyClipboard() {
+    var copyText = document.getElementById("pubKeyDisplay");
+    navigator.clipboard.writeText(copyText.textContent)
+  } 
 </script>
 
 </html>
@@ -104,24 +108,36 @@
     padding-bottom: 10px;
   }
 
+  .copyButton {
+    border: none;
+    outline: none;
+    background-color: #fef2dc;
+    font-size: 35px;
+  }
+
+  .copyButton:active {
+    transform: translateY(4px);
+  }
+
   .keys {
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 25px;
+    font-size: 30px;
     margin-bottom: 10px;
   }
 
   .keysdisplay {
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 20px;
+    font-size: 25px;
     word-wrap: break-word;
     border-radius: 25px;
     border: 2px solid #8d7745;
     padding: 20px;
+
   }
 
-  .keycontainer{
+  .keycontainer {
     padding-bottom: 30px;
   }
 
