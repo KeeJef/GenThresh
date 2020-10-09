@@ -1,105 +1,161 @@
 <!doctype html>
 
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png" />
   <title>GenThresh</title>
   <meta name="description" content="Generate Threshold Signatures">
   <meta name="Kee Jefferys" content="SitePoint">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
 </head>
-<div class="titlebox">
-<div class="title">
-    Generate
-</div>
-<div class="emojititle">
-    🧙
-</div>
-</div>
 
-<div id= "pubKeyDisplay">
+<body onload="generateNewKeypair()">
+  <div class="titlebox">
+    <div class="title">
+      Generate
+    </div>
+    <div class="emojititle">
+      🧙
+    </div>
+  </div>
 
-Your Public key: 
+  <div class="buttonbox">
 
-</div>
-<body>
-  <script src="bundle.js"></script>
+    <div id="button1">
+      <button onclick="generateNewKeypair()" class="emojibutton">&nbsp;✨ Generate New Keypair
+      </button>
+    </div>
+
+    <div id="button2">
+      <button onclick="download_txt()" class="emojibutton">&nbsp;💾 Save Keypair
+      </button>
+    </div>
+
+  </div>
+
+  <div class="keycontainer">
+
+    <div class="keys" id="pubKeyText">
+      Your Public key
+    </div>
+    <div class="keysdisplay" id="pubKeyDisplay"></div>
+
+  </div>
+
+</body>
+
+<script src="bundle.js"></script>
 
 <script>
 
-function bufferToHex (buffer) {
-    return [...new Uint8Array (buffer)]
-        .map (b => b.toString (16).padStart (2, "0"))
-        .join ("");
+  function bufferToHex(buffer) {
+    return [...new Uint8Array(buffer)]
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
+  }
+  function generateNewKeypair() {
+    var array = new Uint8Array(64);
+    privKey = window.crypto.getRandomValues(array) // This needs to be review for security
+    pubKey = myBundle.generatePubKey(privKey); // calling code from the bundle
+    hexPubKey = bufferToHex(pubKey)
+    document.getElementById("pubKeyDisplay").innerHTML = hexPubKey;
+  }
+
+  function download_txt() {
+  var textToSave = bufferToHex(privKey);
+  var hiddenElement = document.createElement('a');
+  hiddenElement.href = 'data:attachment/text,' + encodeURI(textToSave);
+  hiddenElement.target = '_blank';
+  let today = new Date().toISOString().slice(0, 10)
+  hiddenElement.download = 'BLSKEY'+ today + '.txt';
+  hiddenElement.click();
 }
-
-var array = new Uint8Array(64);
-privKey = window.crypto.getRandomValues(array) // This needs to be review for security
-pubKey = myBundle.generatePubKey(privKey); // calling code from the bundle
-hexPubKey = bufferToHex(pubKey)
-
-document.getElementById("pubKeyDisplay").innerHTML += hexPubKey;
-
 </script>
 
-</script>
-</body>
 </html>
 
 <style>
+  /* Add a black background color to the top navigation bar */
+  .emojititle {
+    font-size: 10vw;
+  }
 
-    /* Add a black background color to the top navigation bar */
-    .emojititle {
-      font-size: 10vw;
-    }
+  .title {
+    font-size: 5vw;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+  }
 
-    .title{
-        font-size: 5vw;
-        font-family: Arial, Helvetica, sans-serif;
-        font-weight: bold;
-    }
+  #button1,
+  #button2 {
+    display: inline-block;
+    padding-bottom: 30px;
+  }
 
-    #button1 , #button2 {
-    display:inline-block;
-    }
+  .buttonbox {
+    text-align: center;
+  }
 
-    .buttonbox{
-        text-align: center;
-    }
-    .titlebox{
-        text-align: center;
-        padding-bottom: 10px;
-    }
+  .titlebox {
+    text-align: center;
+    padding-bottom: 10px;
+  }
 
-    body {
-	 background-color: #fef2dc;
-}
- .emojibutton {
-	 font-size: 25px;
-	 font-family: 'Poppins', sans-serif;
-	 font-weight: 600;
-	 color: #fff;
-	 border: 0;
-	 outline: 0;
-	 display: flex;
-	 align-items: center;
-	 justify-content: center;
-	 position: relative;
-	 height: 2.5em;
-	 padding: 0.5em 0.75em;
-	 border-radius: 0.25em;
-	 box-sizing: border-box;
-	 background-color: #e0acf7;
-	 box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
-	 z-index: 1;
-     transition-duration: 0.4s;
-     cursor: pointer;
-}
+  .keys {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 25px;
+    margin-bottom: 10px;
+  }
 
-.emojibutton:hover {
-  background-color: #cc70f3;
-  color: white;
-}
-        
+  .keysdisplay {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    word-wrap: break-word;
+    border-radius: 25px;
+    border: 2px solid #8d7745;
+    padding: 20px;
+  }
+
+  .keycontainer{
+    padding-bottom: 30px;
+  }
+
+  body {
+    background-color: #fef2dc;
+    margin-left: 15%;
+    margin-right: 15%;
+
+  }
+
+  .emojibutton {
+    font-size: 25px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #fff;
+    border: 0;
+    outline: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 2.5em;
+    padding: 0.5em 0.75em;
+    border-radius: 0.25em;
+    box-sizing: border-box;
+    background-color: #e0acf7;
+    box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    transition-duration: 0.4s;
+    cursor: pointer;
+  }
+
+  .emojibutton:hover {
+    background-color: #cc70f3;
+    color: white;
+  }
 </style>
