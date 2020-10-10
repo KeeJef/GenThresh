@@ -1,104 +1,147 @@
 <!doctype html>
 
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png" />
   <title>GenThresh</title>
   <meta name="description" content="Generate Threshold Signatures">
   <meta name="Kee Jefferys" content="SitePoint">
 
 </head>
 <div class="titlebox">
-<div class="title">
+  <div class="title">
     Sign
-</div>
-<div class="emojititle">
+  </div>
+  <div class="emojititle">
     🧙
-</div>
+  </div>
 </div>
 
 <div class="buttonbox">
 
-    <div id="button1" >
-            <button onclick="window.location='generate.html'" class="emojibutton">&nbsp;✨ Generate
-          </button>
-    </div>
-    <div id="button2" >
-        <button onclick="window.location='sign.html'" class="emojibutton">&nbsp;✍️ Sign
-          </button>
-    </div>
+  <div id="button1">
+    <button onclick="window.location='generate.html'" class="emojibutton">&nbsp;✨ Generate
+    </button>
+  </div>
+  <div id="button2">
+    <button onclick="window.location='sign.html'" class="emojibutton">&nbsp;✍️ Sign
+    </button>
+  </div>
 
 </div>
+
 <body>
-    <script src="bundle.js"></script>
 
-<script>
+  <script src="bundle.js"></script>
 
-console.log(myBundle.myFunc2()); // calling code from the bundle
+  <script>
 
-</script>
+    function bufferToHex(buffer) {
+      return [...new Uint8Array(buffer)]
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+    function generateNewKeypair() {
+      var array = new Uint8Array(64);
+      privKey = window.crypto.getRandomValues(array) // This needs to be review for security
+      pubKey = myBundle.generatePubKey(privKey); // calling code from the bundle
+      var keyArray = { privKey, pubKey }
+      return keyArray
+    }
+
+    function signArbMessage(privateKey, message) {
+      signature = myBundle.signMessage(privateKey, message)
+      return signature
+    };
+
+    function checkSignature(signature,pubKey,message){
+      isvalid = myBundle.checkSig(signature,pubKey,message)
+      return isvalid
+    }
+
+    var message = "This is a test message to sign"
+
+    var keypair1 = generateNewKeypair()
+    signature1 = signArbMessage(keypair1.privKey, message)
+    checkSignature(signature1, keypair1.pubKey,message) // this works out
+    
+    var keypair2 = generateNewKeypair()
+    signature2 = signArbMessage(keypair2.privKey, message)
+    checkSignature(signature2,keypair1,message)
+
+    var keypair3 = generateNewKeypair()
 
 
-<script>
-  
-</script>
+
+  </script>
+
+  </script>
+
+
+  <script>
+
+  </script>
 </body>
+
 </html>
 
 <style>
+  /* Add a black background color to the top navigation bar */
+  .emojititle {
+    font-size: 10vw;
+  }
 
-    /* Add a black background color to the top navigation bar */
-    .emojititle {
-      font-size: 10vw;
-    }
+  .title {
+    font-size: 5vw;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+  }
 
-    .title{
-        font-size: 5vw;
-        font-family: Arial, Helvetica, sans-serif;
-        font-weight: bold;
-    }
+  #button1,
+  #button2 {
+    display: inline-block;
+  }
 
-    #button1 , #button2 {
-    display:inline-block;
-    }
+  .buttonbox {
+    text-align: center;
+  }
 
-    .buttonbox{
-        text-align: center;
-    }
-    .titlebox{
-        text-align: center;
-        padding-bottom: 10px;
-    }
+  .titlebox {
+    text-align: center;
+    padding-bottom: 10px;
+  }
 
-    body {
-	 background-color: #fef2dc;
-}
- .emojibutton {
-	 font-size: 25px;
-	 font-family: 'Poppins', sans-serif;
-	 font-weight: 600;
-	 color: #fff;
-	 border: 0;
-	 outline: 0;
-	 display: flex;
-	 align-items: center;
-	 justify-content: center;
-	 position: relative;
-	 height: 2.5em;
-	 padding: 0.5em 0.75em;
-	 border-radius: 0.25em;
-	 box-sizing: border-box;
-	 background-color: #e0acf7;
-	 box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
-	 z-index: 1;
-     transition-duration: 0.4s;
-     cursor: pointer;
-}
+  body {
+    background-color: #fef2dc;
+  }
 
-.emojibutton:hover {
-  background-color: #cc70f3;
-  color: white;
-}
-        
+  .emojibutton {
+    font-size: 25px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #fff;
+    border: 0;
+    outline: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 2.5em;
+    padding: 0.5em 0.75em;
+    border-radius: 0.25em;
+    box-sizing: border-box;
+    background-color: #e0acf7;
+    box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    transition-duration: 0.4s;
+    cursor: pointer;
+  }
+
+  .emojibutton:hover {
+    background-color: #cc70f3;
+    color: white;
+  }
 </style>
