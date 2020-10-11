@@ -10,13 +10,18 @@ function signMessage(privKey, message) {
   return signature
 };
 
-async function checkSig (signature, publicKey, message){
-let sig = await signature
-let isCorrect = await bls.verify(sig,message, publicKey)
+function checkSig (signature, publicKey, message){
+isCorrect = bls.verify(signature,message, publicKey)
 return isCorrect
 }
 
-module.exports = { generatePubKey: generatePubKey, signMessage: signMessage, checkSig: checkSig };
+async function aggregateSignatures(signatureArray){
+  let sigs = await signatureArray
+  aggregateSignature = bls.aggregateSignatures(sigs)
+  return aggregateSignature
+}
+
+module.exports = { generatePubKey: generatePubKey, signMessage: signMessage, checkSig: checkSig, aggregateSignatures: aggregateSignatures};
 
 
 //  browserify test.js --standalone myBundle > bundle.js

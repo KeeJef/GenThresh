@@ -62,18 +62,29 @@
       return isvalid
     }
 
+    async function aggSigs(sigArray){
+      let sigs = await sigArray
+      aggSig = myBundle.aggregateSignatures(sigs)
+      return aggSig
+    }
+
+    // checkSignature(signature1, keypair1.pubKey,message) sign message code
+
     var message = "This is a test message to sign"
 
     var keypair1 = generateNewKeypair()
     signature1 = signArbMessage(keypair1.privKey, message)
-    checkSignature(signature1, keypair1.pubKey,message) // this works out
+    
     
     var keypair2 = generateNewKeypair()
     signature2 = signArbMessage(keypair2.privKey, message)
-    checkSignature(signature2,keypair1,message)
+
 
     var keypair3 = generateNewKeypair()
+    signature3 = signArbMessage(keypair3.privKey, message)
 
+    var sigArraytest = [signature1,signature2,signature3]
+    var aggregateSignature = aggSigs(sigArraytest)
 
 
   </script>
