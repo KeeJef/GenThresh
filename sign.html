@@ -45,9 +45,18 @@
     }
 
     function generateNewKeypair() {
-      var array = new Uint8Array(64);
-      privKey = window.crypto.getRandomValues(array) // This needs to be review for security
+      var array = new Uint8Array(32);
+      privKey = window.crypto.getRandomValues(array)
+      privKey = bufferToHex(privKey)
+      console.log("Private Key :" + privKey)
+      pubKey = myBundle.generatePubKey(privKey);
+      var keyArray = { privKey, pubKey }
+      return keyArray
+    }
+
+    function fakeKeypair(privKey) {
       pubKey = myBundle.generatePubKey(privKey); // calling code from the bundle
+      console.log("Private Key :" + privKey)
       var keyArray = { privKey, pubKey }
       return keyArray
     }
@@ -57,29 +66,49 @@
       return signature
     };
 
-    function checkSignature(signature,pubKey,message){
-      isvalid = myBundle.checkSig(signature,pubKey,message)
+    function checkSignature(signature, pubKey, message) {
+      isvalid = myBundle.checkSig(signature, pubKey, message)
       return isvalid
     }
 
-    function aggSig(signatureArray){
+    function checkMulti(signature, pubKeyArray, message) {
+      isvalid = myBundle.verifyMulti(signature, pubKeyArray, message)
+      return isvalid
+    }
+
+    function aggregateSignature(signatureArray) {
       agg = myBundle.aggSig(signatureArray)
       return agg
+    }
+
+    function aggregateKeys(keyArray) {
+      singleKey = myBundle.aggKey(keyArray)
+      return singleKey
     }
 
     var message = "This is a test message to sign"
 
     var keypair1 = generateNewKeypair()
     signature1 = signArbMessage(keypair1.privKey, message)
-    checkSignature(signature1, keypair1.pubKey,message) // this works out
-    
+
     var keypair2 = generateNewKeypair()
     signature2 = signArbMessage(keypair2.privKey, message)
-    checkSignature(signature2,keypair1,message)
 
-    aggerate = aggSig([signature1,sig])
+    aggerateSig = aggregateSignature([signature1, signature2])
+    aggregateKey = aggregateKeys([keypair1.pubKey, keypair2.pubKey])
 
-    var keypair3 = generateNewKeypair()
+    answer = checkSignature(aggerateSig, aggregateKey, message)
+
+    // var keypair1fake = fakeKeypair('18f020b98eb798752a50ed0563b079c125b0db5dd0b1060d1c1b47d4a193e1e4')
+    // signature1 = signArbMessage(keypair1fake.privKey, message)
+
+    // var keypair2fake = fakeKeypair('ed69a8c50cf8c9836be3b67c7eeff416612d45ba39a5c099d48fa668bf558c9c')
+    // signature2 = signArbMessage(keypair2fake.privKey, message)
+
+    // aggerateSig = aggregateSignature([signature1, signature2])
+    // aggregateKey = aggregateKeys([keypair1fake.pubKey, keypair2fake.pubKey])
+
+    // answer = checkSignature(aggerateSig, aggregateKey, message)
 
 
 

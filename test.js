@@ -5,24 +5,49 @@ function generatePubKey(privKey) {
   return pubKey
 };
 
-function signMessage(privKey, message) {
-  signature = bls.sign(message,privKey)
+async function signMessage(privKey, message) {
+  let signature = await bls.sign(message, privKey)
   return signature
 };
 
-async function checkSig (signature, publicKey, message){
-let sig = await signature
-let isCorrect = await bls.verify(sig,message, publicKey)
-return isCorrect
+function bufferToHex(buffer) {
+  return [...new Uint8Array(buffer)]
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
-async function aggSig (signatureArray){
+async function checkSig(signature, publicKey, message) {
+  let sig = await signature
+  let pk = await publicKey
+  let isCorrect = await bls.verify(sig, message, pk)
+  console.log(isCorrect)
+  return isCorrect
+}
+
+async function verifyMulti(signature, publicKeyArray, message) {
+  let sig = await signature
+  let isCorrect = await bls.verifyBatch(message, publicKeyArray, sig)
+  console.log(isCorrect)
+  return isCorrect
+
+}
+
+async function aggSig(signatureArray) {
   let sig = await Promise.all(signatureArray)
   let agg = await bls.aggregateSignatures(sig)
+  console.log("Agg Sig :" + bufferToHex(agg))
   return agg
-  }
+}
 
-module.exports = { generatePubKey: generatePubKey, signMessage: signMessage, checkSig: checkSig, aggSig: aggSig};
+async function aggKey(keyArray) {
+  //let keys = await Promise.all(keyArray)
+  let singleKey = await bls.aggregatePublicKeys(keyArray)
+  singleKey = singleKey.toCompressedHex()
+  console.log("Agg Key :" + bufferToHex(singleKey))
+  return singleKey
+}
+
+module.exports = { generatePubKey: generatePubKey, signMessage: signMessage, checkSig: checkSig, aggSig: aggSig, aggKey: aggKey, verifyMulti: verifyMulti };
 
 
 //  browserify test.js --standalone myBundle > bundle.js
