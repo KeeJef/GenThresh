@@ -26,7 +26,7 @@
         </button>
     </div>
     <div id="button2">
-        <button onclick="window.location='sign.html'" class="emojibutton">&nbsp;✍️ Sign
+        <button onclick="signArbMessage()" class="emojibutton">&nbsp;✍️ Sign
         </button>
     </div>
 
@@ -35,7 +35,13 @@
         <div class="keys" id="pubKeyText">
             Message
         </div>
-        <div contenteditable="true" class="keysdisplay" id="pubKeyDisplay"></div>
+        <div contenteditable="true" class="keysdisplay" placeholder="Test" id="messageContainer"></div>
+
+        <div class="keys" id="signatureText">
+            Signature
+        </div>
+        <div class="keysdisplay" id="signatureContainer"></div>
+
     </div>
 
 </div>
@@ -46,16 +52,42 @@
 
     <script>
 
+
         function bufferToHex(buffer) {
             return [...new Uint8Array(buffer)]
                 .map(b => b.toString(16).padStart(2, "0"))
                 .join("");
         }
 
-        function signArbMessage(privateKey, message) {
+        function signArbMessage() {
+            messageObject = document.getElementById("messageContainer")
+            message = messageObject.innerText;
+
+            if (message == "") {
+
+                messageDisplay = document.getElementById("pubKeyText")
+                messageDisplay.innerHTML = "Please add a message"
+                return
+            }
+
+            messageDisplay = document.getElementById("pubKeyText")
+            messageDisplay.innerHTML = "Message"
+
+            privateKey = window.content
             signature = myBundle.signMessage(privateKey, message)
-            return signature
+            displaySignature(signature)
         };
+
+        async function displaySignature(signature) {
+
+            var sigTextField = document.getElementById("signatureText");
+            var sigContainer = document.getElementById("signatureContainer");
+            sigTextField.style.display = "block";
+            sigContainer.style.display = "block";
+
+            sigContainer.innerText = bufferToHex(await signature)
+
+        }
 
         function aggregateSignature(signatureArray) {
             agg = myBundle.aggSig(signatureArray)
@@ -82,6 +114,7 @@
                 // here we tell the reader what to do when it's done reading...
                 reader.onload = readerEvent => {
                     var content = readerEvent.target.result; // this is the content!
+                    window.content = content
                 }
 
                 var T = document.getElementById("button2");
@@ -190,7 +223,7 @@
     }
 
     .keysdisplay {
-        
+
         font-family: Arial, Helvetica, sans-serif;
         font-size: 25px;
         height: auto;
@@ -201,6 +234,11 @@
         padding: 20px;
         text-align: left;
 
+    }
+
+    #signatureContainer,
+    #signatureText {
+        display: none;
     }
 
     .keycontainer {
