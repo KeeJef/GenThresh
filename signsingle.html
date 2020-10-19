@@ -30,6 +30,14 @@
         </button>
     </div>
 
+    <div class="keycontainer">
+
+        <div class="keys" id="pubKeyText">
+            Message
+        </div>
+        <div contenteditable="true" class="keysdisplay" id="pubKeyDisplay"></div>
+    </div>
+
 </div>
 
 <body>
@@ -66,6 +74,18 @@
             input.onchange = e => {
                 var filetest = e.target.files[0];
                 console.log(filetest.name)
+
+                // setting up the reader
+                var reader = new FileReader();
+                reader.readAsText(filetest, 'UTF-8');
+
+                // here we tell the reader what to do when it's done reading...
+                reader.onload = readerEvent => {
+                    var content = readerEvent.target.result; // this is the content!
+                }
+
+                var T = document.getElementById("button2");
+                T.style.display = "inline-block";
 
             }
 
@@ -109,9 +129,15 @@
         font-weight: bold;
     }
 
-    #button1,
-    #button2 {
+
+    #button1 {
         display: inline-block;
+        padding-bottom: 30px;
+    }
+
+    #button2 {
+        display: none;
+        padding-bottom: 30px;
     }
 
     .buttonbox {
@@ -125,6 +151,8 @@
 
     body {
         background-color: #fef2dc;
+        margin-left: 15%;
+        margin-right: 15%;
     }
 
     .emojibutton {
@@ -152,5 +180,30 @@
     .emojibutton:hover {
         background-color: #cc70f3;
         color: white;
+    }
+
+    .keys {
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 30px;
+        margin-bottom: 10px;
+    }
+
+    .keysdisplay {
+        
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 25px;
+        height: auto;
+        min-height: 150px;
+        word-wrap: break-word;
+        border-radius: 25px;
+        border: 2px solid #8d7745;
+        padding: 20px;
+        text-align: left;
+
+    }
+
+    .keycontainer {
+        padding-bottom: 30px;
     }
 </style>
