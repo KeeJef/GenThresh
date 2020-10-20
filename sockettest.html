@@ -6,15 +6,40 @@
 </head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 <script>
-
-const
-    
-    ioClient = io.connect("http://163.172.168.41:8000");
-
-ioClient.on("seq-num", (msg) => console.info(msg));
-
-</script>
-
-<body>Hello world</body>
-
+    var socket = io.connect("http://163.172.168.41:8000");
+    function setUsername() {
+       socket.emit('setUsername', document.getElementById('name').value);
+    };
+    var user;
+    socket.on('userExists', function(data) {
+       document.getElementById('error-container').innerHTML = data;
+    });
+    socket.on('userSet', function(data) {
+       user = data.username;
+       document.body.innerHTML = '<input type = "text" id = "message">\
+       <button type = "button" name = "button" onclick = "sendMessage()">Send</button>\
+       <div id = "message-container"></div>';
+    });
+    function sendMessage() {
+       var msg = document.getElementById('message').value;
+       if(msg) {
+          socket.emit('msg', {message: msg, user: user});
+       }
+    }
+    socket.on('newmsg', function(data) {
+       if(user) {
+          document.getElementById('message-container').innerHTML += '<div><b>' + 
+             data.user + '</b>: ' + data.message + '</div>'
+       }
+    })
+ </script>
+ 
+ <body>
+    <div id = "error-container"></div>
+    <input id = "name" type = "text" name = "name" value = "" 
+       placeholder = "Enter your name!">
+    <button type = "button" name = "button" onclick = "setUsername()">
+       Let me chat!
+    </button>
+ </body>
 </html>

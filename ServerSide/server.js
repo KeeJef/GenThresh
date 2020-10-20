@@ -1,27 +1,22 @@
-const
     io = require("socket.io"),
     server = io.listen(8000);
 
-let
-    sequenceNumberByClient = new Map();
-
-// event fired every time a new client connects:
-server.on("connection", (socket) => {
-    console.info(`Client connected [id=${socket.id}]`);
-    // initialize this client's sequence number
-    sequenceNumberByClient.set(socket, 1);
-
-    // when socket disconnects, remove it from the list:
-    socket.on("disconnect", () => {
-        sequenceNumberByClient.delete(socket);
-        console.info(`Client gone [id=${socket.id}]`);
-    });
+users = [];
+server.on('connection', function(socket) {
+   console.log('A user connected');
+   socket.on('setUsername', function(data) {
+      console.log(data);
+      
+      if(users.indexOf(data) > -1) {
+         socket.emit('userExists', data + ' username is taken! Try some other username.');
+      } else {
+         users.push(data);
+         socket.emit('userSet', {username: data});
+      }
+   });
+   
+   socket.on('msg', function(data) {
+      //Send message to everyone
+      server.sockets.emit('newmsg', data);
+   })
 });
-
-// sends each client its current sequence number
-setInterval(() => {
-    for (const [client, sequenceNumber] of sequenceNumberByClient.entries()) {
-        client.emit("seq-num", sequenceNumber);
-        sequenceNumberByClient.set(client, sequenceNumber + 1);
-    }
-}, 1000);
