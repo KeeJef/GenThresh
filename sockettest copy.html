@@ -7,7 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 <script>
     var socket = io.connect("http://163.172.168.41:8000");
-    randomroom = 'kwekwe' //Math.random().toString(36).substr(2, 7)
+    randomroom = 'kwskwe' //Math.random().toString(36).substr(2, 7)
     socket.emit('create', randomroom);
 
     function setUsername() {
