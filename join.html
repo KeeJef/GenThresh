@@ -1,0 +1,287 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <title>GenThresh</title>
+    <meta name="description" content="Generate Threshold Signatures">
+    <meta name="Kee Jefferys" content="SitePoint">
+
+</head>
+
+<body>
+
+    <div class="titlebox">
+        <div class="title">
+            Group Sign
+        </div>
+        <div class="emojititle">
+            🧙
+        </div>
+    </div>
+
+    <div class="namecontainer" id="nameContainer">
+
+        <input class="namebox" id="nameEntry" type="text" placeholder="Enter name here" /> <button class="copyButton"
+            id="enterName" onclick="getName()">✔️</button>
+
+    </div>
+
+    <div class="roomcontainer" id="roomcontainer">
+        <input class="roombox" id="roombox" type="text" readonly /> <button class="copyButton"
+            onclick="copyClipboard()">📋</button>
+    </div>
+
+    <div class="keycontainer">
+
+        <div class="keys" id="pubKeyText">
+        </div>
+        <div class="keysdisplay" id="pubKeyDisplay">
+
+        </div>
+    </div>
+
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+
+
+    <script>
+
+
+        var socket = io.connect("http://163.172.168.41:8000");
+        chosenRoom = window.location.href
+        chosenRoom = chosenRoom.split ('?')[1]
+
+        socket.emit('create', chosenRoom);
+        
+    
+        function setUsername(name) {
+           socket.emit('setUsername', name);
+        };
+        var user;
+        socket.on('userExists', function(data) {
+           document.getElementById('error-container').innerHTML = data;
+        });
+        socket.on('userSet', function(data) {
+           user = data.username;
+           document.body.innerHTML = '<input type = "text" id = "message">\
+           <button type = "button" name = "button" onclick = "sendMessage()">Send</button>\
+           <div id = "message-container"></div>';
+        });
+
+        function getUsers() {
+            socket.emit('getUsers', { roomid: chosenRoom});
+        };
+
+        socket.on('getUsers', function (data) {
+            console.log(data)
+        })
+
+        function sendMessage() {
+           var msg = document.getElementById('message').value;
+           if(msg) {
+              socket.emit('msg', {message: msg, user: user, roomid: chosenRoom});
+           }
+        }
+        socket.on('newmsg', function(data) {
+           if(user) {
+              document.getElementById('message-container').innerHTML += '<div><b>' + 
+                 data.user + '</b>: ' + data.message + '</div>'
+           }
+    
+        })
+        
+     
+     </script>
+
+    <script>
+        function getName() {
+            var yourName = document.getElementById("nameEntry").value;
+            setUsername(yourName)
+            document.getElementById("nameContainer").remove()
+            document.getElementById("pubKeyDisplay").innerHTML = "<div class=\"joinedNames\">" + randomEmoji() + yourName +"</div>"
+            getUsers()
+        }
+
+        function copyClipboard() {
+            var copyText = document.getElementById("roombox");
+            navigator.clipboard.writeText(copyText.value)
+        }
+
+        function randomEmoji(){
+
+            allowedEmojis = ['😄','😃','😀','😊','☺','😉','😍','😘','😚','😗','😙','😜','😝','😛','😳','😁','😔','😌','😒','😞','😣','😢','😂','😭','😪','😥','😰','😅','😓','😩','😫','😨','😱','😠','😡','😤','😖','😆','😋','😷','😎','😴','😵','😲','😟','😦','😧','😈','👿','😮','😬','😐','😕','😯','😶','😇','😏','😑','👲','👳','👮','👷','💂','👶','👦','👧','👨','👩','👴','👵','👱','👼','👸','😺','😸','😻','😽','😼','🙀','😿','😹','😾','👹','👺','🙈','🙉','🙊','💀','👽','💩','🔥','✨','🌟','💫','💥','💢','💦','💧','💤','💨','👂','👀','👃','👅','👄','👍','👎','👌','👊','✊','✌','👋','✋','👐','👆','👇','👉','👈','🙌','🙏','☝','👏','💪','🚶','🏃','💃','👫','👪','👬','👭','💏','💑','👯','🙆','🙅','💁','🙋','💆','💇','💅','👰','🙎','🙍','🙇','🎩','👑','👒','👟','👞','👡','👠','👢','👕','👔','👚','👗','🎽','👖','👘','👙','💼','👜','👝','👛','👓','🎀','🌂','💄','💛','💙','💜','💚','❤','💔','💗','💓','💕','💖','💞','💘','💌','💋','💍','💎','👤','👥','💬','👣','💭','🐶','🐺','🐱','🐭','🐹','🐰','🐸','🐯','🐨','🐻','🐷','🐽','🐮','🐗','🐵','🐒','🐴','🐑','🐘','🐼','🐧','🐦','🐤','🐥','🐣','🐔','🐍','🐢','🐛','🐝','🐜','🐞','🐌','🐙','🐚','🐠','🐟','🐬','🐳','🐋','🐄','🐏','🐀','🐃','🐅','🐇','🐉','🐎','🐐','🐓','🐕','🐖','🐁','🐂','🐲','🐡','🐊','🐫','🐪','🐆','🐈','🐩','🐾','💐','🌸','🌷','🍀','🌹','🌻','🌺','🍁','🍃','🍂','🌿','🌾','🍄','🌵','🌴','🌲','🌳','🌰','🌱','🌼','🌐','🌞','🌝','🌚','🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘','🌜','🌛','🌙','🌍','🌎','🌏','🌋','🌌','🌠','⭐','☀','⛅','☁','⚡','☔','❄','⛄','🌀','🌁','🌈','🌊','🎍','💝','🎎','🎒','🎓','🎏','🎆','🎇','🎐','🎑','🎃','👻','🎅','🎄','🎁','🎋','🎉','🎊','🎈','🎌','🔮','🎥','📷','📹','📼','💿','📀','💽','💾','💻','📱','☎','📞','📟','📠','📡','📺','📻','🔊','🔉','🔈','🔇','🔔','🔕','📢','📣','⏳','⌛','⏰','⌚','🔓','🔒','🔏','🔐','🔑','🔎','💡','🔦','🔆','🔅','🔌','🔋','🔍','🛁','🛀','🚿','🚽','🔧','🔩','🔨','🚪','🚬','💣','🔫','🔪','💊','💉','💰','💴','💵','💷','💶','💳','💸','📲','📧','📥','📤','✉','📩','📨','📯','📫','📪','📬','📭','📮','📦','📝','📄','📃','📑','📊','📈','📉','📜','📋','📅','📆','📇','📁','📂','✂','📌','📎','✒','✏','📏','📐','📕','📗','📘','📙','📓','📔','📒','📚','📖','🔖','📛','🔬','🔭','📰','🎨','🎬','🎤','🎧','🎼','🎵','🎶','🎹','🎻','🎺','🎷','🎸','👾','🎮','🃏','🎴','🀄','🎲','🎯','🏈','🏀','⚽','⚾','🎾','🎱','🏉','🎳','⛳','🚵','🚴','🏁','🏇','🏆','🎿','🏂','🏊','🏄','🎣','☕','🍵','🍶','🍼','🍺','🍻','🍸','🍹','🍷','🍴','🍕','🍔','🍟','🍗','🍖','🍝','🍛','🍤','🍱','🍣','🍥','🍙','🍘','🍚','🍜','🍲','🍢','🍡','🍳','🍞','🍩','🍮','🍦','🍨','🍧','🎂','🍰','🍪','🍫','🍬','🍭','🍯','🍎','🍏','🍊','🍋','🍒','🍇','🍉','🍓','🍑','🍈','🍌','🍐','🍍','🍠','🍆','🍅','🌽','🏠','🏡','🏫','🏢','🏣','🏥','🏦','🏪','🏩','🏨','💒','⛪','🏬','🏤','🌇','🌆','🏯','🏰','⛺','🏭','🗼','🗾','🗻','🌄','🌅','🌃','🗽','🌉','🎠','🎡','⛲','🎢','🚢','⛵','🚤','🚣','⚓','🚀','✈','💺','🚁','🚂','🚊','🚉','🚞','🚆','🚄','🚅','🚈','🚇','🚝','🚋','🚃','🚎','🚌','🚍','🚙','🚘','🚗','🚕','🚖','🚛','🚚','🚨','🚓','🚔','🚒','🚑','🚐','🚲','🚡','🚟','🚠','🚜','💈','🚏','🎫','🚦','🚥','⚠','🚧','🔰','⛽','🏮']
+            emojis = [Math.floor(Math.random() * allowedEmojis.length)];
+            emoji = allowedEmojis[emojis[0]]
+            return emoji
+        }
+
+        var input = document.getElementById("nameEntry");
+        input.addEventListener("keyup", function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                document.getElementById("enterName").click();
+            }
+        });
+    </script>
+</body>
+
+</html>
+
+<style>
+    /* Add a black background color to the top navigation bar */
+    .emojititle {
+        font-size: 10vw;
+    }
+
+    .title {
+        font-size: 5vw;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+    }
+
+    #button1,
+    #button2 {
+        display: inline-block;
+    }
+
+    .buttonbox {
+        text-align: center;
+        padding-bottom: 20px;
+    }
+
+    .titlebox {
+        text-align: center;
+        padding-bottom: 10px;
+    }
+
+    .namebox {
+
+        border: 0;
+        outline: 0;
+        font-size: 25px;
+        text-align: center;
+        background: transparent;
+        border-bottom: 2px solid rgb(253, 232, 191);
+        width: 30%;
+    }
+
+    .roombox {
+
+        border: 0;
+        outline: 0;
+        font-size: 40px;
+        text-align: center;
+        background: transparent;
+        color: grey;
+        border-bottom: 2px solid rgb(253, 232, 191);
+        min-width: 30%;
+        width: auto;
+    }
+
+    .keysdisplay {
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 25px;
+        word-wrap: break-word;
+        border-radius: 25px;
+        border: 2px solid #8d7745;
+        padding: 20px;
+
+    }
+
+    .keycontainer {
+        padding-bottom: 30px;
+    }
+
+    body {
+        background-color: #fef2dc;
+        margin-left: 15%;
+        margin-right: 15%;
+
+    }
+
+    .copyButton {
+        border: none;
+        outline: none;
+        background-color: #fef2dc;
+        font-size: 35px;
+    }
+
+    .copyButton:active {
+        transform: translateY(4px);
+    }
+
+    .namecontainer {
+        text-align: center;
+        padding-bottom: 20px;
+    }
+
+    .roomcontainer {
+        display: none;
+        text-align: center;
+        padding-bottom: 20px;
+    }
+
+    body {
+        background-color: rgb(254, 242, 220);
+    }
+
+    .emojibutton {
+        font-size: 25px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        color: #fff;
+        border: 0;
+        outline: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        height: 2.5em;
+        padding: 0.5em 0.75em;
+        border-radius: 0.25em;
+        box-sizing: border-box;
+        background-color: #e0acf7;
+        box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        transition-duration: 0.4s;
+        cursor: pointer;
+    }
+
+    .emojibutton:hover {
+        background-color: #cc70f3;
+        color: white;
+    }
+
+    .joinedNames {
+        font-size: 25px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        color: #fff;
+        border: 0;
+        outline: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        height: 2.5em;
+        max-width: 5em;
+        padding: 0.5em 0.75em;
+        border-radius: 0.25em;
+        box-sizing: border-box;
+        background-color: #16C60C;
+        box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        transition-duration: 0.4s;
+        cursor: pointer;
+    }
+
+    .joinedNames:hover {
+        background-color: #12970b;
+        color: white;
+    }
+</style>

@@ -1,24 +1,45 @@
 io = require("socket.io"),
    server = io.listen(8000);
 
-users = [];
+userArrays = []; //This is all being stored in memory which is bad
 server.on('connection', function (socket) {
    console.log('A user connected');
 
    socket.on('setUsername', function (data) {
       console.log(data);
 
-      if (users.indexOf(data) > -1) {
-         socket.emit('userExists', data + ' username is taken! Try some other username.');
-      } else {
-         users.push(data);
-         socket.emit('userSet', { username: data });
+      for (let index = 0; index < userArrays.length; index++) {
+         const element = userArrays[index];
+         
+         if (element.RoomName == data.roomname) {
+            element.members.push(data.namewanted);
+            return
+         }
+
       }
+
+      
+
    });
 
    socket.on('create', function (room) {
       console.log("a new room was created with the name" + room)
       socket.join(room);
+      var roomObject = {RoomName:room, members:[]}; 
+      userArrays.push(roomObject)
+   });
+
+   socket.on('getUsers', function (data) {
+
+      for (let index = 0; index < userArrays.length; index++) {
+         const element = userArrays[index];
+         
+         if (element.RoomName == data.roomid) {
+            server.sockets.in(data.roomid).emit('getUsers',{userlist: element.members});
+            return
+         }
+
+      }
       
    });
 
