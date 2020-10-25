@@ -50,14 +50,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script>
 
-
+        yourName = ''
         var socket = io.connect("http://localhost:8000"); // Just replace with IP address
         randomroom = Math.random().toString(36).substr(2, 7)
         socket.emit('create', randomroom);
 
 
         function setUsername(name, roomid) {
-            socket.emit('setUsername', {namewanted:name ,roomname: roomid});
+            socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid : socket.id });
         };
 
         function getUsers() {
@@ -65,7 +65,14 @@
         };
 
         socket.on('getUsers', function (data) {
-            console.log(data)
+            userList = data
+
+            document.getElementById("pubKeyDisplay").innerHTML = ""
+
+            for (let index = 0; index < userList.userlist.length; index++) {
+                const element = userList.userlist[index].name;
+                document.getElementById("pubKeyDisplay").innerHTML += "<div class=\"joinedNames\">" + randomEmoji() + element + "</div>"
+            }
         })
 
         var user;
@@ -87,16 +94,12 @@
 
         })
 
-    </script>
-
-    <script>
         function getName() {
-            var yourName = document.getElementById("nameEntry").value;
+            yourName = document.getElementById("nameEntry").value;
             setUsername(yourName, randomroom)
             document.getElementById("nameContainer").remove()
             document.getElementById("roombox").value = "GenThresh.org/join?" + randomroom
             document.getElementById("roomcontainer").style.display = "block"
-            document.getElementById("pubKeyDisplay").innerHTML = "<div class=\"joinedNames\">" + randomEmoji() + yourName + "</div>"
             getUsers()
         }
 

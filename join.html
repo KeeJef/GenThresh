@@ -49,7 +49,7 @@
 
 
     <script>
-        userList = {}
+
 
         var socket = io.connect("http://localhost:8000");
         chosenRoom = window.location.href
@@ -59,8 +59,9 @@
         
     
         function setUsername(name, roomid) {
-            socket.emit('setUsername', {namewanted:name ,roomname: roomid});
+            socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid : socket.id });
         };
+
 
         function getUsers() {
             socket.emit('getUsers', { roomid: chosenRoom });
@@ -81,8 +82,10 @@
         socket.on('getUsers', function (data) {
             userList = data
 
+            document.getElementById("pubKeyDisplay").innerHTML = ""
+
             for (let index = 0; index < userList.userlist.length; index++) {
-                const element = userList.userlist[index];
+                const element = userList.userlist[index].name;
                 document.getElementById("pubKeyDisplay").innerHTML += "<div class=\"joinedNames\">" + randomEmoji() + element +"</div>"
             }
         })
