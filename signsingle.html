@@ -74,7 +74,10 @@
             messageDisplay = document.getElementById("pubKeyText")
             messageDisplay.innerHTML = "Message"
 
-            privateKey = window.content
+            keys = window.content.split('\n')
+            privateKey = keys[1].split(':')
+            privateKey = privateKey[1]
+
             signature = myBundle.signMessage(privateKey, message)
             displaySignature(signature)
         };
