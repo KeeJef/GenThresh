@@ -39,7 +39,7 @@
   <div class="keycontainer">
 
     <div class="keys" id="pubKeyText">
-      Your Public key <button class="copyButton" onclick="copyClipboard()">📋</button>
+      Your keys <button class="copyButton" onclick="copyClipboard()">📋</button>
     </div>
     <div class="keysdisplay" id="pubKeyDisplay"></div>
   </div>
@@ -59,12 +59,13 @@
     var array = new Uint8Array(64);
     privKey = window.crypto.getRandomValues(array) // This needs to be review for security
     pubKey = myBundle.generatePubKey(privKey); // calling code from the bundle
-    hexPubKey = bufferToHex(pubKey)
-    document.getElementById("pubKeyDisplay").innerHTML = hexPubKey;
+    
+    document.getElementById("pubKeyDisplay").innerHTML = '<div>Public Key:</div>' + bufferToHex(pubKey) + '\n';
+    document.getElementById("pubKeyDisplay").innerHTML += '<div class ="publickey">Private Key:</div>' + bufferToHex(privKey)
   }
 
   function download_txt() {
-    var textToSave = bufferToHex(privKey);
+    var textToSave = document.getElementById("pubKeyDisplay").textContent;
     var hiddenElement = document.createElement('a');
     hiddenElement.href = 'data:attachment/text,' + encodeURI(textToSave);
     hiddenElement.target = '_blank';
@@ -126,8 +127,12 @@
     margin-bottom: 10px;
   }
 
+  .publickey{
+    padding-top: 20px;
+  }
+
   .keysdisplay {
-    text-align: center;
+    
     font-family: Arial, Helvetica, sans-serif;
     font-size: 25px;
     word-wrap: break-word;
