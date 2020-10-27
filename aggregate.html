@@ -45,7 +45,7 @@
         Signature
     </div>
 
-    <div class="keysdisplay" id="signatureContainer"></div>
+    <div class="keysdisplay" id="signatureDisplayBox"></div>
 
     <div class="keys" id="keyBanner">
         Keys
@@ -55,6 +55,8 @@
     <div class="keys" id="signatureBox">
         Signature
     </div>
+
+    <div class="keysdisplay" id="signatureContainer"></div>
 
 </div>
 
@@ -92,15 +94,30 @@
 
         }
 
-        function aggregateSignature(signatureArray) {
+        async function aggregateSignature() {
 
-            //Write logic to seperate and put signature into array
+            signatureText = document.getElementById("signatureContainer").innerText
 
+            if (signatureText == "") {
 
+                document.getElementById("signatureBanner").innerHTML = "Please enter valid Signatures"
+                return
+            }
+
+            signatureArray = signatureText.split(',')
             agg = myBundle.aggSig(signatureArray)
+
+            sigBox = document.getElementById("signatureBox");
+            sigBox.style.display = "block";
+
+            container = document.getElementById("signatureDisplayBox");
+            container.innerHTML = bufferToHex(await agg) 
+            container.style.display = "block";
 
             //call function to unhide the display and show agg
             return agg
+
+            
         }
 
         function aggregateKeys(keyArray) {
@@ -268,6 +285,7 @@
     #signatureBanner,
     #signatureBox,
     #keyBanner,
+    #signatureDisplayBox,
     #keysBox,
     #keyContainer,
     #signatureContainer {
@@ -285,6 +303,10 @@
 
     .keycontainer {
         padding-bottom: 30px;
+    }
+
+    #signatureBox{
+        padding-top: 20px;
     }
 
     .emojilink {
