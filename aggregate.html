@@ -27,7 +27,7 @@
     </div>
 
     <div id="button2">
-        <button onclick="getKeys()" class="emojibutton">&nbsp;🔑 Aggregate Keys</button>
+        <button onclick="keyAggregationButton()" class="emojibutton">&nbsp;🔑 Aggregate Keys</button>
     </div>
 
 </div>
@@ -47,16 +47,20 @@
 
     <div class="keysdisplay" id="signatureDisplayBox"></div>
 
+    <!-- Hidden Signature divs above hidden key divs below -->
+
     <div class="keys" id="keyBanner">
         Keys
     </div>
-    <div contenteditable="true" class="keysdisplay" placeholder="Test" id="keyContainer"></div>
+    <div contenteditable="true" contenteditable
+        data-placeholder="Enter keys separated by commas like: 89c969...e9bbbc,b5f8be...0ebb53" class="keysdisplay"
+        placeholder="Test" id="keyContainer"></div>
 
-    <div class="keys" id="signatureBox">
+    <div class="keys" id="keyBox">
         Signature
     </div>
 
-    <div class="keysdisplay" id="signatureContainer"></div>
+    <div class="keysdisplay" id="keyDisplayBox"></div>
 
 </div>
 
@@ -75,6 +79,17 @@
             document.getElementById("signatureContainer").style.display = "block";
 
         }
+
+        function keyAggregationButton() {
+
+            document.getElementById("button1").innerHTML = "<button onclick=\"importFile()\" class=\"emojibutton\">&nbsp;⬆️💾 Import Keys <span class=\"tooltiptext\">Accepts a .csv of raw keys</span></button>"
+            document.getElementById("button2").innerHTML = "<button onclick=\"aggregateKeys()\" class=\"emojibutton\">&nbsp;💫 Aggregate Keys</button>"
+            document.getElementById("keyBanner").style.display = "block";
+            document.getElementById("keyContainer").style.display = "block";
+
+        }
+
+
 
         function bufferToHex(buffer) {
             return [...new Uint8Array(buffer)]
@@ -111,18 +126,36 @@
             sigBox.style.display = "block";
 
             container = document.getElementById("signatureDisplayBox");
-            container.innerHTML = bufferToHex(await agg) 
+            container.innerHTML = bufferToHex(await agg)
             container.style.display = "block";
 
             //call function to unhide the display and show agg
             return agg
 
-            
         }
 
-        function aggregateKeys(keyArray) {
+        async function aggregateKeys() {
+
+
+            keyText = document.getElementById("keyContainer").innerText
+
+            if (keyText == "") {
+
+                document.getElementById("keyBanner").innerHTML = "Please enter valid keys"
+                return
+            }
+
+            keyArray = keyText.split(',')
             singleKey = myBundle.aggKey(keyArray)
-            return singleKey
+
+            keyBox = document.getElementById("keyBox");
+            keyBox.style.display = "block";
+
+            container = document.getElementById("keyDisplayBox");
+            container.innerHTML = bufferToHex(await singleKey)
+            container.style.display = "block";
+
+
         }
 
         function importFile() {
@@ -140,7 +173,7 @@
                 // here we tell the reader what to do when it's done reading...
                 reader.onload = readerEvent => {
                     var content = readerEvent.target.result; // this is the content!
-                    document.getElementById("signatureContainer").innerHTML = content 
+                    document.getElementById("signatureContainer").innerHTML = content
 
                 }
 
@@ -239,7 +272,7 @@
         visibility: hidden;
         font-size: 18px;
         background-color: #f7d596;
-        color:black;
+        color: black;
         text-align: center;
         border-radius: 6px;
         padding: 5px 5px;
@@ -247,7 +280,7 @@
         position: absolute;
         z-index: 1;
         bottom: 100%;
-        
+
     }
 
     .emojibutton:hover .tooltiptext {
@@ -286,7 +319,8 @@
     #signatureBox,
     #keyBanner,
     #signatureDisplayBox,
-    #keysBox,
+    #keyBox,
+    #keyDisplayBox,
     #keyContainer,
     #signatureContainer {
         display: none;
@@ -305,7 +339,7 @@
         padding-bottom: 30px;
     }
 
-    #signatureBox{
+    #signatureBox {
         padding-top: 20px;
     }
 
