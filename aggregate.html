@@ -57,7 +57,7 @@
         placeholder="Test" id="keyContainer"></div>
 
     <div class="keys" id="keyBox">
-        Signature
+        Aggregate Key
     </div>
 
     <div class="keysdisplay" id="keyDisplayBox"></div>
@@ -71,9 +71,12 @@
 
     <script>
 
+
+        sigContain = document.getElementById("signatureContainer")
+        keyContain = document.getElementById("keyContainer")
         function sigAggregationButton() {
 
-            document.getElementById("button1").innerHTML = "<button onclick=\"importFile()\" class=\"emojibutton\">&nbsp;⬆️💾 Import Signatures <span class=\"tooltiptext\">Accepts a .csv of raw signatures</span></button>"
+            document.getElementById("button1").innerHTML = "<button onclick=\"importFile(sigContain)\" class=\"emojibutton\">&nbsp;⬆️💾 Import Signatures <span class=\"tooltiptext\">Accepts a .csv of raw signatures</span></button>"
             document.getElementById("button2").innerHTML = "<button onclick=\"aggregateSignature()\" class=\"emojibutton\">&nbsp;💫 Aggregate Signatures</button>"
             document.getElementById("signatureBanner").style.display = "block";
             document.getElementById("signatureContainer").style.display = "block";
@@ -82,7 +85,7 @@
 
         function keyAggregationButton() {
 
-            document.getElementById("button1").innerHTML = "<button onclick=\"importFile()\" class=\"emojibutton\">&nbsp;⬆️💾 Import Keys <span class=\"tooltiptext\">Accepts a .csv of raw keys</span></button>"
+            document.getElementById("button1").innerHTML = "<button onclick=\"importFile(keyContain)\" class=\"emojibutton\">&nbsp;⬆️💾 Import Keys <span class=\"tooltiptext\">Accepts a .csv of raw keys</span></button>"
             document.getElementById("button2").innerHTML = "<button onclick=\"aggregateKeys()\" class=\"emojibutton\">&nbsp;💫 Aggregate Keys</button>"
             document.getElementById("keyBanner").style.display = "block";
             document.getElementById("keyContainer").style.display = "block";
@@ -146,7 +149,7 @@
             }
 
             keyArray = keyText.split(',')
-            singleKey = myBundle.aggKey(keyArray)
+            singleKey =  await myBundle.aggKey(keyArray)
 
             keyBox = document.getElementById("keyBox");
             keyBox.style.display = "block";
@@ -158,7 +161,7 @@
 
         }
 
-        function importFile() {
+        function importFile(elementToChange) {
             var input = document.createElement('input');
             input.type = 'file';
 
@@ -173,7 +176,7 @@
                 // here we tell the reader what to do when it's done reading...
                 reader.onload = readerEvent => {
                     var content = readerEvent.target.result; // this is the content!
-                    document.getElementById("signatureContainer").innerHTML = content
+                    elementToChange.innerHTML = content // this is not agnostic!
 
                 }
 
@@ -337,6 +340,11 @@
 
     .keycontainer {
         padding-bottom: 30px;
+    }
+    #keyBox{
+
+        padding-top: 20px;
+
     }
 
     #signatureBox {
