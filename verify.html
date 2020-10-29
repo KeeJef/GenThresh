@@ -3,168 +3,296 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <title>GenThresh</title>
-  <meta name="description" content="Generate Threshold Signatures">
-  <meta name="Kee Jefferys" content="SitePoint">
+    <meta charset="utf-8">
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <title>GenThresh</title>
+    <meta name="description" content="Generate Threshold Signatures">
+    <meta name="Kee Jefferys" content="SitePoint">
 
 </head>
 <div class="titlebox">
-  <div class="title">
-    Verify
-  </div>
-  <div class="emojititle">
-    🧙
-  </div>
+    <div class="title">
+        Verify
+    </div>
+    <div class="emojititle">
+        <a class="emojilink" href="Genthresh.html">🧙</a>
+
+    </div>
 </div>
 
 <div class="buttonbox">
 
-  <div id="button1">
-    <button onclick="window.location='generate.html'" class="emojibutton">&nbsp;✨ Generate
-    </button>
-  </div>
-  <div id="button2">
-    <button onclick="window.location='sign.html'" class="emojibutton">&nbsp;✍️ Sign
-    </button>
-  </div>
+    <div id="button1">
+        <button onclick="importFileKeys(keyContain)" class="emojibutton">&nbsp;⬆️💾 Import Key</button>
+    </div>
+
+    <div id="button2">
+        <button onclick="keyAggregationButton()" class="emojibutton">&nbsp;👀 Verify</button>
+    </div>
 
 </div>
 
+<div class="keycontainer">
+
+
+<div class="containers">
+    <div class="keys" id="signatureBanner">
+        Signature
+    </div>
+    <div contenteditable="true" contenteditable
+        data-placeholder="Enter signature"
+        class="keysdisplay" id="signatureContainer"></div>
+
+</div>
+
+
+    <!-- Hidden Signature divs above hidden key divs below -->
+<div class="containers">
+
+    <div class="keys" id="keyBanner">
+        Public Key
+    </div>
+    <div contenteditable="true" contenteditable
+        data-placeholder="Enter Public Key" class="keysdisplay"
+        placeholder="Test" id="keyContainer"></div>
+</div>
+
+
+  <!-- Hidden Signature divs above hidden key divs below -->
+
+<div class="containers">
+
+  <div class="keys" id="messageBanner">
+      Message
+  </div>
+  <div contenteditable="true" contenteditable
+      data-placeholder="Enter message" class="keysdisplay"
+      placeholder="Test" id="messageContainer"></div>
+</div>
+</div>
+
+
 <body>
 
-  <script src="bundle.js"></script>
+    <script src="bundle.js"></script>
 
-  <script>
+    <script>
 
-    function bufferToHex(buffer) {
-      return [...new Uint8Array(buffer)]
-        .map(b => b.toString(16).padStart(2, "0"))
-        .join("");
-    }
 
-    function generateNewKeypair() {
-      var array = new Uint8Array(32);
-      privKey = window.crypto.getRandomValues(array)
-      privKey = bufferToHex(privKey)
-      console.log("Private Key :" + privKey)
-      pubKey = myBundle.generatePubKey(privKey);
-      var keyArray = { privKey, pubKey }
-      return keyArray
-    }
+        
+        keyContain = document.getElementById("keyContainer")
 
-    function fakeKeypair(privKey) {
-      pubKey = myBundle.generatePubKey(privKey); // calling code from the bundle
-      console.log("Private Key :" + privKey)
-      var keyArray = { privKey, pubKey }
-      return keyArray
-    }
+        function bufferToHex(buffer) {
+            return [...new Uint8Array(buffer)]
+                .map(b => b.toString(16).padStart(2, "0"))
+                .join("");
+        }
 
-    function signArbMessage(privateKey, message) {
-      signature = myBundle.signMessage(privateKey, message)
-      return signature
-    };
-
+        
     function checkSignature(signature, pubKey, message) {
       isvalid = myBundle.checkSig(signature, pubKey, message)
       return isvalid
     }
 
-    function checkMulti(signature, pubKeyArray, message) {
-      isvalid = myBundle.verifyMulti(signature, pubKeyArray, message)
-      return isvalid
-    }
+        function importFileKeys(elementToChange) {
+            var input = document.createElement('input');
+            input.type = 'file';
 
-    function aggregateSignature(signatureArray) {
-      agg = myBundle.aggSig(signatureArray)
-      return agg
-    }
+            input.onchange = e => {
+                var filetest = e.target.files[0];
+                console.log(filetest.name)
 
-    function aggregateKeys(keyArray) {
-      singleKey = myBundle.aggKey(keyArray)
-      return singleKey
-    }
+                // setting up the reader
+                var reader = new FileReader();
+                reader.readAsText(filetest, 'UTF-8');
 
-    var message = "This is a test message to sign"
+                // here we tell the reader what to do when it's done reading...
+                reader.onload = readerEvent => {
+                    var content = readerEvent.target.result; // this is the content!
 
-    var keypair1 = generateNewKeypair()
-    signature1 = signArbMessage(keypair1.privKey, message)
+                    content = content.split('\n')
+                    content = content[0].split(':')
+                    content = content[1]
 
-    var keypair2 = generateNewKeypair()
-    signature2 = signArbMessage(keypair2.privKey, message)
+                    elementToChange.innerHTML = content // this is not agnostic!
 
-    aggerateSig = aggregateSignature([signature1, signature2])
-    aggregateKey = aggregateKeys([keypair1.pubKey, keypair2.pubKey])
+                }
 
-    answer = checkSignature(aggerateSig, aggregateKey, message)
+            }
 
-  </script>
+            input.click();
+        }
 
-  </script>
+        // var message = "This is a test message to sign"
+
+        // var keypair1 = generateNewKeypair()
+        // signature1 = signArbMessage(keypair1.privKey, message)
+
+        // var keypair2 = generateNewKeypair()
+        // signature2 = signArbMessage(keypair2.privKey, message)
+
+        // aggerateSig = aggregateSignature([signature1, signature2])
+        // aggregateKey = aggregateKeys([keypair1.pubKey, keypair2.pubKey])
+
+        // answer = checkSignature(aggerateSig, aggregateKey, message)
+
+    </script>
+
+    </script>
 
 
-  <script>
+    <script>
 
-  </script>
+    </script>
 </body>
 
 </html>
 
 <style>
-  /* Add a black background color to the top navigation bar */
-  .emojititle {
-    font-size: 10vw;
-  }
+    /* Add a black background color to the top navigation bar */
+    .emojititle {
+        font-size: 10vw;
+    }
 
-  .title {
-    font-size: 5vw;
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: bold;
-  }
+    .title {
+        font-size: 5vw;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+    }
 
-  #button1,
-  #button2 {
-    display: inline-block;
-  }
 
-  .buttonbox {
-    text-align: center;
-  }
+    #button1 {
+        display: inline-block;
+        padding-bottom: 30px;
+    }
 
-  .titlebox {
-    text-align: center;
-    padding-bottom: 10px;
-  }
+    #button2 {
+        display: inline-block;
+        padding-bottom: 30px;
+    }
 
-  body {
-    background-color: #fef2dc;
-  }
+    .buttonbox {
+        text-align: center;
+    }
 
-  .emojibutton {
-    font-size: 25px;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    color: #fff;
-    border: 0;
-    outline: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    height: 2.5em;
-    padding: 0.5em 0.75em;
-    border-radius: 0.25em;
-    box-sizing: border-box;
-    background-color: #e0acf7;
-    box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
-    z-index: 1;
-    transition-duration: 0.4s;
-    cursor: pointer;
-  }
+    .titlebox {
+        text-align: center;
+        padding-bottom: 30px;
+    }
 
-  .emojibutton:hover {
-    background-color: #cc70f3;
-    color: white;
-  }
+    body {
+        background-color: #fef2dc;
+        margin-left: 10%;
+        margin-right: 10%;
+    }
+
+    .emojibutton {
+        font-size: 25px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        color: #fff;
+        border: 0;
+        outline: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        height: 2.5em;
+        padding: 0.5em 0.75em;
+        border-radius: 0.25em;
+        box-sizing: border-box;
+        background-color: #e0acf7;
+        box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        transition-duration: 0.4s;
+        cursor: pointer;
+    }
+
+
+    .emojibutton .tooltiptext {
+        visibility: hidden;
+        font-size: 18px;
+        background-color: #f7d596;
+        color: black;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 5px;
+        /* Position the tooltip */
+        position: absolute;
+        z-index: 1;
+        bottom: 100%;
+
+    }
+
+    .emojibutton:hover .tooltiptext {
+        visibility: visible;
+    }
+
+    .emojibutton:hover {
+        background-color: #cc70f3;
+        color: white;
+    }
+
+    .keys {
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 30px;
+        margin-bottom: 10px;
+    }
+
+    .keysdisplay {
+
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 25px;
+        height: auto;
+        min-height: 150px;
+        max-height: 300px;
+        word-wrap: break-word;
+        border-radius: 25px;
+        border: 2px solid #8d7745;
+        overflow: hidden;
+        overflow-y: auto;
+        padding: 20px;
+        text-align: left;
+    }
+
+    #signatureText {
+        padding-top: 20px;
+    }
+
+    .keysdisplay:empty:before {
+        content: attr(data-placeholder);
+        color: grey;
+        font-size: 2vw;
+    }
+
+    .keycontainer{
+        padding-bottom: 30px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .containers{
+      display: flex;
+      flex-basis: 100%;
+      width: 80%;      
+    }
+
+    #keyBox{
+
+        padding-top: 20px;
+
+    }
+
+    .containerclass{
+      display: inline-block;
+    }
+
+    #signatureBox {
+        padding-top: 20px;
+    }
+
+    .emojilink {
+        text-decoration: none;
+    }
 </style>
