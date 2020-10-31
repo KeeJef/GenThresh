@@ -27,7 +27,7 @@
     </div>
 
     <div id="button2">
-        <button onclick="keyAggregationButton()" class="emojibutton">&nbsp;👀 Verify</button>
+        <button onclick="checkSignature()" class="emojibutton">&nbsp;👀 Verify</button>
     </div>
 
 </div>
@@ -68,6 +68,10 @@
     </div>
 </div>
 
+<div class="results" id="results">
+
+</div>
+
 
 <body>
 
@@ -86,9 +90,29 @@
         }
 
 
-        function checkSignature(signature, pubKey, message) {
-            isvalid = myBundle.checkSig(signature, pubKey, message)
-            return isvalid
+        async function checkSignature() {
+
+            signature = document.getElementById('signatureContainer').innerText
+            key = document.getElementById('keyContainer').innerText
+            message = document.getElementById('messageContainer').innerText
+
+            if (signature == "" || key == "" || message == "") {
+                return
+            }
+
+            isvalid = await myBundle.checkSig(signature, key, message)
+
+            if (isvalid == true) {
+                
+                document.getElementById('results').innerHTML = "Valid Signature ✅"
+                
+            }else{
+
+                document.getElementById('results').innerHTML = "Invalid Signature ❌"
+
+            }
+
+            return
         }
 
         function importFileKeys(elementToChange) {
@@ -243,7 +267,7 @@
         font-size: 25px;
         height: auto;
         min-height: 150px;
-        max-height: 300px;
+        max-height: 150px;
         word-wrap: break-word;
         border-radius: 25px;
         border: 2px solid #8d7745;
@@ -306,6 +330,12 @@
 
     #signatureBox {
         padding-top: 20px;
+    }
+
+    .results{
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 30px;
     }
 
     .emojilink {
