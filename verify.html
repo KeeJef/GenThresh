@@ -35,40 +35,37 @@
 <div class="keycontainer">
 
 
-<div class="containers">
-    <div class="keys" id="signatureBanner">
-        Signature
-    </div>
-    <div contenteditable="true" contenteditable
-        data-placeholder="Enter signature"
-        class="keysdisplay" id="signatureContainer"></div>
+    <div class="containers" id="left">
+        <div class="keys" id="signatureBanner">
+            Signature
+        </div>
+        <div contenteditable="true" contenteditable data-placeholder="Enter signature" class="keysdisplay"
+            id="signatureContainer"></div>
 
-</div>
+    </div>
 
 
     <!-- Hidden Signature divs above hidden key divs below -->
-<div class="containers">
+    <div class="containers" id="middle">
 
-    <div class="keys" id="keyBanner">
-        Public Key
+        <div class="keys" id="keyBanner">
+            Public Key
+        </div>
+        <div contenteditable="true" contenteditable data-placeholder="Enter Public Key" class="keysdisplay"
+            placeholder="Test" id="keyContainer"></div>
     </div>
-    <div contenteditable="true" contenteditable
-        data-placeholder="Enter Public Key" class="keysdisplay"
-        placeholder="Test" id="keyContainer"></div>
-</div>
 
 
-  <!-- Hidden Signature divs above hidden key divs below -->
+    <!-- Hidden Signature divs above hidden key divs below -->
 
-<div class="containers">
+    <div class="containers" id="right">
 
-  <div class="keys" id="messageBanner">
-      Message
-  </div>
-  <div contenteditable="true" contenteditable
-      data-placeholder="Enter message" class="keysdisplay"
-      placeholder="Test" id="messageContainer"></div>
-</div>
+        <div class="keys" id="messageBanner">
+            Message
+        </div>
+        <div contenteditable="true" contenteditable data-placeholder="Enter message" class="keysdisplay"
+            placeholder="Test" id="messageContainer"></div>
+    </div>
 </div>
 
 
@@ -79,7 +76,7 @@
     <script>
 
 
-        
+
         keyContain = document.getElementById("keyContainer")
 
         function bufferToHex(buffer) {
@@ -88,11 +85,11 @@
                 .join("");
         }
 
-        
-    function checkSignature(signature, pubKey, message) {
-      isvalid = myBundle.checkSig(signature, pubKey, message)
-      return isvalid
-    }
+
+        function checkSignature(signature, pubKey, message) {
+            isvalid = myBundle.checkSig(signature, pubKey, message)
+            return isvalid
+        }
 
         function importFileKeys(elementToChange) {
             var input = document.createElement('input');
@@ -266,26 +263,45 @@
         font-size: 2vw;
     }
 
-    .keycontainer{
+    .keycontainer {
         padding-bottom: 30px;
-        display: flex;
-        justify-content: center;
     }
 
-    .containers{
-      display: flex;
-      flex-basis: 100%;
-      width: 80%;      
+    .containers {
+        width: 80%;
     }
 
-    #keyBox{
+    #left,
+    #middle,
+    #right {
+        display: inline-block;
+        *display: inline;
+        zoom: 1;
+        vertical-align: top;
+    }
+
+    #left {
+        width: 33%;
+    }
+
+    #middle {
+        width: 33%;
+        
+    }
+
+    #right {
+        width: 33%;
+        
+    }
+
+    #keyBox {
 
         padding-top: 20px;
 
     }
 
-    .containerclass{
-      display: inline-block;
+    .containerclass {
+        display: inline-block;
     }
 
     #signatureBox {
