@@ -89,7 +89,7 @@
             sigTextField.style.display = "block";
             sigContainer.style.display = "block";
 
-            sigContainer.innerText = await signature
+            sigContainer.innerText = bufferToHex(await signature)
 
         }
 
