@@ -63,6 +63,8 @@ server.on('connection', function (socket) {
 
    socket.on('disconnect', function () {
 
+      //todo, remove empty UserArrays to reduce memory usage
+   
       for (let index1 = 0; index1 < userArrays.length; index1++) {
          const membersArray = userArrays[index1].members;
 

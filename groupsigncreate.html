@@ -22,6 +22,18 @@
         </div>
     </div>
 
+    <div class="buttonbox" id="buttonbox">
+
+        <div id="button1">
+            <button onclick="newGroup()" class="emojibutton">&nbsp;✨ New Group Ceremony</button>
+        </div>
+
+        <div id="button2">
+            <button onclick="displayExisting()" class="emojibutton">&nbsp;👨‍👩‍👧‍👦 Existing Group</button>
+        </div>
+
+    </div>
+
     <div class="namecontainer" id="nameContainer">
 
         <input class="namebox" id="nameEntry" type="text" placeholder="Enter name here" /> <button class="copyButton"
@@ -44,7 +56,26 @@
     </div>
 
 
+    <div class="thresholdselector"> 
+    
+    <svg  width="250" height="250">
+        <circle id="circleobject" r="125" cx="125" cy="125" />
+        <circle id="circleobject1" r="125" cx="125" cy="125" />
+        <circle id="circleobject2" r="125" cx="125" cy="125" />
+    </svg>
     </div>
+
+    <div class="keys" id="SignersValue">Number Of Signers </div>
+    <div class="keys" id="ThresholdValue">Threshold </div>
+
+    <div class="slidecontainer">
+        <input type="range" min="1" max="100" value="1" class="slider" id="numberOfSigners">
+    </div>
+
+    <div class="slidecontainer">
+        <input type="range" min="1" max="100" value="1" class="slider" id="threshold">
+    </div>
+
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
@@ -57,7 +88,7 @@
 
 
         function setUsername(name, roomid) {
-            socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid : socket.id });
+            socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid: socket.id });
         };
 
         function getUsers() {
@@ -67,6 +98,7 @@
         socket.on('getUsers', function (data) {
             userList = data
 
+            document.getElementById("pubKeyDisplay").style.display = "block"
             document.getElementById("pubKeyDisplay").innerHTML = ""
 
             for (let index = 0; index < userList.userlist.length; index++) {
@@ -103,6 +135,17 @@
             getUsers()
         }
 
+        function displayExisting() {
+            document.getElementById("nameContainer").style.display = "block"
+            document.getElementById("buttonbox").style.display = "none"
+
+        }
+
+        function newGroup() {
+            document.getElementById("buttonbox").style.display = "none"
+
+        }
+
         function copyClipboard() {
             var copyText = document.getElementById("roombox");
             navigator.clipboard.writeText(copyText.value)
@@ -122,6 +165,30 @@
                 document.getElementById("enterName").click();
             }
         });
+    </script>
+
+    <script>
+        var sliderSigners = document.getElementById("numberOfSigners");
+        var outputSigners = document.getElementById("SignersValue");
+
+        var sliderThreshold = document.getElementById("threshold");
+        var outputThreshold = document.getElementById("ThresholdValue");
+
+
+        outputSigners.innerHTML += sliderSigners.value;
+        outputThreshold.innerHTML += sliderThreshold.value;
+
+        sliderSigners.oninput = function () {
+            outputSigners.innerHTML = "Number of Signers: " + this.value;
+            document.getElementById('circleobject').style.strokeDasharray = (this.value * 7.8539) + " 785.39" 
+            document.getElementById('threshold').max = this.value
+        }
+
+        sliderThreshold.oninput = function () {
+            outputThreshold.innerHTML = "Threshold of Signers: " + this.value;
+            document.getElementById('circleobject1').style.strokeDasharray = (this.value * 7.8539) + " 785.39" 
+            
+        }
     </script>
 </body>
 
@@ -193,6 +260,34 @@
         padding-bottom: 30px;
     }
 
+
+    circle {
+        fill: #fadb8d;
+        stroke: #e0acf7;
+        stroke-width: 250;
+        stroke-dasharray: 0 785.39;       
+        /* Changes to stroke dash array will affect how filled it is */
+    }
+
+    #circleobject1 {
+        fill: none;
+        stroke: #ce6df8;
+    }
+
+    #circleobject2 {
+        fill: none;
+        stroke-width: 10;
+        stroke-dasharray: 785.39 785.39;
+        stroke: black;
+    }
+
+    svg {
+        transform: rotate(-90deg);
+        background:#fadb8d;
+        border-radius: 50%;
+        
+    }
+
     body {
         background-color: #fef2dc;
         margin-left: 15%;
@@ -253,6 +348,80 @@
         color: white;
     }
 
+    .keys {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 30px;
+    margin-bottom: 10px;
+  }
+
+    .thresholdselector{
+        text-align: center;
+        padding-bottom: 20px;
+    }
+
+    #pubKeyDisplay,
+    #nameContainer {
+        display: none;
+    }
+
+    .slidecontainer {
+        width: 100%;
+        /* Width of the outside container */
+    }
+
+    /* The slider itself */
+    .slider {
+        -webkit-appearance: none;
+        /* Override default CSS styles */
+        appearance: none;
+        width: 100%;
+        /* Full-width */
+        height: 25px;
+        /* Specified height */
+        background: #d3d3d3;
+        /* Grey background */
+        outline: none;
+        /* Remove outline */
+        opacity: 0.7;
+        /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: .2s;
+        /* 0.2 seconds transition on hover */
+        transition: opacity .2s;
+    }
+
+    /* Mouse-over effects */
+    .slider:hover {
+        opacity: 1;
+        /* Fully shown on mouse-over */
+    }
+
+    /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        /* Override default look */
+        appearance: none;
+        width: 25px;
+        /* Set a specific slider handle width */
+        height: 25px;
+        /* Slider handle height */
+        background: #4CAF50;
+        /* Green background */
+        cursor: pointer;
+        /* Cursor on hover */
+    }
+
+    .slider::-moz-range-thumb {
+        width: 25px;
+        /* Set a specific slider handle width */
+        height: 25px;
+        /* Slider handle height */
+        background: #4CAF50;
+        /* Green background */
+        cursor: pointer;
+        /* Cursor on hover */
+    }
+
     .joinedNames {
         font-size: 25px;
         font-family: 'Poppins', sans-serif;
@@ -281,7 +450,7 @@
         color: white;
     }
 
-    .emojilink{
+    .emojilink {
         text-decoration: none;
     }
 </style>
