@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <div class="buttonbox" id="buttonbox">
+    <div class="buttonbox" id="buttonboxmain">
 
         <div id="button1">
             <button onclick="newGroup()" class="emojibutton">&nbsp;✨ New Group Ceremony</button>
@@ -55,33 +55,47 @@
         </div>
     </div>
 
+    <div id="selectionFramework">
 
-    <div class="thresholdselector"> 
-    
-    <svg  width="250" height="250">
-        <circle id="circleobject" r="125" cx="125" cy="125" />
-        <circle id="circleobject1" r="125" cx="125" cy="125" />
-        <circle id="circleobject2" r="125" cx="125" cy="125" />
-    </svg>
+        <div class="thresholdselector">
+
+            <svg width="250" height="250">
+                <circle id="circleobject" r="125" cx="125" cy="125" />
+                <circle id="circleobject1" r="125" cx="125" cy="125" />
+                <circle id="circleobject2" r="125" cx="125" cy="125" />
+            </svg>
+        </div>
+
+        <div class="keys" id="SignersValue">Number Of Signers </div>
+        <div class="keys" id="ThresholdValue">Threshold </div>
+
+        <div class="slidecontainer">
+            <input type="range" min="1" max="100" value="1" class="slider" id="numberOfSigners">
+        </div>
+
+        <div class="slidecontainer">
+            <input type="range" min="1" max="100" value="1" class="slider" id="threshold">
+        </div>
+
+        <div class="buttonbox" id="buttonbox">
+
+            <div id="button1">
+                <button onclick="thresholdGroup()" class="emojibutton">&nbsp;➡️ Next</button>
+            </div>
+
+        </div>
     </div>
 
-    <div class="keys" id="SignersValue">Number Of Signers </div>
-    <div class="keys" id="ThresholdValue">Threshold </div>
-
-    <div class="slidecontainer">
-        <input type="range" min="1" max="100" value="1" class="slider" id="numberOfSigners">
-    </div>
-
-    <div class="slidecontainer">
-        <input type="range" min="1" max="100" value="1" class="slider" id="threshold">
-    </div>
-
-
+    <div class="keys" id="wait"></div>
+    <div id="readybutton"><button class="copyButton" id="enterName" onclick="ready()">Are you Ready?✔️</button></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script>
 
         yourName = ''
+        threshold = ''
+        signers = ''
+
         var socket = io.connect("http://localhost:8000"); // Just replace with IP address
         randomroom = Math.random().toString(36).substr(2, 7)
         socket.emit('create', randomroom);
@@ -95,15 +109,25 @@
             socket.emit('getUsers', { roomid: randomroom });
         };
 
+        function readyUp() {
+            socket.emit('readyUp', { namewanted: name, roomname: roomid, socketid: socket.id });
+        };
+
         socket.on('getUsers', function (data) {
             userList = data
 
             document.getElementById("pubKeyDisplay").style.display = "block"
-            document.getElementById("pubKeyDisplay").innerHTML = ""
+            document.getElementById("pubKeyDisplay").innerHTML = ""            
+            document.getElementById("wait").style.display = "block"
+            document.getElementById("wait").innerText = "Waiting for Signers " + userList.userlist.length + " Out of " + signers
 
             for (let index = 0; index < userList.userlist.length; index++) {
                 const element = userList.userlist[index].name;
                 document.getElementById("pubKeyDisplay").innerHTML += "<div class=\"joinedNames\">" + randomEmoji() + element + "</div>"
+            }
+
+            if (userList.userlist.length == signers) {
+                ready()
             }
         })
 
@@ -130,10 +154,18 @@
             yourName = document.getElementById("nameEntry").value;
             setUsername(yourName, randomroom)
             document.getElementById("nameContainer").remove()
+            document.getElementById("buttonboxmain").style.display = "none"
             document.getElementById("roombox").value = "GenThresh.org/join?" + randomroom
             document.getElementById("roomcontainer").style.display = "block"
             getUsers()
         }
+
+        function ready(){
+            document.getElementById("wait").style.display = "none"
+            document.getElementById("readybutton").style.display = "block"
+        }
+
+
 
         function displayExisting() {
             document.getElementById("nameContainer").style.display = "block"
@@ -142,8 +174,18 @@
         }
 
         function newGroup() {
-            document.getElementById("buttonbox").style.display = "none"
 
+            document.getElementById("buttonboxmain").style.display = "none"
+            document.getElementById("selectionFramework").style.display = "block"
+
+        }
+
+        function thresholdGroup() {
+
+            signers = document.getElementById("numberOfSigners").value
+            threshold = document.getElementById("threshold").value
+            document.getElementById("selectionFramework").style.display = "none"
+            displayExisting()
         }
 
         function copyClipboard() {
@@ -180,14 +222,14 @@
 
         sliderSigners.oninput = function () {
             outputSigners.innerHTML = "Number of Signers: " + this.value;
-            document.getElementById('circleobject').style.strokeDasharray = (this.value * 7.8539) + " 785.39" 
+            document.getElementById('circleobject').style.strokeDasharray = (this.value * 7.8539) + " 785.39"
             document.getElementById('threshold').max = this.value
         }
 
         sliderThreshold.oninput = function () {
             outputThreshold.innerHTML = "Threshold of Signers: " + this.value;
-            document.getElementById('circleobject1').style.strokeDasharray = (this.value * 7.8539) + " 785.39" 
-            
+            document.getElementById('circleobject1').style.strokeDasharray = (this.value * 7.8539) + " 785.39"
+
         }
     </script>
 </body>
@@ -249,11 +291,11 @@
         text-align: center;
         font-family: Arial, Helvetica, sans-serif;
         font-size: 25px;
+        overflow: hidden;
         word-wrap: break-word;
         border-radius: 25px;
         border: 2px solid #8d7745;
         padding: 20px;
-
     }
 
     .keycontainer {
@@ -265,7 +307,7 @@
         fill: #fadb8d;
         stroke: #e0acf7;
         stroke-width: 250;
-        stroke-dasharray: 0 785.39;       
+        stroke-dasharray: 0 785.39;
         /* Changes to stroke dash array will affect how filled it is */
     }
 
@@ -283,9 +325,9 @@
 
     svg {
         transform: rotate(-90deg);
-        background:#fadb8d;
+        background: #fadb8d;
         border-radius: 50%;
-        
+
     }
 
     body {
@@ -349,24 +391,30 @@
     }
 
     .keys {
-    text-align: center;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 30px;
-    margin-bottom: 10px;
-  }
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 30px;
+        margin-bottom: 10px;
+    }
 
-    .thresholdselector{
+    .thresholdselector {
         text-align: center;
         padding-bottom: 20px;
     }
 
     #pubKeyDisplay,
-    #nameContainer {
+    #nameContainer,
+    #wait, #readybutton {
         display: none;
+    }
+
+    #readybutton{
+        text-align: center;
     }
 
     .slidecontainer {
         width: 100%;
+        padding-bottom: 20px;
         /* Width of the outside container */
     }
 
@@ -422,6 +470,10 @@
         /* Cursor on hover */
     }
 
+    #selectionFramework {
+        display: none;
+    }
+
     .joinedNames {
         font-size: 25px;
         font-family: 'Poppins', sans-serif;
@@ -429,12 +481,12 @@
         color: #fff;
         border: 0;
         outline: 0;
+        float: left;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
         height: 2.5em;
-        width: 10em;
         padding: 0.5em 0.75em;
         border-radius: 0.25em;
         box-sizing: border-box;
