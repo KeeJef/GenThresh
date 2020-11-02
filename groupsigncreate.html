@@ -109,8 +109,8 @@
             socket.emit('getUsers', { roomid: randomroom });
         };
 
-        function readyUp() {
-            socket.emit('readyUp', { namewanted: name, roomname: roomid, socketid: socket.id });
+        function readyUp(roomid) {
+            socket.emit('readyUp', { roomname: roomid, socketid: socket.id });
         };
 
         socket.on('getUsers', function (data) {

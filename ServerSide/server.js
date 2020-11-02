@@ -61,6 +61,23 @@ server.on('connection', function (socket) {
 
    });
 
+   socket.on('readyUp', function (data) {
+
+
+         // Add a new property in get users called ready status, set to ready for this user when received, then emit get users and handle
+
+      for (let index = 0; index < userArrays.length; index++) {
+         const element = userArrays[index];
+
+         if (element.RoomName == data.roomid) {
+            server.sockets.in(data.roomid).emit('getUsers', { userlist: element.members });
+            return
+         }
+
+      }
+
+   });
+
    socket.on('disconnect', function () {
 
       //todo, remove empty UserArrays to reduce memory usage
