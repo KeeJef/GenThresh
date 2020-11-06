@@ -43,6 +43,9 @@
         </div>
     </div>
 
+    <div class="keys" id="wait"></div>
+    <div id="readybutton"><button class="copyButton" id="enterName" onclick="readyUp(chosenRoom)">Are you Ready?✔️</button></div>
+
 
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
@@ -80,14 +83,20 @@
 
 
         socket.on('getUsers', function (data) {
-            userList = data
+            userList = data.userlist
 
-            document.getElementById("pubKeyDisplay").innerHTML = ""
+            document.getElementById("pubKeyDisplay").style.display = "block"
+            document.getElementById("pubKeyDisplay").innerHTML = ""            
 
-            for (let index = 0; index < userList.userlist.length; index++) {
-                const element = userList.userlist[index].name;
-                document.getElementById("pubKeyDisplay").innerHTML += "<div class=\"joinedNames\">" + randomEmoji() + element +"</div>"
+            for (let index = 0; index < userList.length; index++) {
+                name = userList[index].name;
+                socketchoice = userList[index].socketid
+                document.getElementById("pubKeyDisplay").innerHTML += "<div id="+socketchoice+ "" + " class=\"joinedNames\">" +  randomEmoji() + name + "</div>" //carry emojis serverside
+                if (userList[index].readyStatus == true) {
+                    document.getElementById(socketchoice).innerText += "✔️"
+                }
             }
+
         })
 
         function sendMessage() {
@@ -96,6 +105,12 @@
               socket.emit('msg', {message: msg, user: user, roomid: chosenRoom});
            }
         }
+
+        function readyUp(roomid) {
+            document.getElementById("readybutton").style.display = "none"
+            socket.emit('readyUp', { roomname: roomid, socketid: socket.id });
+        };
+
         socket.on('newmsg', function(data) {
            if(user) {
               document.getElementById('message-container').innerHTML += '<div><b>' + 

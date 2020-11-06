@@ -13,7 +13,7 @@ server.on('connection', function (socket) {
 
          if (element.RoomName == data.roomname) {
 
-            userObject = { name: data.namewanted, socketid: data.socketid }
+            userObject = {name: data.namewanted, socketid: data.socketid, readyStatus: false}
             element.members.push(userObject);
             return
          }
@@ -39,7 +39,7 @@ server.on('connection', function (socket) {
          if (room == element) {//dont recreate already created rooms
             return
          } else {
-            var roomObject = { RoomName: room, members: [] };
+            var roomObject = { RoomName: room, members: []};
             userArrays.push(roomObject)
          }
 
@@ -64,24 +64,35 @@ server.on('connection', function (socket) {
    socket.on('readyUp', function (data) {
 
 
-         // Add a new property in get users called ready status, set to ready for this user when received, then emit get users and handle
+      // Add a new property in get users called ready status, set to ready for this user when received, then emit get users and handle
 
-      for (let index = 0; index < userArrays.length; index++) {
-         const element = userArrays[index];
+      for (let index1 = 0; index1 < userArrays.length; index1++) {
+         room = userArrays[index1];
 
-         if (element.RoomName == data.roomid) {
-            server.sockets.in(data.roomid).emit('getUsers', { userlist: element.members });
-            return
+         if (room.RoomName == data.roomname) {
+
+          for (let index = 0; index < room.members.length; index++) {
+
+            if (room.members[index].socketid == socket.id) {
+               userArrays[index1].members[index].readyStatus = true
+               server.sockets.in(data.roomname).emit('getUsers', { userlist: userArrays[index1].members });
+               return
+            }
+            
+          }
+
          }
+         
 
       }
 
    });
 
+
    socket.on('disconnect', function () {
 
       //todo, remove empty UserArrays to reduce memory usage
-   
+
       for (let index1 = 0; index1 < userArrays.length; index1++) {
          const membersArray = userArrays[index1].members;
 

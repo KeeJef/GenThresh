@@ -87,7 +87,7 @@
     </div>
 
     <div class="keys" id="wait"></div>
-    <div id="readybutton"><button class="copyButton" id="enterName" onclick="ready()">Are you Ready?✔️</button></div>
+    <div id="readybutton"><button class="copyButton" id="enterName" onclick="readyUp(randomroom)">Are you Ready?✔️</button></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script>
@@ -95,6 +95,7 @@
         yourName = ''
         threshold = ''
         signers = ''
+        userList = ''
 
         var socket = io.connect("http://localhost:8000"); // Just replace with IP address
         randomroom = Math.random().toString(36).substr(2, 7)
@@ -110,26 +111,33 @@
         };
 
         function readyUp(roomid) {
+            document.getElementById("readybutton").style.display = "none"
             socket.emit('readyUp', { roomname: roomid, socketid: socket.id });
         };
 
         socket.on('getUsers', function (data) {
-            userList = data
+            userList = data.userlist
 
             document.getElementById("pubKeyDisplay").style.display = "block"
             document.getElementById("pubKeyDisplay").innerHTML = ""            
             document.getElementById("wait").style.display = "block"
-            document.getElementById("wait").innerText = "Waiting for Signers " + userList.userlist.length + " Out of " + signers
+            document.getElementById("wait").innerText = "Waiting for Signers " + userList.length + " Out of " + signers
 
-            for (let index = 0; index < userList.userlist.length; index++) {
-                const element = userList.userlist[index].name;
-                document.getElementById("pubKeyDisplay").innerHTML += "<div class=\"joinedNames\">" + randomEmoji() + element + "</div>"
+            for (let index = 0; index < userList.length; index++) {
+                name = userList[index].name;
+                socketchoice = userList[index].socketid
+                document.getElementById("pubKeyDisplay").innerHTML += "<div id="+socketchoice+ "" + " class=\"joinedNames\">" +  randomEmoji() + name + "</div>" //carry emojis serverside
+                if (userList[index].readyStatus == true) {
+                    document.getElementById(socketchoice).innerText += "✔️"
+                }
             }
 
-            if (userList.userlist.length == signers) {
+            if (userList.length == signers) {
+                //check if you are ready with global personal are ready
                 ready()
             }
         })
+
 
         var user;
         socket.on('userExists', function (data) {
