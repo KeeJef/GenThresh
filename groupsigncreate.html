@@ -96,6 +96,7 @@
         threshold = ''
         signers = ''
         userList = ''
+        isReady = false
 
         var socket = io.connect("http://localhost:8000"); // Just replace with IP address
         randomroom = Math.random().toString(36).substr(2, 7)
@@ -111,6 +112,7 @@
         };
 
         function readyUp(roomid) {
+            isReady = true
             document.getElementById("readybutton").style.display = "none"
             socket.emit('readyUp', { roomname: roomid, socketid: socket.id });
         };
@@ -132,9 +134,13 @@
                 }
             }
 
-            if (userList.length == signers) {
+            if (isReady == false && userList.length == signers) {
                 //check if you are ready with global personal are ready
                 ready()
+
+            }
+            else{
+                document.getElementById("readybutton").style.display = "none"
             }
         })
 
