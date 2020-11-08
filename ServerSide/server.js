@@ -88,8 +88,6 @@ server.on('connection', function (socket) {
 
    socket.on('disconnect', function () {
 
-      //todo, remove empty UserArrays to reduce memory usage
-
       for (let index1 = 0; index1 < userArrays.length; index1++) {
          const membersArray = userArrays[index1].members;
 
@@ -98,6 +96,11 @@ server.on('connection', function (socket) {
 
             if (element.socketid == socket.id) {
                userArrays[index1].members.splice(index2, 1);
+
+               if (userArrays[index1].members.length == 0) {
+                  userArrays.splice(index1, 1)
+                  return
+               }
 
                server.sockets.in(userArrays[index1].RoomName).emit('getUsers', { userlist: userArrays[index1].members });
 
