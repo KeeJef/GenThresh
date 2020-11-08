@@ -13,7 +13,7 @@ server.on('connection', function (socket) {
 
          if (element.RoomName == data.roomname) {
 
-            userObject = {name: data.namewanted, socketid: data.socketid, readyStatus: false}
+            userObject = {name: data.namewanted, socketid: data.socketid, readyStatus: false, isLeader: data.isLeader}
             element.members.push(userObject);
             return
          }
@@ -62,9 +62,6 @@ server.on('connection', function (socket) {
    });
 
    socket.on('readyUp', function (data) {
-
-
-      // Add a new property in get users called ready status, set to ready for this user when received, then emit get users and handle
 
       for (let index1 = 0; index1 < userArrays.length; index1++) {
          room = userArrays[index1];
