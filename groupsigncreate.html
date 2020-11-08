@@ -145,7 +145,7 @@
         }
 
         function setUsername(name, roomid) {
-            socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid: socket.id, isLeader: true });
+            socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid: socket.id, isLeader: true, publicKey: pubKey});
         };
 
         function getUsers() {
@@ -198,7 +198,7 @@
                     pubKey = publicKey[1]
                     privKey = privateKey[1]
 
-                    
+
                 document.getElementById("GeneratedKeyBox").style.display = "block"
                 document.getElementById("pubKeyDisplayPublic").innerHTML = '<div>Public Key:</div>' + pubKey + '\n';
                 document.getElementById("pubKeyDisplayPublic").innerHTML += '<div class ="publickey">Private Key:</div>' + privKey
