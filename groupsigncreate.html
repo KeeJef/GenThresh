@@ -237,13 +237,17 @@
             }
 
             if (isReady == false && userList.length == signers) {
-                //check if you are ready with global personal are ready
+                document.getElementById("wait").innerText = "Waiting for everyone to ready up "
                 ready()
 
             }
             else {
                 document.getElementById("readybutton").style.display = "none"
             }
+
+            // if (//use above forloop to not ready status, when ready state == signers do x) {
+                
+            // }
         })
 
 
