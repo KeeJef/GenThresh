@@ -131,7 +131,7 @@
         threshold = ''
         signers = ''
         userList = ''
-        privKey =''
+        privKey = ''
         pubKey = ''
         isReady = false
 
@@ -145,7 +145,7 @@
         }
 
         function setUsername(name, roomid) {
-            socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid: socket.id, isLeader: true, publicKey: pubKey});
+            socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid: socket.id, isLeader: true, publicKey: pubKey });
         };
 
         function getUsers() {
@@ -176,6 +176,14 @@
                 .join("");
         }
 
+        function aggregateKeys(keyArray) {
+
+            singleKey = myBundle.aggKey(keyArray)
+            singleKey = bufferToHex(singleKey)
+            
+            return singleKey
+        }
+
         function getKeys() {
             var input = document.createElement('input');
             input.type = 'file';
@@ -199,14 +207,14 @@
                     privKey = privateKey[1]
 
 
-                document.getElementById("GeneratedKeyBox").style.display = "block"
-                document.getElementById("pubKeyDisplayPublic").innerHTML = '<div>Public Key:</div>' + pubKey + '\n';
-                document.getElementById("pubKeyDisplayPublic").innerHTML += '<div class ="publickey">Private Key:</div>' + privKey
-                document.getElementById("buttonboxthreshold").style.display = "block"
-                    
+                    document.getElementById("GeneratedKeyBox").style.display = "block"
+                    document.getElementById("pubKeyDisplayPublic").innerHTML = '<div>Public Key:</div>' + pubKey + '\n';
+                    document.getElementById("pubKeyDisplayPublic").innerHTML += '<div class ="publickey">Private Key:</div>' + privKey
+                    document.getElementById("buttonboxthreshold").style.display = "block"
+
                 }
 
-                
+
 
             }
 
@@ -221,6 +229,7 @@
 
         socket.on('getUsers', function (data) {
             userList = data.userlist
+            readyUsers = 0
 
             document.getElementById("pubKeyDisplay").style.display = "block"
             document.getElementById("pubKeyDisplay").innerHTML = ""
@@ -233,7 +242,9 @@
                 document.getElementById("pubKeyDisplay").innerHTML += "<div id=" + socketchoice + "" + " class=\"joinedNames\">" + name + "</div>"
                 if (userList[index].readyStatus == true) {
                     document.getElementById(socketchoice).innerText += "✔️"
+                    readyUsers++
                 }
+
             }
 
             if (isReady == false && userList.length == signers) {
@@ -245,9 +256,9 @@
                 document.getElementById("readybutton").style.display = "none"
             }
 
-            // if (//use above forloop to not ready status, when ready state == signers do x) {
-                
-            // }
+            if (readyUsers == signers) {
+                groupInfo()
+            }
         })
 
 
@@ -291,6 +302,24 @@
         function displayExisting() {
             document.getElementById("nameContainer").style.display = "block"
             document.getElementById("buttonbox").style.display = "none"
+
+        }
+
+        async function groupInfo() {
+            keyArray = []
+            proposedDownloadText = "Number of Signers: " + signers + "\n"
+            proposedDownloadText += "Threshold Required: " + threshold + "\n"
+
+            for (let index = 0; index < userList.length; index++) {
+                const element = userList[index];
+                keyArray.push(element.publicKey)
+                proposedDownloadText += "Key " + index + " :" + element.publicKey + "\n"
+
+            }
+            aggkey = await aggregateKeys(keyArray) // deal with the promise, might be because i fucked with the function
+            proposedDownloadText += "Aggregate Key: " + aggkey + "\n"
+
+            console.log(proposedDownloadText)
 
         }
 
@@ -519,8 +548,8 @@
     #wait,
     #readybutton,
     #generateOrLoad,
-    #GeneratedKeyBox, #buttonboxthreshold
-     {
+    #GeneratedKeyBox,
+    #buttonboxthreshold {
         display: none;
     }
 
