@@ -177,10 +177,7 @@
         }
 
         function aggregateKeys(keyArray) {
-
-            singleKey = myBundle.aggKey(keyArray)
-            singleKey = bufferToHex(singleKey)
-            
+            singleKey = myBundle.aggKey(keyArray)            
             return singleKey
         }
 
@@ -317,6 +314,7 @@
 
             }
             aggkey = await aggregateKeys(keyArray) // deal with the promise, might be because i fucked with the function
+            aggkey = bufferToHex(aggkey)
             proposedDownloadText += "Aggregate Key: " + aggkey + "\n"
 
             console.log(proposedDownloadText)
