@@ -123,6 +123,14 @@
             Ready?✔️</button>
     </div>
 
+    <div class="buttonbox" id="groupinfobox">
+
+        <div id="button1">
+            <button onclick="groupInfo()" class="emojibutton">&nbsp;💾 Save Group Info</button>
+        </div>
+
+    </div>
+
     <script src="bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script>
@@ -145,7 +153,7 @@
         }
 
         function setUsername(name, roomid) {
-            socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid: socket.id, isLeader: true, publicKey: pubKey });
+            socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid: socket.id, isLeader: true, publicKey: pubKey, thresholdNumber: threshold, signersNumber: signers });
         };
 
         function getUsers() {
@@ -254,7 +262,8 @@
             }
 
             if (readyUsers == signers) {
-                groupInfo()
+                document.getElementById("wait").style.display = "none"
+                document.getElementById("groupinfobox").style.display = "block"
             }
         })
 
@@ -316,8 +325,13 @@
             aggkey = await aggregateKeys(keyArray) // deal with the promise, might be because i fucked with the function
             aggkey = bufferToHex(aggkey)
             proposedDownloadText += "Aggregate Key: " + aggkey + "\n"
-
-            console.log(proposedDownloadText)
+            
+            var hiddenElement = document.createElement('a');
+            hiddenElement.href = 'data:attachment/text,' + encodeURI(proposedDownloadText);
+            hiddenElement.target = '_blank';
+            let today = new Date().toISOString().slice(0, 10)
+            hiddenElement.download = 'GroupInfoBLS' + today + '.txt';
+            hiddenElement.click();
 
         }
 
@@ -547,7 +561,7 @@
     #readybutton,
     #generateOrLoad,
     #GeneratedKeyBox,
-    #buttonboxthreshold {
+    #buttonboxthreshold, #groupinfobox {
         display: none;
     }
 

@@ -13,7 +13,7 @@ server.on('connection', function (socket) {
 
          if (element.RoomName == data.roomname) {
 
-            userObject = {name: data.namewanted, socketid: data.socketid, readyStatus: false, isLeader: data.isLeader, publicKey:data.publicKey}
+            userObject = {name: data.namewanted, socketid: data.socketid, readyStatus: false, isLeader: data.isLeader, publicKey:data.publicKey, signers:data.signersNumber, threshold:data.thresholdNumber }
             element.members.push(userObject);
             return
          }

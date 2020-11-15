@@ -80,6 +80,15 @@
             Ready?✔️</button>
     </div>
 
+    
+    <div class="buttonbox" id="groupinfobox">
+
+        <div id="button1">
+            <button onclick="groupInfo()" class="emojibutton">&nbsp;💾 Save Group Info</button>
+        </div>
+
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script src="bundle.js"></script>
 
@@ -88,6 +97,8 @@
         privKey = ''
         pubKey = ''
         chosenRoom = ''
+        threshold = ''
+        signers =''
 
         var socket = io.connect("http://localhost:8000");
 
@@ -107,6 +118,10 @@
             document.getElementById("nameContainer").style.display = 'block'
         }
 
+        function aggregateKeys(keyArray) {
+            singleKey = myBundle.aggKey(keyArray)            
+            return singleKey
+        }
 
         function getUsers() {
             socket.emit('getUsers', { roomid: chosenRoom });
@@ -129,6 +144,7 @@
 
         socket.on('getUsers', function (data) {
             userList = data.userlist
+            readyUsers = 0
 
             document.getElementById("pubKeyDisplay").style.display = "block"
             document.getElementById("pubKeyDisplay").innerHTML = ""
@@ -139,7 +155,18 @@
                 document.getElementById("pubKeyDisplay").innerHTML += "<div id=" + socketchoice + "" + " class=\"joinedNames\">" + name + "</div>"
                 if (userList[index].readyStatus == true) {
                     document.getElementById(socketchoice).innerText += "✔️"
+                    readyUsers++
                 }
+                if (userList[index].isLeader == true) {
+                    signers = userList[index].signers
+                    threshold = userList[index].threshold
+                }
+
+            }
+
+            if (readyUsers == signers) {
+                
+                document.getElementById("groupinfobox").style.display = "block"
             }
 
         })
@@ -185,6 +212,30 @@
             document.getElementById("pubKeyDisplayPublic").innerHTML = '<div>Public Key:</div>' + pubKey + '\n';
             document.getElementById("pubKeyDisplayPublic").innerHTML += '<div class ="publickey">Private Key:</div>' + privKey
             document.getElementById("buttonboxthreshold").style.display = "block"
+
+        }
+
+        async function groupInfo() {
+            keyArray = []
+            proposedDownloadText = "Number of Signers: " + signers + "\n"
+            proposedDownloadText += "Threshold Required: " + threshold + "\n"
+
+            for (let index = 0; index < userList.length; index++) {
+                const element = userList[index];
+                keyArray.push(element.publicKey)
+                proposedDownloadText += "Key " + index + " :" + element.publicKey + "\n"
+
+            }
+            aggkey = await aggregateKeys(keyArray) // deal with the promise, might be because i fucked with the function
+            aggkey = bufferToHex(aggkey)
+            proposedDownloadText += "Aggregate Key: " + aggkey + "\n"
+            
+            var hiddenElement = document.createElement('a');
+            hiddenElement.href = 'data:attachment/text,' + encodeURI(proposedDownloadText);
+            hiddenElement.target = '_blank';
+            let today = new Date().toISOString().slice(0, 10)
+            hiddenElement.download = 'GroupInfoBLS' + today + '.txt';
+            hiddenElement.click();
 
         }
 
@@ -276,7 +327,9 @@
     #pubKeyDisplay,
     
     #GeneratedKeyBox,
-    #buttonboxthreshold, #nameContainer {
+    #buttonboxthreshold, 
+    #nameContainer, 
+    #groupinfobox {
         display: none;
     }
 
