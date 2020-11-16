@@ -22,6 +22,8 @@
         </div>
     </div>
 
+    <div class="keys" id="ThresholdDisplay"></div>
+
     <div class="buttonbox" id="buttonboxmain">
 
         <div id="button1">
@@ -123,12 +125,25 @@
             Ready?✔️</button>
     </div>
 
-    <div class="buttonbox" id="groupinfobox">
+    <div class="buttonbox" id="buttonboxProposedMessage">
+
+        <div id="buttonSendMessage">
+            <button onclick="sendMessage()" class="emojibutton">&nbsp;📧 Send Message</button>
+        </div>
 
         <div id="button1">
             <button onclick="groupInfo()" class="emojibutton">&nbsp;💾 Save Group Info</button>
         </div>
 
+    </div>
+
+
+    <div class="keycontainer" id= "proposedMessageDisplay">
+
+        <div class="keys" id="pubKeyText">
+            Proposed Message
+        </div>
+        <div contenteditable="true" class="keysdisplay" placeholder="Test" id="messageContainer"></div>
     </div>
 
     <script src="bundle.js"></script>
@@ -138,7 +153,8 @@
         yourName = ''
         threshold = ''
         signers = ''
-        userList = ''
+        userList = []
+        signatureArray = []
         privKey = ''
         pubKey = ''
         isReady = false
@@ -263,7 +279,9 @@
 
             if (readyUsers == signers) {
                 document.getElementById("wait").style.display = "none"
-                document.getElementById("groupinfobox").style.display = "block"
+                document.getElementById("proposedMessageDisplay").style.display = "block"
+                document.getElementById("buttonboxProposedMessage").style.display = "block"
+
             }
         })
 
@@ -273,18 +291,19 @@
             document.getElementById('error-container').innerHTML = data;
         });
 
-        function sendMessage() {
-            var msg = document.getElementById('message').value;
-            if (msg) {
-                socket.emit('msg', { message: msg, user: user, roomid: randomroom });
+        async function sendMessage() {
+            var message = document.getElementById('messageContainer').innerText;
+            signature = await myBundle.signMessage(privKey, message)
+            signature = bufferToHex(signature)
+
+            if (message) {
+                document.getElementById("buttonSendMessage").style.display = "none"
+                document.getElementById("messageContainer").contentEditable = false
+                socket.emit('msg', {message:message, signature: signature, roomid: randomroom, publicKey: pubKey, leaderstatus: true});
             }
         }
         socket.on('newmsg', function (data) {
-            if (user) {
-                document.getElementById('message-container').innerHTML += '<div><b>' +
-                    data.user + '</b>: ' + data.message + '</div>'
-            }
-
+                signatureArray.push({message: data.msg, signature:data.signature ,publicKey: data.publicKey})
         })
 
         function getName() {
@@ -295,6 +314,7 @@
             document.getElementById("buttonboxmain").style.display = "none"
             document.getElementById("roombox").value = "GenThresh.org/join?" + randomroom
             document.getElementById("roomcontainer").style.display = "block"
+            document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + signers +" Threshold: " + threshold
             getUsers()
         }
 
@@ -402,7 +422,7 @@
     }
 
     #button1,
-    #button2 {
+    #button2, #buttonSendMessage{
         display: inline-block;
     }
 
@@ -561,7 +581,9 @@
     #readybutton,
     #generateOrLoad,
     #GeneratedKeyBox,
-    #buttonboxthreshold, #groupinfobox {
+    #buttonboxthreshold, 
+    #groupinfobox, #proposedMessageDisplay,
+    #buttonboxProposedMessage {
         display: none;
     }
 

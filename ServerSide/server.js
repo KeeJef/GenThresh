@@ -6,7 +6,7 @@ server.on('connection', function (socket) {
    console.log('A user connected');
 
    socket.on('setUsername', function (data) {
-      console.log(data);
+      console.log("User Joined Room " + data.roomname + " with name " + data.namewanted);
 
       for (let index = 0; index < userArrays.length; index++) {
          const element = userArrays[index];
@@ -25,7 +25,7 @@ server.on('connection', function (socket) {
    });
 
    socket.on('create', function (room) {
-      console.log("a new room was created with the name" + room)
+      console.log("a new room was created with the name " + room)
       socket.join(room);
 
       if (userArrays.length <= 0) {
@@ -95,9 +95,11 @@ server.on('connection', function (socket) {
             const element = membersArray[index2];
 
             if (element.socketid == socket.id) {
+               console.log("Removed User " + userArrays[index1].members[index2].name)
                userArrays[index1].members.splice(index2, 1);
 
                if (userArrays[index1].members.length == 0) {
+                  console.log("Removed Empty Room " + userArrays[index1].RoomName)
                   userArrays.splice(index1, 1)
                   return
                }
@@ -115,7 +117,7 @@ server.on('connection', function (socket) {
 
    socket.on('msg', function (data) {
       //Send message to everyone
-      server.sockets.in(data.roomid).emit('newmsg', data);
+      server.sockets.in(data.roomid).emit('newmsg',{msg: data.message, publicKey: data.publicKey, signature: data.signature, leaderstatus:data.leaderstatus});
    })
 });
 

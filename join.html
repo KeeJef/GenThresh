@@ -18,9 +18,11 @@
             Group Sign
         </div>
         <div class="emojititle">
-            🧙
+            <a class="emojilink" href="Genthresh.html">🧙</a>
         </div>
     </div>
+
+    <div class="keys" id="ThresholdDisplay"></div>
 
     <div class="namecontainer" id="nameContainer">
 
@@ -80,7 +82,7 @@
             Ready?✔️</button>
     </div>
 
-    
+
     <div class="buttonbox" id="groupinfobox">
 
         <div id="button1">
@@ -88,6 +90,16 @@
         </div>
 
     </div>
+
+    <div class="keycontainer" id="ProposedMessageDisplay">
+
+        <div class="keys" id="pubKeyText">
+            Proposed Message
+        </div>
+        <div class="keysdisplay" id="proposedMessageBox"></div>
+    </div>
+
+    <!-- Add Sign or No sign buttons which call send message and sign the shit or not, move save group info buttons -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script src="bundle.js"></script>
@@ -98,7 +110,8 @@
         pubKey = ''
         chosenRoom = ''
         threshold = ''
-        signers =''
+        signers = ''
+        signatureArray = []
 
         var socket = io.connect("http://localhost:8000");
 
@@ -113,13 +126,13 @@
             socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid: socket.id, isLeader: false, publicKey: pubKey });
         };
 
-        function nameChoose(){
+        function nameChoose() {
             document.getElementById("GenerateFramework").style.display = 'none'
             document.getElementById("nameContainer").style.display = 'block'
         }
 
         function aggregateKeys(keyArray) {
-            singleKey = myBundle.aggKey(keyArray)            
+            singleKey = myBundle.aggKey(keyArray)
             return singleKey
         }
 
@@ -160,35 +173,43 @@
                 if (userList[index].isLeader == true) {
                     signers = userList[index].signers
                     threshold = userList[index].threshold
+                    document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + signers +" Threshold: " + threshold
+
                 }
 
             }
 
             if (readyUsers == signers) {
-                
+
                 document.getElementById("groupinfobox").style.display = "block"
             }
 
         })
 
-        function sendMessage() {
-            var msg = document.getElementById('message').value;
-            if (msg) {
-                socket.emit('msg', { message: msg, user: user, roomid: chosenRoom });
-            }
-        }
 
         function readyUp(roomid) {
             document.getElementById("readybutton").style.display = "none"
             socket.emit('readyUp', { roomname: roomid, socketid: socket.id });
         };
 
-        socket.on('newmsg', function (data) {
-            if (user) {
-                document.getElementById('message-container').innerHTML += '<div><b>' +
-                    data.user + '</b>: ' + data.message + '</div>'
-            }
+        async function sendMessage() {
+            var message = document.getElementById('messageContainer').innerText;
+            signature = await myBundle.signMessage(privKey, message)
+            signature = bufferToHex(signature)
 
+            if (message) {
+                document.getElementById("buttonSendMessage").style.display = "none"
+                socket.emit('msg', {message:message, signature: signature, roomid: randomroom, publicKey: pubKey, leaderstatus: false});
+            }
+        }
+        socket.on('newmsg', function (data) {
+
+                if (data.leaderstatus == true) {
+                    document.getElementById("proposedMessageBox").innerText = data.msg
+                    document.getElementById("ProposedMessageDisplay").style.display = "block"
+                }
+
+                signatureArray.push({message: data.msg, signature:data.signature, publicKey: data.publicKey})
         })
 
         function getName() {
@@ -229,7 +250,7 @@
             aggkey = await aggregateKeys(keyArray) // deal with the promise, might be because i fucked with the function
             aggkey = bufferToHex(aggkey)
             proposedDownloadText += "Aggregate Key: " + aggkey + "\n"
-            
+
             var hiddenElement = document.createElement('a');
             hiddenElement.href = 'data:attachment/text,' + encodeURI(proposedDownloadText);
             hiddenElement.target = '_blank';
@@ -325,11 +346,11 @@
     }
 
     #pubKeyDisplay,
-    
+
     #GeneratedKeyBox,
-    #buttonboxthreshold, 
-    #nameContainer, 
-    #groupinfobox {
+    #buttonboxthreshold,
+    #nameContainer,
+    #groupinfobox, #ProposedMessageDisplay {
         display: none;
     }
 
@@ -482,5 +503,9 @@
     .joinedNames:hover {
         background-color: #12970b;
         color: white;
+    }
+
+    .emojilink {
+        text-decoration: none;
     }
 </style>
