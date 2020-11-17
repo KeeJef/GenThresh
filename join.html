@@ -22,7 +22,14 @@
         </div>
     </div>
 
-    <div class="keys" id="ThresholdDisplay"></div>
+    <div class="buttonbox" id="groupinfobox">
+
+        <div class="keys" id="ThresholdDisplay"></div>
+        <div id="buttonSavegroup">
+            <button onclick="groupInfo()" class="emojibutton">&nbsp;💾 Save Group Info</button>
+        </div>
+
+    </div>
 
     <div class="namecontainer" id="nameContainer">
 
@@ -82,15 +89,6 @@
             Ready?✔️</button>
     </div>
 
-
-    <div class="buttonbox" id="groupinfobox">
-
-        <div id="button1">
-            <button onclick="groupInfo()" class="emojibutton">&nbsp;💾 Save Group Info</button>
-        </div>
-
-    </div>
-
     <div class="keycontainer" id="ProposedMessageDisplay">
 
         <div class="keys" id="pubKeyText">
@@ -98,6 +96,19 @@
         </div>
         <div class="keysdisplay" id="proposedMessageBox"></div>
     </div>
+
+    <div class="buttonbox" id="signOrNot">
+
+        <div id="button1">
+            <button onclick="sendMessage()" class="emojibutton">&nbsp;✔️ Sign</button>
+        </div>
+
+        <div id="button1">
+            <button onclick="reject()" class="emojibutton">&nbsp;❌ Reject</button>
+        </div>
+    </div>
+
+    
 
     <!-- Add Sign or No sign buttons which call send message and sign the shit or not, move save group info buttons -->
 
@@ -192,14 +203,18 @@
             socket.emit('readyUp', { roomname: roomid, socketid: socket.id });
         };
 
+        function reject(){
+            document.getElementById("signOrNot").style.display = "none"
+        }
+
         async function sendMessage() {
-            var message = document.getElementById('messageContainer').innerText;
+            var message = document.getElementById('proposedMessageBox').innerText;
             signature = await myBundle.signMessage(privKey, message)
             signature = bufferToHex(signature)
 
             if (message) {
-                document.getElementById("buttonSendMessage").style.display = "none"
-                socket.emit('msg', {message:message, signature: signature, roomid: randomroom, publicKey: pubKey, leaderstatus: false});
+                document.getElementById("signOrNot").style.display = "none"
+                socket.emit('msg', {message:message, signature: signature, roomid: chosenRoom, publicKey: pubKey, leaderstatus: false});
             }
         }
         socket.on('newmsg', function (data) {
@@ -207,6 +222,7 @@
                 if (data.leaderstatus == true) {
                     document.getElementById("proposedMessageBox").innerText = data.msg
                     document.getElementById("ProposedMessageDisplay").style.display = "block"
+                    document.getElementById("signOrNot").style.display = "block"
                 }
 
                 signatureArray.push({message: data.msg, signature:data.signature, publicKey: data.publicKey})
@@ -344,13 +360,19 @@
     #button2 {
         display: inline-block;
     }
+    #buttonSavegroup
+    {
+        display: inline-block;
+        margin-left: 40px;
+    }
 
     #pubKeyDisplay,
-
     #GeneratedKeyBox,
     #buttonboxthreshold,
     #nameContainer,
-    #groupinfobox, #ProposedMessageDisplay {
+    #groupinfobox, 
+    #ProposedMessageDisplay, 
+    #signOrNot {
         display: none;
     }
 
@@ -422,6 +444,10 @@
         margin-left: 15%;
         margin-right: 15%;
 
+    }
+
+    #ThresholdDisplay{
+        display: inline;
     }
 
     .copyButton {

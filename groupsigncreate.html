@@ -22,7 +22,17 @@
         </div>
     </div>
 
-    <div class="keys" id="ThresholdDisplay"></div>
+    <div class="buttonbox" id="topMenuThreshold">
+
+        <div class="keys" id="ThresholdDisplay"></div>
+
+        <div id="buttonSavegroup">
+            <button onclick="groupInfo()" class="emojibutton">&nbsp;💾 Save Group Info</button>
+        </div>
+
+    </div>
+
+
 
     <div class="buttonbox" id="buttonboxmain">
 
@@ -125,26 +135,28 @@
             Ready?✔️</button>
     </div>
 
-    <div class="buttonbox" id="buttonboxProposedMessage">
-
-        <div id="buttonSendMessage">
-            <button onclick="sendMessage()" class="emojibutton">&nbsp;📧 Send Message</button>
-        </div>
-
-        <div id="button1">
-            <button onclick="groupInfo()" class="emojibutton">&nbsp;💾 Save Group Info</button>
-        </div>
-
-    </div>
-
-
-    <div class="keycontainer" id= "proposedMessageDisplay">
+    <div class="keycontainer" id="proposedMessageDisplay">
 
         <div class="keys" id="pubKeyText">
             Proposed Message
         </div>
         <div contenteditable="true" class="keysdisplay" placeholder="Test" id="messageContainer"></div>
     </div>
+
+    <div class="buttonbox" id="buttonboxProposedMessage">
+
+        <div id="buttonSendMessage">
+            <button onclick="sendMessage()" class="emojibutton">&nbsp;📧 Send Message</button>
+        </div>
+    </div>
+
+
+    <div id="myProgress">
+        <div id="currentSigned"></div>
+        <div id="thresholdBar"></div>
+      </div>
+      <!-- Basically we want to scale lower thresholds to make em look better, so for for a Signer of 10 and a threshold of 5
+    50/10 = 5 5*10 = 50 step function 50/Signers -->
 
     <script src="bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
@@ -201,7 +213,7 @@
         }
 
         function aggregateKeys(keyArray) {
-            singleKey = myBundle.aggKey(keyArray)            
+            singleKey = myBundle.aggKey(keyArray)
             return singleKey
         }
 
@@ -277,10 +289,11 @@
                 document.getElementById("readybutton").style.display = "none"
             }
 
-            if (readyUsers == signers) {
+            if (readyUsers >= signers) {
                 document.getElementById("wait").style.display = "none"
                 document.getElementById("proposedMessageDisplay").style.display = "block"
                 document.getElementById("buttonboxProposedMessage").style.display = "block"
+                document.getElementById("buttonSavegroup").style.display = "inline-block"
 
             }
         })
@@ -299,11 +312,11 @@
             if (message) {
                 document.getElementById("buttonSendMessage").style.display = "none"
                 document.getElementById("messageContainer").contentEditable = false
-                socket.emit('msg', {message:message, signature: signature, roomid: randomroom, publicKey: pubKey, leaderstatus: true});
+                socket.emit('msg', { message: message, signature: signature, roomid: randomroom, publicKey: pubKey, leaderstatus: true });
             }
         }
         socket.on('newmsg', function (data) {
-                signatureArray.push({message: data.msg, signature:data.signature ,publicKey: data.publicKey})
+            signatureArray.push({ message: data.msg, signature: data.signature, publicKey: data.publicKey })
         })
 
         function getName() {
@@ -314,7 +327,7 @@
             document.getElementById("buttonboxmain").style.display = "none"
             document.getElementById("roombox").value = "GenThresh.org/join?" + randomroom
             document.getElementById("roomcontainer").style.display = "block"
-            document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + signers +" Threshold: " + threshold
+            document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + signers + " Threshold: " + threshold
             getUsers()
         }
 
@@ -345,7 +358,7 @@
             aggkey = await aggregateKeys(keyArray) // deal with the promise, might be because i fucked with the function
             aggkey = bufferToHex(aggkey)
             proposedDownloadText += "Aggregate Key: " + aggkey + "\n"
-            
+
             var hiddenElement = document.createElement('a');
             hiddenElement.href = 'data:attachment/text,' + encodeURI(proposedDownloadText);
             hiddenElement.target = '_blank';
@@ -422,7 +435,8 @@
     }
 
     #button1,
-    #button2, #buttonSendMessage{
+    #button2,
+    #buttonSendMessage {
         display: inline-block;
     }
 
@@ -581,10 +595,41 @@
     #readybutton,
     #generateOrLoad,
     #GeneratedKeyBox,
-    #buttonboxthreshold, 
-    #groupinfobox, #proposedMessageDisplay,
+    #buttonboxthreshold,
+    #groupinfobox,
+    #proposedMessageDisplay,
     #buttonboxProposedMessage {
         display: none;
+    }
+
+    #buttonSavegroup {
+        display: none;
+        margin-left: 40px;
+    }
+
+    #ThresholdDisplay {
+        display: inline;
+    }
+
+    #myProgress {
+        position: relative;
+        width: 100%;
+        background-color: #fadb8d;
+        
+    }
+
+    #currentSigned {
+        position: absolute;
+        width: 4%;
+        height: 60px;
+        background-color: #e0acf7;
+    }
+
+    #thresholdBar {
+        
+        width: 40%;
+        height: 60px;
+        background-color: #ce6df8;
     }
 
     #readybutton {
