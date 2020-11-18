@@ -154,9 +154,8 @@
     <div id="myProgress">
         <div id="currentSigned"></div>
         <div id="thresholdBar"></div>
-      </div>
-      <!-- Basically we want to scale lower thresholds to make em look better, so for for a Signer of 10 and a threshold of 5
-    50/10 = 5 5*10 = 50 step function 50/Signers -->
+    </div>
+
 
     <script src="bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
@@ -168,7 +167,10 @@
         userList = []
         signatureArray = []
         privKey = ''
+        signerCount = 0
         pubKey = ''
+        steps = ''
+        thresholdSet = ''
         isReady = false
 
         var socket = io.connect("http://localhost:8000"); // Just replace with IP address
@@ -191,6 +193,11 @@
         function GenerateOrLoad() {
             signers = document.getElementById("numberOfSigners").value
             threshold = document.getElementById("threshold").value
+
+            //Used Later when displaying threshold signed
+            steps = 100/signers
+            thresholdSet = threshold*steps
+
             document.getElementById("selectionFramework").style.display = "none"
             document.getElementById("generateOrLoad").style.display = "block"
         }
@@ -312,11 +319,21 @@
             if (message) {
                 document.getElementById("buttonSendMessage").style.display = "none"
                 document.getElementById("messageContainer").contentEditable = false
+                document.getElementById("myProgress").style.display = "block"
                 socket.emit('msg', { message: message, signature: signature, roomid: randomroom, publicKey: pubKey, leaderstatus: true });
             }
         }
         socket.on('newmsg', function (data) {
             signatureArray.push({ message: data.msg, signature: data.signature, publicKey: data.publicKey })
+            signerCount++
+            document.getElementById("currentSigned").style.width = signerCount * steps+"%"
+            document.getElementById("thresholdBar").style.width = thresholdSet+"%"
+
+            if (signerCount >= threshold) {
+
+                //aggregate signatures and display/allow download
+                
+            }
         })
 
         function getName() {
@@ -598,7 +615,8 @@
     #buttonboxthreshold,
     #groupinfobox,
     #proposedMessageDisplay,
-    #buttonboxProposedMessage {
+    #buttonboxProposedMessage,
+    #myProgress {
         display: none;
     }
 
@@ -615,21 +633,21 @@
         position: relative;
         width: 100%;
         background-color: #fadb8d;
-        
+
     }
 
     #currentSigned {
         position: absolute;
-        width: 4%;
-        height: 60px;
-        background-color: #e0acf7;
+        width: 0%;
+        height: 50px;
+        background-color: #ce6df8;
     }
 
     #thresholdBar {
-        
-        width: 40%;
-        height: 60px;
-        background-color: #ce6df8;
+
+        width: 0%;
+        height: 50px;
+        background-color: #e0acf7;
     }
 
     #readybutton {

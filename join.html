@@ -108,9 +108,10 @@
         </div>
     </div>
 
-    
-
-    <!-- Add Sign or No sign buttons which call send message and sign the shit or not, move save group info buttons -->
+    <div id="myProgress">
+        <div id="currentSigned"></div>
+        <div id="thresholdBar"></div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script src="bundle.js"></script>
@@ -120,8 +121,11 @@
         privKey = ''
         pubKey = ''
         chosenRoom = ''
+        signerCount = 0
         threshold = ''
         signers = ''
+        steps = ''
+        thresholdSet = ''
         signatureArray = []
 
         var socket = io.connect("http://localhost:8000");
@@ -184,7 +188,11 @@
                 if (userList[index].isLeader == true) {
                     signers = userList[index].signers
                     threshold = userList[index].threshold
-                    document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + signers +" Threshold: " + threshold
+
+                    steps = 100 / signers
+                    thresholdSet = threshold * steps
+
+                    document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + signers + " Threshold: " + threshold
 
                 }
 
@@ -203,7 +211,7 @@
             socket.emit('readyUp', { roomname: roomid, socketid: socket.id });
         };
 
-        function reject(){
+        function reject() {
             document.getElementById("signOrNot").style.display = "none"
         }
 
@@ -214,18 +222,29 @@
 
             if (message) {
                 document.getElementById("signOrNot").style.display = "none"
-                socket.emit('msg', {message:message, signature: signature, roomid: chosenRoom, publicKey: pubKey, leaderstatus: false});
+                socket.emit('msg', { message: message, signature: signature, roomid: chosenRoom, publicKey: pubKey, leaderstatus: false });
             }
         }
         socket.on('newmsg', function (data) {
 
-                if (data.leaderstatus == true) {
-                    document.getElementById("proposedMessageBox").innerText = data.msg
-                    document.getElementById("ProposedMessageDisplay").style.display = "block"
-                    document.getElementById("signOrNot").style.display = "block"
-                }
+            if (data.leaderstatus == true) {
+                document.getElementById("proposedMessageBox").innerText = data.msg
+                document.getElementById("ProposedMessageDisplay").style.display = "block"
+                document.getElementById("myProgress").style.display = "block"
+                document.getElementById("signOrNot").style.display = "block"
+            }
 
-                signatureArray.push({message: data.msg, signature:data.signature, publicKey: data.publicKey})
+            signatureArray.push({ message: data.msg, signature: data.signature, publicKey: data.publicKey })
+
+            signerCount++
+            document.getElementById("currentSigned").style.width = signerCount * steps + "%"
+            document.getElementById("thresholdBar").style.width = thresholdSet + "%"
+
+            if (signerCount >= threshold) {
+
+                //aggregate signatures and display/allow download
+
+            }
         })
 
         function getName() {
@@ -360,8 +379,8 @@
     #button2 {
         display: inline-block;
     }
-    #buttonSavegroup
-    {
+
+    #buttonSavegroup {
         display: inline-block;
         margin-left: 40px;
     }
@@ -370,15 +389,36 @@
     #GeneratedKeyBox,
     #buttonboxthreshold,
     #nameContainer,
-    #groupinfobox, 
-    #ProposedMessageDisplay, 
-    #signOrNot {
+    #groupinfobox,
+    #ProposedMessageDisplay,
+    #signOrNot,#myProgress {
         display: none;
     }
 
     #readybutton {
         display: none;
         text-align: center;
+    }
+
+    #myProgress {
+        position: relative;
+        width: 100%;
+        background-color: #fadb8d;
+
+    }
+
+    #currentSigned {
+        position: absolute;
+        width: 0%;
+        height: 50px;
+        background-color: #ce6df8;
+    }
+
+    #thresholdBar {
+
+        width: 0%;
+        height: 50px;
+        background-color: #e0acf7;
     }
 
 
@@ -446,7 +486,7 @@
 
     }
 
-    #ThresholdDisplay{
+    #ThresholdDisplay {
         display: inline;
     }
 
