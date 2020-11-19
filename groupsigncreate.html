@@ -157,6 +157,14 @@
     </div>
 
 
+    <div class="Legend" id="Legend">
+
+        <div class="colour darkpurp"></div>Already Signed
+        <div class="colour lightpurp"></div>Threshold
+        <div class="colour yellow"></div>Maximum
+
+    </div>
+
     <script src="bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script>
@@ -195,8 +203,8 @@
             threshold = document.getElementById("threshold").value
 
             //Used Later when displaying threshold signed
-            steps = 100/signers
-            thresholdSet = threshold*steps
+            steps = 100 / signers
+            thresholdSet = threshold * steps
 
             document.getElementById("selectionFramework").style.display = "none"
             document.getElementById("generateOrLoad").style.display = "block"
@@ -222,6 +230,12 @@
         function aggregateKeys(keyArray) {
             singleKey = myBundle.aggKey(keyArray)
             return singleKey
+        }
+
+
+        function aggregateSignature() {
+            agg = myBundle.aggSig(signatureArray)
+            return agg
         }
 
         function getKeys() {
@@ -301,6 +315,7 @@
                 document.getElementById("proposedMessageDisplay").style.display = "block"
                 document.getElementById("buttonboxProposedMessage").style.display = "block"
                 document.getElementById("buttonSavegroup").style.display = "inline-block"
+                document.getElementById("roomcontainer").style.display = "none"
 
             }
         })
@@ -320,19 +335,29 @@
                 document.getElementById("buttonSendMessage").style.display = "none"
                 document.getElementById("messageContainer").contentEditable = false
                 document.getElementById("myProgress").style.display = "block"
+                document.getElementById("Legend").style.display = "flex"
                 socket.emit('msg', { message: message, signature: signature, roomid: randomroom, publicKey: pubKey, leaderstatus: true });
             }
         }
         socket.on('newmsg', function (data) {
             signatureArray.push({ message: data.msg, signature: data.signature, publicKey: data.publicKey })
             signerCount++
-            document.getElementById("currentSigned").style.width = signerCount * steps+"%"
-            document.getElementById("thresholdBar").style.width = thresholdSet+"%"
+            document.getElementById("currentSigned").style.width = signerCount * steps + "%"
+            document.getElementById("thresholdBar").style.width = thresholdSet + "%"
 
             if (signerCount >= threshold) {
+                aggregateKeyArray = []
+                aggregateSignatureArray = []
+                for (let index = 0; index < signatureArray.length; index++) {
+                    aggregateKeyArray.push(signatureArray[index].publicKey);
+                    aggregateSignatureArray.push(signatureArray[index].signature);
+                }
+                aggregateKeys(aggregateKeyArray)
+                aggregateSignature(aggregateSignatureArray)
 
-                //aggregate signatures and display/allow download
-                
+                //we want want to specify the keys that signed, and they should be specified using their index in save group info,
+                //save group info should be deterministic which we can do by ordering by key (high to low mathamatical closeness)
+                //Then we need to check each key in signature array and match it to its index, or lets just include that from the user
             }
         })
 
@@ -372,9 +397,9 @@
                 proposedDownloadText += "Key " + index + " :" + element.publicKey + "\n"
 
             }
-            aggkey = await aggregateKeys(keyArray) // deal with the promise, might be because i fucked with the function
+            aggkey = await aggregateKeys(keyArray) 
             aggkey = bufferToHex(aggkey)
-            proposedDownloadText += "Aggregate Key: " + aggkey + "\n"
+            proposedDownloadText += "Full Aggregate Key: " + aggkey + "\n"
 
             var hiddenElement = document.createElement('a');
             hiddenElement.href = 'data:attachment/text,' + encodeURI(proposedDownloadText);
@@ -616,7 +641,8 @@
     #groupinfobox,
     #proposedMessageDisplay,
     #buttonboxProposedMessage,
-    #myProgress {
+    #myProgress,
+    #Legend {
         display: none;
     }
 
@@ -648,6 +674,34 @@
         width: 0%;
         height: 50px;
         background-color: #e0acf7;
+    }
+
+    .colour {
+        width: 50px;
+        height: 50px;
+        margin: 5px;
+    }
+
+    .darkpurp {
+        background: #ce6df8;
+    }
+
+    .lightpurp {
+        background: #e0acf7;
+    }
+
+    .yellow {
+        background: #fadb8d;
+    }
+
+    .Legend {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 20px;
+        height: 50px;
+        padding-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     #readybutton {
