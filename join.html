@@ -121,6 +121,8 @@
 
     </div>
 
+    <div id="roomIsFull" class="keys">Room is full please contact the operator</div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script src="bundle.js"></script>
 
@@ -131,6 +133,7 @@
         chosenRoom = ''
         signerCount = 0
         threshold = ''
+        frozenUserList = []
         signers = ''
         steps = ''
         thresholdSet = ''
@@ -186,6 +189,12 @@
             document.getElementById("pubKeyDisplay").innerHTML = ""
 
             for (let index = 0; index < userList.length; index++) {
+
+                if (userList[index].roomFullStatus == true) {
+                    roomIsFull()
+                    return
+                }
+
                 name = userList[index].name;
                 socketchoice = userList[index].socketid
                 document.getElementById("pubKeyDisplay").innerHTML += "<div id=" + socketchoice + "" + " class=\"joinedNames\">" + name + "</div>"
@@ -204,6 +213,11 @@
 
                 }
 
+                if (readyUsers == signers && frozenUserList.length == 0 ) {
+                //Freeze getinfo Array when everyone is joined
+                frozenUserList = userList
+            }
+
             }
 
             if (readyUsers == signers) {
@@ -218,6 +232,13 @@
             document.getElementById("readybutton").style.display = "none"
             socket.emit('readyUp', { roomname: roomid, socketid: socket.id });
         };
+
+        function roomIsFull(){
+            document.getElementById("roomIsFull").style.display = "block"
+            document.getElementById("readybutton").style.display = "none"
+            document.getElementById("pubKeyDisplay").style.display = "none"
+            
+        }
 
         function reject() {
             document.getElementById("signOrNot").style.display = "none"
@@ -285,8 +306,8 @@
             proposedDownloadText = "Number of Signers: " + signers + "\n"
             proposedDownloadText += "Threshold Required: " + threshold + "\n"
 
-            for (let index = 0; index < userList.length; index++) {
-                const element = userList[index];
+            for (let index = 0; index < frozenUserList.length; index++) {
+                const element = frozenUserList[index];
                 keyArray.push(element.publicKey)
                 proposedDownloadText += "Key " + index + " :" + element.publicKey + "\n"
 
@@ -400,7 +421,7 @@
     #nameContainer,
     #groupinfobox,
     #ProposedMessageDisplay,
-    #signOrNot,#myProgress, #Legend {
+    #signOrNot,#myProgress, #Legend, #roomIsFull {
         display: none;
     }
 

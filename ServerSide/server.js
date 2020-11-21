@@ -13,7 +13,7 @@ server.on('connection', function (socket) {
 
          if (element.RoomName == data.roomname) {
 
-            userObject = {name: data.namewanted, socketid: data.socketid, readyStatus: false, isLeader: data.isLeader, publicKey:data.publicKey, signers:data.signersNumber, threshold:data.thresholdNumber }
+            userObject = {name: data.namewanted, socketid: data.socketid, readyStatus: false, isLeader: data.isLeader, publicKey:data.publicKey, signers:data.signersNumber, threshold:data.thresholdNumber, roomFullStatus: false }
             element.members.push(userObject);
             return
          }
@@ -61,6 +61,8 @@ server.on('connection', function (socket) {
 
    });
 
+   // Load a room 
+
    socket.on('readyUp', function (data) {
 
       for (let index1 = 0; index1 < userArrays.length; index1++) {
@@ -82,6 +84,27 @@ server.on('connection', function (socket) {
          
 
       }
+
+   });
+
+   socket.on('roomFull', function (data) {
+
+      for (let index1 = 0; index1 < userArrays.length; index1++) {
+         room = userArrays[index1];
+
+         if (room.RoomName == data.roomname) {
+
+          for (let index = 0; index < room.members.length; index++) {
+
+            room.members[index].roomFullStatus = true
+
+            }
+         
+            server.sockets.in(data.roomname).emit('getUsers', { userlist: userArrays[index1].members });
+            
+          }
+
+         }
 
    });
 

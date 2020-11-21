@@ -173,6 +173,7 @@
         threshold = ''
         signers = ''
         userList = []
+        frozenUserList = []
         signatureArray = []
         privKey = ''
         signerCount = 0
@@ -281,6 +282,11 @@
             socket.emit('readyUp', { roomname: roomid, socketid: socket.id });
         };
 
+        function roomFull(roomid) {
+            socket.emit('roomFull', { roomname: roomid});
+        };
+
+
         socket.on('getUsers', function (data) {
             userList = data.userlist
             readyUsers = 0
@@ -317,6 +323,13 @@
                 document.getElementById("buttonSavegroup").style.display = "inline-block"
                 document.getElementById("roomcontainer").style.display = "none"
 
+            }
+            if (readyUsers == signers && frozenUserList.length == 0 ) {
+                //Freeze getinfo Array when everyone is joined
+                frozenUserList = userList
+                roomFull(randomroom)
+
+    
             }
         })
 
@@ -391,8 +404,8 @@
             proposedDownloadText = "Number of Signers: " + signers + "\n"
             proposedDownloadText += "Threshold Required: " + threshold + "\n"
 
-            for (let index = 0; index < userList.length; index++) {
-                const element = userList[index];
+            for (let index = 0; index < frozenUserList.length; index++) {
+                const element = frozenUserList[index];
                 keyArray.push(element.publicKey)
                 proposedDownloadText += "Key " + index + " :" + element.publicKey + "\n"
 
