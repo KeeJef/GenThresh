@@ -297,6 +297,7 @@
             document.getElementById("wait").innerText = "Waiting for Signers " + userList.length + " Out of " + signers
 
             for (let index = 0; index < userList.length; index++) {
+
                 name = userList[index].name;
                 socketchoice = userList[index].socketid
                 document.getElementById("pubKeyDisplay").innerHTML += "<div id=" + socketchoice + "" + " class=\"joinedNames\">" + name + "</div>"
@@ -340,6 +341,7 @@
         });
 
         async function sendMessage() {
+            arrayPosition = 0
             var message = document.getElementById('messageContainer').innerText;
             signature = await myBundle.signMessage(privKey, message)
             signature = bufferToHex(signature)
@@ -349,7 +351,18 @@
                 document.getElementById("messageContainer").contentEditable = false
                 document.getElementById("myProgress").style.display = "block"
                 document.getElementById("Legend").style.display = "flex"
-                socket.emit('msg', { message: message, signature: signature, roomid: randomroom, publicKey: pubKey, leaderstatus: true });
+
+                for (let index = 0; index < userList.length; index++) {
+                    element = userList[index];
+
+                    if (element.publicKey == pubKey) {
+                        arrayPosition = index
+                        break
+                    }
+                    
+                }
+
+                socket.emit('msg', { message: message, signature: signature, roomid: randomroom, publicKey: pubKey, leaderstatus: true, arrayPosition: arrayPosition });
             }
         }
         socket.on('newmsg', function (data) {

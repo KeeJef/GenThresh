@@ -131,6 +131,7 @@
         privKey = ''
         pubKey = ''
         chosenRoom = ''
+        firstJoin = true
         signerCount = 0
         threshold = ''
         frozenUserList = []
@@ -145,7 +146,10 @@
 
             chosenRoom = window.location.href
             chosenRoom = chosenRoom.split('?')[1]
+            socket.emit('checkRoom', {roomid: chosenRoom}) //this checks room, but will go onto other stuff, this function is only called when
+            //user sets name, we call get users and if room is empty we want everything to fuck off, basically we want to check room before rendering anything else
             socket.emit('create', chosenRoom);
+
         }
 
         function setUsername(name, roomid) {
@@ -168,18 +172,9 @@
             document.getElementById("GenerateFramework").style.display = 'none'
         };
 
-        var user;
-        socket.on('userExists', function (data) {
-            document.getElementById('error-container').innerHTML = data;
+        socket.on('roomFullEvent', function (data) {
+            roomIsFull()
         });
-        socket.on('userSet', function (data) {
-            user = data.username;
-            document.body.innerHTML = '<input type = "text" id = "message">\
-           <button type = "button" name = "button" onclick = "sendMessage()">Send</button>\
-           <div id = "message-container"></div>';
-        });
-
-
 
         socket.on('getUsers', function (data) {
             userList = data.userlist
@@ -188,12 +183,8 @@
             document.getElementById("pubKeyDisplay").style.display = "block"
             document.getElementById("pubKeyDisplay").innerHTML = ""
 
-            for (let index = 0; index < userList.length; index++) {
 
-                if (userList[index].roomFullStatus == true) {
-                    roomIsFull()
-                    return
-                }
+            for (let index = 0; index < userList.length; index++) {
 
                 name = userList[index].name;
                 socketchoice = userList[index].socketid
@@ -224,7 +215,6 @@
 
                 document.getElementById("groupinfobox").style.display = "block"
             }
-
         })
 
 

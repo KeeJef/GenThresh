@@ -108,6 +108,29 @@ server.on('connection', function (socket) {
 
    });
 
+   socket.on('checkRoom', function (data) {
+
+      for (let index1 = 0; index1 < userArrays.length; index1++) {
+         room = userArrays[index1];
+
+         if (room.RoomName == data.roomid) {
+
+          for (let index = 0; index < room.members.length; index++) {
+
+            if (room.members[index].roomFullStatus = true) {
+               server.io.to(socket.id).emit('roomFullEvent', true);
+               return
+            }
+            
+            }
+            server.io.to(socket.id).emit('roomFullEvent', false);     
+            
+          }
+
+         }
+
+   });
+
 
    socket.on('disconnect', function () {
 
@@ -140,7 +163,7 @@ server.on('connection', function (socket) {
 
    socket.on('msg', function (data) {
       //Send message to everyone
-      server.sockets.in(data.roomid).emit('newmsg',{msg: data.message, publicKey: data.publicKey, signature: data.signature, leaderstatus:data.leaderstatus});
+      server.sockets.in(data.roomid).emit('newmsg',{msg: data.message, publicKey: data.publicKey, signature: data.signature, leaderstatus:data.leaderstatus, arrayPosition: data.arrayPosition});
    })
 });
 
