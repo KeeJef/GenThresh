@@ -128,9 +128,11 @@
 
     <script>
 
+        chosenRoom = window.location.href
+        chosenRoom = chosenRoom.split('?')[1]
+
         privKey = ''
         pubKey = ''
-        chosenRoom = ''
         firstJoin = true
         signerCount = 0
         threshold = ''
@@ -141,20 +143,19 @@
         signatureArray = []
 
         var socket = io.connect("http://localhost:8000");
+        checkroomfull()
 
         function startSocket() {
-
-            chosenRoom = window.location.href
-            chosenRoom = chosenRoom.split('?')[1]
-            socket.emit('checkRoom', {roomid: chosenRoom}) //this checks room, but will go onto other stuff, this function is only called when
-            //user sets name, we call get users and if room is empty we want everything to fuck off, basically we want to check room before rendering anything else
             socket.emit('create', chosenRoom);
-
         }
 
         function setUsername(name, roomid) {
             socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid: socket.id, isLeader: false, publicKey: pubKey });
         };
+
+        function checkroomfull(){
+            socket.emit('checkRoom', {roomid: chosenRoom}) 
+        }
 
         function nameChoose() {
             document.getElementById("GenerateFramework").style.display = 'none'
@@ -173,7 +174,9 @@
         };
 
         socket.on('roomFullEvent', function (data) {
-            roomIsFull()
+            if (data == true) {
+               roomIsFull() 
+            }
         });
 
         socket.on('getUsers', function (data) {
@@ -225,8 +228,7 @@
 
         function roomIsFull(){
             document.getElementById("roomIsFull").style.display = "block"
-            document.getElementById("readybutton").style.display = "none"
-            document.getElementById("pubKeyDisplay").style.display = "none"
+            document.getElementById("generateOrLoad").style.display = "none"
             
         }
 

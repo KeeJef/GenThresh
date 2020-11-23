@@ -117,13 +117,13 @@ server.on('connection', function (socket) {
 
           for (let index = 0; index < room.members.length; index++) {
 
-            if (room.members[index].roomFullStatus = true) {
-               server.io.to(socket.id).emit('roomFullEvent', true);
+            if (room.members[index].roomFullStatus == true) {
+               server.to(socket.id).emit('roomFullEvent', true);
                return
             }
             
             }
-            server.io.to(socket.id).emit('roomFullEvent', false);     
+            server.to(socket.id).emit('roomFullEvent', false);     
             
           }
 
