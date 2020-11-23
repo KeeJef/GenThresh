@@ -165,6 +165,16 @@
 
     </div>
 
+    <div class="keysdisplay" id="aggSigAggKeyDisplay"></div>
+
+    <div class="buttonbox" id="buttonboxpadding">
+
+        <div id="button1">
+            <button onclick="downloadsigs()" class="emojibutton" id ="SaveSignatureInfo">&nbsp;💾 Save Signature info</button>
+        </div>
+
+    </div>
+
     <script src="bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script>
@@ -234,7 +244,7 @@
         }
 
 
-        function aggregateSignature() {
+        function aggregateSignature(signatureArray) {
             agg = myBundle.aggSig(signatureArray)
             return agg
         }
@@ -283,7 +293,7 @@
         };
 
         function roomFull(roomid) {
-            socket.emit('roomFull', { roomname: roomid});
+            socket.emit('roomFull', { roomname: roomid });
         };
 
 
@@ -325,12 +335,12 @@
                 document.getElementById("roomcontainer").style.display = "none"
 
             }
-            if (readyUsers == signers && frozenUserList.length == 0 ) {
+            if (readyUsers == signers && frozenUserList.length == 0) {
                 //Freeze getinfo Array when everyone is joined
                 frozenUserList = userList
                 roomFull(randomroom)
 
-    
+
             }
         })
 
@@ -352,38 +362,53 @@
                 document.getElementById("myProgress").style.display = "block"
                 document.getElementById("Legend").style.display = "flex"
 
-                for (let index = 0; index < userList.length; index++) {
-                    element = userList[index];
+                for (let index = 0; index < frozenUserList.length; index++) {
+                    element = frozenUserList[index];
 
                     if (element.publicKey == pubKey) {
                         arrayPosition = index
                         break
                     }
-                    
+
                 }
 
                 socket.emit('msg', { message: message, signature: signature, roomid: randomroom, publicKey: pubKey, leaderstatus: true, arrayPosition: arrayPosition });
             }
         }
-        socket.on('newmsg', function (data) {
-            signatureArray.push({ message: data.msg, signature: data.signature, publicKey: data.publicKey })
+        socket.on('newmsg', async function (data) {
+            signatureArray.push({ message: data.msg, signature: data.signature, publicKey: data.publicKey, arrayPosition: data.arrayPosition })
             signerCount++
             document.getElementById("currentSigned").style.width = signerCount * steps + "%"
             document.getElementById("thresholdBar").style.width = thresholdSet + "%"
 
             if (signerCount >= threshold) {
+
+                document.getElementById("proposedMessageDisplay").style.display = 'none'
+                document.getElementById("myProgress").style.display = 'none'
+                document.getElementById("Legend").style.display = 'none'
+                document.getElementById("SaveSignatureInfo").style.display = 'flex'
+                
+
                 aggregateKeyArray = []
                 aggregateSignatureArray = []
+                signerIndex = []
                 for (let index = 0; index < signatureArray.length; index++) {
+                    signerIndex.push(signatureArray[index].arrayPosition)
                     aggregateKeyArray.push(signatureArray[index].publicKey);
                     aggregateSignatureArray.push(signatureArray[index].signature);
                 }
-                aggregateKeys(aggregateKeyArray)
-                aggregateSignature(aggregateSignatureArray)
 
-                //we want want to specify the keys that signed, and they should be specified using their index in save group info,
-                //save group info should be deterministic which we can do by ordering by key (high to low mathamatical closeness)
-                //Then we need to check each key in signature array and match it to its index, or lets just include that from the user
+                finalAggKeys = await aggregateKeys(aggregateKeyArray)
+                finalAggKeys = bufferToHex(finalAggKeys)
+                finalAggSig = await aggregateSignature(aggregateSignatureArray)
+                finalAggSig = bufferToHex(finalAggSig)
+
+
+            document.getElementById("aggSigAggKeyDisplay").style.display = "block"
+            document.getElementById("aggSigAggKeyDisplay").innerHTML = '<div>Aggregate Key:</div>' + finalAggKeys + '\n';
+            document.getElementById("aggSigAggKeyDisplay").innerHTML += '<div class ="publickey">Aggregate Signature:</div>' + finalAggSig
+            document.getElementById("aggSigAggKeyDisplay").innerHTML += '<div class ="publickey">Signer Indexes:</div>' + signerIndex
+
             }
         })
 
@@ -423,15 +448,31 @@
                 proposedDownloadText += "Key " + index + " :" + element.publicKey + "\n"
 
             }
-            aggkey = await aggregateKeys(keyArray) 
+            aggkey = await aggregateKeys(keyArray)
             aggkey = bufferToHex(aggkey)
             proposedDownloadText += "Full Aggregate Key: " + aggkey + "\n"
 
+            let today = new Date().toISOString().slice(0, 10)
+            filename = 'GroupInfoBLS' + today + '.txt'
+            downloadtext(proposedDownloadText,filename)
+
+        }
+
+        function downloadsigs(){
+            proposedText = document.getElementById("aggSigAggKeyDisplay").innerText
+            let today = new Date().toISOString().slice(0, 10)
+            proposedFileName = 'SignatureInfoBLS' + today + '.txt'
+            downloadtext(proposedText,proposedFileName)
+        }
+
+
+        function downloadtext(proposedMessage, proposedFilename){
+
             var hiddenElement = document.createElement('a');
-            hiddenElement.href = 'data:attachment/text,' + encodeURI(proposedDownloadText);
+            hiddenElement.href = 'data:attachment/text,' + encodeURI(proposedMessage);
             hiddenElement.target = '_blank';
             let today = new Date().toISOString().slice(0, 10)
-            hiddenElement.download = 'GroupInfoBLS' + today + '.txt';
+            hiddenElement.download = proposedFilename;
             hiddenElement.click();
 
         }
@@ -511,6 +552,9 @@
     .buttonbox {
         text-align: center;
         padding-bottom: 20px;
+    }
+    #buttonboxpadding{
+        padding-top: 20px;
     }
 
     .titlebox {
@@ -668,7 +712,7 @@
     #proposedMessageDisplay,
     #buttonboxProposedMessage,
     #myProgress,
-    #Legend {
+    #Legend,#aggSigAggKeyDisplay, #SaveSignatureInfo {
         display: none;
     }
 

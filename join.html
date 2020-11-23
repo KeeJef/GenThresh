@@ -123,6 +123,17 @@
 
     <div id="roomIsFull" class="keys">Room is full please contact the operator</div>
 
+    <div class="keysdisplay" id="aggSigAggKeyDisplay"></div>
+
+    <div class="buttonbox" id="buttonboxpadding">
+
+        <div id="button1">
+            <button onclick="downloadsigs()" class="emojibutton" id ="SaveSignatureInfo">&nbsp;💾 Save Signature info</button>
+        </div>
+
+    </div>
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script src="bundle.js"></script>
 
@@ -153,8 +164,8 @@
             socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid: socket.id, isLeader: false, publicKey: pubKey });
         };
 
-        function checkroomfull(){
-            socket.emit('checkRoom', {roomid: chosenRoom}) 
+        function checkroomfull() {
+            socket.emit('checkRoom', { roomid: chosenRoom })
         }
 
         function nameChoose() {
@@ -167,6 +178,12 @@
             return singleKey
         }
 
+
+        function aggregateSignature(signatureArray) {
+            agg = myBundle.aggSig(signatureArray)
+            return agg
+        }
+
         function getUsers() {
             socket.emit('getUsers', { roomid: chosenRoom });
             document.getElementById("readybutton").style.display = 'block'
@@ -175,7 +192,7 @@
 
         socket.on('roomFullEvent', function (data) {
             if (data == true) {
-               roomIsFull() 
+                roomIsFull()
             }
         });
 
@@ -207,10 +224,10 @@
 
                 }
 
-                if (readyUsers == signers && frozenUserList.length == 0 ) {
-                //Freeze getinfo Array when everyone is joined
-                frozenUserList = userList
-            }
+                if (readyUsers == signers && frozenUserList.length == 0) {
+                    //Freeze getinfo Array when everyone is joined
+                    frozenUserList = userList
+                }
 
             }
 
@@ -226,10 +243,10 @@
             socket.emit('readyUp', { roomname: roomid, socketid: socket.id });
         };
 
-        function roomIsFull(){
+        function roomIsFull() {
             document.getElementById("roomIsFull").style.display = "block"
             document.getElementById("generateOrLoad").style.display = "none"
-            
+
         }
 
         function reject() {
@@ -241,12 +258,22 @@
             signature = await myBundle.signMessage(privKey, message)
             signature = bufferToHex(signature)
 
+            for (let index = 0; index < frozenUserList.length; index++) {
+                element = frozenUserList[index];
+
+                if (element.publicKey == pubKey) {
+                    arrayPosition = index
+                    break
+                }
+
+            }
+
             if (message) {
                 document.getElementById("signOrNot").style.display = "none"
-                socket.emit('msg', { message: message, signature: signature, roomid: chosenRoom, publicKey: pubKey, leaderstatus: false });
+                socket.emit('msg', { message: message, signature: signature, roomid: chosenRoom, publicKey: pubKey, leaderstatus: false, arrayPosition: arrayPosition });
             }
         }
-        socket.on('newmsg', function (data) {
+        socket.on('newmsg', async function (data) {
 
             if (data.leaderstatus == true) {
                 document.getElementById("proposedMessageBox").innerText = data.msg
@@ -256,7 +283,7 @@
                 document.getElementById("signOrNot").style.display = "block"
             }
 
-            signatureArray.push({ message: data.msg, signature: data.signature, publicKey: data.publicKey })
+            signatureArray.push({ message: data.msg, signature: data.signature, publicKey: data.publicKey, arrayPosition: data.arrayPosition })
 
             signerCount++
             document.getElementById("currentSigned").style.width = signerCount * steps + "%"
@@ -264,7 +291,32 @@
 
             if (signerCount >= threshold) {
 
-                //aggregate signatures and display/allow download
+                if (signerCount == signers) {
+                document.getElementById("ProposedMessageDisplay").style.display = 'none'
+                document.getElementById("myProgress").style.display = 'none'
+                document.getElementById("Legend").style.display = 'none'
+                document.getElementById("SaveSignatureInfo").style.display = 'flex'
+
+                }
+
+                aggregateKeyArray = []
+                aggregateSignatureArray = []
+                signerIndex = []
+                for (let index = 0; index < signatureArray.length; index++) {
+                    signerIndex.push(signatureArray[index].arrayPosition)
+                    aggregateKeyArray.push(signatureArray[index].publicKey);
+                    aggregateSignatureArray.push(signatureArray[index].signature);
+                }
+
+                finalAggKeys = await aggregateKeys(aggregateKeyArray)
+                finalAggKeys = bufferToHex(finalAggKeys)
+                finalAggSig = await aggregateSignature(aggregateSignatureArray)
+                finalAggSig = bufferToHex(finalAggSig)
+
+                document.getElementById("aggSigAggKeyDisplay").style.display = "block"
+                document.getElementById("aggSigAggKeyDisplay").innerHTML = '<div>Aggregate Key:</div>' + finalAggKeys + '\n';
+                document.getElementById("aggSigAggKeyDisplay").innerHTML += '<div class ="publickey">Aggregate Signature:</div>' + finalAggSig
+                document.getElementById("aggSigAggKeyDisplay").innerHTML += '<div class ="publickey">Signer Indexes:</div>' + signerIndex
 
             }
         })
@@ -308,14 +360,32 @@
             aggkey = bufferToHex(aggkey)
             proposedDownloadText += "Aggregate Key: " + aggkey + "\n"
 
+            let today = new Date().toISOString().slice(0, 10)
+            filename = 'GroupInfoBLS' + today + '.txt'
+            downloadtext(proposedDownloadText,filename)
+
+
+        }
+
+        function downloadsigs(){
+            proposedText = document.getElementById("aggSigAggKeyDisplay").innerText
+            let today = new Date().toISOString().slice(0, 10)
+            proposedFileName = 'SignatureInfoBLS' + today + '.txt'
+            downloadtext(proposedText,proposedFileName)
+        }
+
+
+        function downloadtext(proposedMessage, proposedFilename){
+
             var hiddenElement = document.createElement('a');
-            hiddenElement.href = 'data:attachment/text,' + encodeURI(proposedDownloadText);
+            hiddenElement.href = 'data:attachment/text,' + encodeURI(proposedMessage);
             hiddenElement.target = '_blank';
             let today = new Date().toISOString().slice(0, 10)
-            hiddenElement.download = 'GroupInfoBLS' + today + '.txt';
+            hiddenElement.download = proposedFilename;
             hiddenElement.click();
 
         }
+
 
         function bufferToHex(buffer) {
             return [...new Uint8Array(buffer)]
@@ -413,7 +483,10 @@
     #nameContainer,
     #groupinfobox,
     #ProposedMessageDisplay,
-    #signOrNot,#myProgress, #Legend, #roomIsFull {
+    #signOrNot,
+    #myProgress,
+    #Legend,
+    #roomIsFull, #aggSigAggKeyDisplay, #SaveSignatureInfo {
         display: none;
     }
 
@@ -578,14 +651,19 @@
         background: #fadb8d;
     }
 
-    .Legend{
+    .Legend {
         font-family: Arial, Helvetica, sans-serif;
         font-size: 20px;
+        padding-bottom: 20px;
         height: 50px;
         padding-top: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+
+    #buttonboxpadding{
+        padding-top: 20px;
     }
 
     .emojibutton:hover {
