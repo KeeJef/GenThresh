@@ -128,7 +128,8 @@
     <div class="buttonbox" id="buttonboxpadding">
 
         <div id="button1">
-            <button onclick="downloadsigs()" class="emojibutton" id ="SaveSignatureInfo">&nbsp;💾 Save Signature info</button>
+            <button onclick="downloadsigs()" class="emojibutton" id="SaveSignatureInfo">&nbsp;💾 Save Signature
+                info</button>
         </div>
 
     </div>
@@ -147,6 +148,7 @@
         firstJoin = true
         signerCount = 0
         threshold = ''
+        globalMessage = ''
         frozenUserList = []
         signers = ''
         steps = ''
@@ -277,6 +279,7 @@
 
             if (data.leaderstatus == true) {
                 document.getElementById("proposedMessageBox").innerText = data.msg
+                globalMessage = data.msg
                 document.getElementById("ProposedMessageDisplay").style.display = "block"
                 document.getElementById("myProgress").style.display = "block"
                 document.getElementById("Legend").style.display = "flex"
@@ -294,9 +297,9 @@
                 document.getElementById("SaveSignatureInfo").style.display = 'flex'
 
                 if (signerCount == signers) {
-                document.getElementById("ProposedMessageDisplay").style.display = 'none'
-                document.getElementById("myProgress").style.display = 'none'
-                document.getElementById("Legend").style.display = 'none'
+                    document.getElementById("ProposedMessageDisplay").style.display = 'none'
+                    document.getElementById("myProgress").style.display = 'none'
+                    document.getElementById("Legend").style.display = 'none'
                 }
 
                 aggregateKeyArray = []
@@ -314,9 +317,8 @@
                 finalAggSig = bufferToHex(finalAggSig)
 
                 document.getElementById("aggSigAggKeyDisplay").style.display = "block"
-                document.getElementById("aggSigAggKeyDisplay").innerHTML = '<div>Aggregate Key:</div>' + finalAggKeys + '\n';
-                document.getElementById("aggSigAggKeyDisplay").innerHTML += '<div class ="publickey">Aggregate Signature:</div>' + finalAggSig
-                document.getElementById("aggSigAggKeyDisplay").innerHTML += '<div class ="publickey">Signer Indexes:</div>' + signerIndex
+                SignatureObject = { aggregateKey: finalAggKeys, aggrgateSignature: finalAggSig, signerIndexes: signerIndex, message: globalMessage }
+                document.getElementById("aggSigAggKeyDisplay").innerHTML += JSON.stringify(SignatureObject)
 
             }
         })
@@ -347,35 +349,32 @@
 
         async function groupInfo() {
             keyArray = []
-            proposedDownloadText = "Number of Signers: " + signers + "\n"
-            proposedDownloadText += "Threshold Required: " + threshold + "\n"
 
             for (let index = 0; index < frozenUserList.length; index++) {
                 const element = frozenUserList[index];
                 keyArray.push(element.publicKey)
-                proposedDownloadText += "Key " + index + " :" + element.publicKey + "\n"
 
             }
             aggkey = await aggregateKeys(keyArray) // deal with the promise, might be because i fucked with the function
             aggkey = bufferToHex(aggkey)
-            proposedDownloadText += "Aggregate Key: " + aggkey + "\n"
+
+            proposedDownloadText = {numberOfSigners:signers, thresholdNumber: threshold, signingKeys: keyArray, aggregateKey: aggkey}
 
             let today = new Date().toISOString().slice(0, 10)
             filename = 'GroupInfoBLS' + today + '.txt'
-            downloadtext(proposedDownloadText,filename)
-
+            downloadtext(JSON.stringify(proposedDownloadText),filename)
 
         }
 
-        function downloadsigs(){
+        function downloadsigs() {
             proposedText = document.getElementById("aggSigAggKeyDisplay").innerText
             let today = new Date().toISOString().slice(0, 10)
             proposedFileName = 'SignatureInfoBLS' + today + '.txt'
-            downloadtext(proposedText,proposedFileName)
+            downloadtext(proposedText, proposedFileName)
         }
 
 
-        function downloadtext(proposedMessage, proposedFilename){
+        function downloadtext(proposedMessage, proposedFilename) {
 
             var hiddenElement = document.createElement('a');
             hiddenElement.href = 'data:attachment/text,' + encodeURI(proposedMessage);
@@ -486,7 +485,9 @@
     #signOrNot,
     #myProgress,
     #Legend,
-    #roomIsFull, #aggSigAggKeyDisplay, #SaveSignatureInfo {
+    #roomIsFull,
+    #aggSigAggKeyDisplay,
+    #SaveSignatureInfo {
         display: none;
     }
 
@@ -662,7 +663,7 @@
         justify-content: center;
     }
 
-    #buttonboxpadding{
+    #buttonboxpadding {
         padding-top: 20px;
     }
 

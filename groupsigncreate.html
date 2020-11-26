@@ -186,6 +186,7 @@
         frozenUserList = []
         signatureArray = []
         privKey = ''
+        globalMessage = ''
         signerCount = 0
         pubKey = ''
         steps = ''
@@ -352,7 +353,8 @@
 
         async function sendMessage() {
             arrayPosition = 0
-            var message = document.getElementById('messageContainer').innerText;
+            message = document.getElementById('messageContainer').innerText;
+            globalMessage = message
             signature = await myBundle.signMessage(privKey, message)
             signature = bufferToHex(signature)
 
@@ -403,12 +405,9 @@
                 finalAggSig = await aggregateSignature(aggregateSignatureArray)
                 finalAggSig = bufferToHex(finalAggSig)
 
-
             document.getElementById("aggSigAggKeyDisplay").style.display = "block"
-            document.getElementById("aggSigAggKeyDisplay").innerHTML = '<div>Aggregate Key:</div>' + finalAggKeys + '\n';
-            document.getElementById("aggSigAggKeyDisplay").innerHTML += '<div class ="publickey">Aggregate Signature:</div>' + finalAggSig
-            document.getElementById("aggSigAggKeyDisplay").innerHTML += '<div class ="publickey">Signer Indexes:</div>' + signerIndex
-
+            SignatureObject = {aggregateKey: finalAggKeys, aggrgateSignature: finalAggSig, signerIndexes: signerIndex, message: globalMessage}
+            document.getElementById("aggSigAggKeyDisplay").innerHTML += JSON.stringify(SignatureObject)
             }
         })
 
@@ -447,22 +446,20 @@
 
         async function groupInfo() {
             keyArray = []
-            proposedDownloadText = "Number of Signers: " + signers + "\n"
-            proposedDownloadText += "Threshold Required: " + threshold + "\n"
 
             for (let index = 0; index < frozenUserList.length; index++) {
                 const element = frozenUserList[index];
                 keyArray.push(element.publicKey)
-                proposedDownloadText += "Key " + index + " :" + element.publicKey + "\n"
 
             }
             aggkey = await aggregateKeys(keyArray)
             aggkey = bufferToHex(aggkey)
-            proposedDownloadText += "Full Aggregate Key: " + aggkey + "\n"
+
+            proposedDownloadText = {numberOfSigners:signers, thresholdNumber: threshold, signingKeys: keyArray, aggregateKey: aggkey}
 
             let today = new Date().toISOString().slice(0, 10)
             filename = 'GroupInfoBLS' + today + '.txt'
-            downloadtext(proposedDownloadText,filename)
+            downloadtext(JSON.stringify(proposedDownloadText),filename)
 
         }
 
