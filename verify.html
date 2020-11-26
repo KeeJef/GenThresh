@@ -23,16 +23,33 @@
 <div class="buttonbox">
 
     <div id="button1">
-        <button onclick="importFileKeys(keyContain)" class="emojibutton">&nbsp;⬆️💾 Import Key</button>
+        <button onclick="importFileKeys(keyContain,'keys')" class="emojibutton">&nbsp;⬆️💾 Import Key</button>
     </div>
 
     <div id="button2">
         <button onclick="checkSignature()" class="emojibutton">&nbsp;👀 Verify</button>
     </div>
 
+    <div id="button3">
+        <button onclick="groupVerifyDisplay()" class="emojibutton">&nbsp;👨‍👩‍👧‍👦 Verify Group</button>
+    </div>
+
+    <div id="button4">
+        <button onclick="importFileKeys(groupContainer,'')" class="emojibutton">&nbsp;⬆️👨‍👩‍👧‍👦 Import Group Info</button>
+    </div>
+
+    <div id="button5">
+        <button onclick="importFileKeys(sigContainer,'')" class="emojibutton">&nbsp;⬆️✍️ Import Group Signature</button>
+    </div>
+
+    <div id="button6">
+        <button onclick="checkSignatureGroup()" class="emojibutton">&nbsp;👀 Verify</button>
+    </div>
+
+
 </div>
 
-<div class="keycontainer">
+<div class="keycontainer" id = "mainContainer">
 
 
     <div class="containers" id="left">
@@ -68,6 +85,22 @@
     </div>
 </div>
 
+<div class="keycontainer" id="secondContainer">
+
+    <div class="keys" id="pubKeyText">
+        Group Info
+    </div>
+    <div contenteditable="true" class="keysdisplay" data-placeholder="Enter Group info" id="groupContainer"></div>
+
+    <div class="keys" id="signatureText">
+        Group Signature
+    </div>
+    <div contenteditable="true" class="keysdisplay" data-placeholder="Enter Signature info" id="sigContainer"></div>
+
+
+</div>
+
+
 <div class="results" id="results">
 
 </div>
@@ -87,6 +120,18 @@
             return [...new Uint8Array(buffer)]
                 .map(b => b.toString(16).padStart(2, "0"))
                 .join("");
+        }
+
+        function groupVerifyDisplay(){
+            document.getElementById('mainContainer').remove()
+            document.getElementById('button1').remove()
+            document.getElementById('button2').remove()
+            document.getElementById('button3').remove()
+            document.getElementById('button4').style.display = "inline-block"
+            document.getElementById('button5').style.display = "inline-block"
+            document.getElementById('button6').style.display = "inline-block"
+            document.getElementById('secondContainer').style.display = "block"
+            
         }
 
 
@@ -115,7 +160,21 @@
             return
         }
 
-        function importFileKeys(elementToChange) {
+        function checkSignatureGroup(){
+
+            groupInfo = document.getElementById('groupContainer')
+            sigInfo = document.getElementById('sigContainer')
+            
+            if (groupInfo.innerText == '' || sigInfo.innerText == '') {
+                return
+            }
+
+            splitGroupInfo = groupInfo.innerText.split('\n')
+            splitGroupInfo = splitGroupInfo.split(':')
+
+        }
+
+        function importFileKeys(elementToChange, type) {
             var input = document.createElement('input');
             input.type = 'file';
 
@@ -131,9 +190,11 @@
                 reader.onload = readerEvent => {
                     var content = readerEvent.target.result; // this is the content!
 
-                    content = content.split('\n')
+                    if (type == 'keys') {
+                        content = content.split('\n')
                     content = content[0].split(':')
                     content = content[1]
+                    }
 
                     elementToChange.innerHTML = content // this is not agnostic!
 
@@ -182,14 +243,18 @@
     }
 
 
-    #button1 {
+    #button1,#button2,#button3 {
         display: inline-block;
         padding-bottom: 30px;
     }
 
-    #button2 {
-        display: inline-block;
+    #button4,#button5,#button6{
+        display: none;
         padding-bottom: 30px;
+    }
+
+    #secondContainer{
+        display: none;
     }
 
     .buttonbox {

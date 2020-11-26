@@ -291,12 +291,12 @@
 
             if (signerCount >= threshold) {
 
+                document.getElementById("SaveSignatureInfo").style.display = 'flex'
+
                 if (signerCount == signers) {
                 document.getElementById("ProposedMessageDisplay").style.display = 'none'
                 document.getElementById("myProgress").style.display = 'none'
                 document.getElementById("Legend").style.display = 'none'
-                document.getElementById("SaveSignatureInfo").style.display = 'flex'
-
                 }
 
                 aggregateKeyArray = []
