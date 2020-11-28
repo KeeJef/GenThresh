@@ -1,5 +1,5 @@
-io = require("socket.io"),
-   server = io.listen(8000);
+io = require("socket.io")()
+server = io.listen(8000);
 
 userArrays = []; //This is all being stored in memory which is bad
 server.on('connection', function (socket) {
