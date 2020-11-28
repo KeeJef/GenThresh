@@ -100,10 +100,8 @@
 
 </div>
 
-
-<div class="results" id="results">
-
-</div>
+<div class="results" id="threshold"></div>
+<div class="results" id="results"></div>
 
 
 <body>
@@ -160,13 +158,14 @@
             return
         }
 
-        function checkSignatureGroup(){
+        async function checkSignatureGroup(){
             loadedKeyArray = []
             message = ''
             numberOfSigners = 0
             thresholdOfSigners = 0
             aggregateSignature = ''
             signerIndexes = []
+            actualSigners =[]
 
             groupInfo = document.getElementById('groupContainer')
             sigInfo = document.getElementById('sigContainer')
@@ -174,8 +173,48 @@
             if (groupInfo.innerText == '' || sigInfo.innerText == '') {
                 return
             }
+            
+            jsonGroupInfo = JSON.parse(groupInfo.innerText)
+            loadedKeyArray = jsonGroupInfo.signingKeys
+            numberOfSigners = jsonGroupInfo.numberOfSigners
+            thresholdOfSigners = jsonGroupInfo.thresholdNumber
 
-            //jsonify group info and siginfo, then process
+            jsonSigInfo = JSON.parse(sigInfo.innerText)
+            aggregateSignature = jsonSigInfo.aggrgateSignature //updatethis
+            message  = jsonSigInfo.message
+            signerIndexes = jsonSigInfo.signerIndexes
+
+            for (let index = 0; index < signerIndexes.length; index++) {
+                element = signerIndexes[index];
+                actualSigners.push(loadedKeyArray[element])                
+            }
+
+            if (actualSigners.length >= thresholdOfSigners) {
+
+            }
+            else{
+                document.getElementById('threshold').innerHTML = "Threshold not met, only " + actualSigners.length + " out of " + thresholdOfSigners
+                return
+            }
+
+            try {
+                aggregateKey = await myBundle.aggKey(actualSigners)
+            } catch (error) {
+                document.getElementById('results').innerHTML = "Invalid Keys ❌"
+            }
+
+            try {
+                isvalid = await myBundle.checkSig(aggregateSignature, aggregateKey, message) 
+            } catch (error) {
+                document.getElementById('results').innerHTML = "Invalid Signature, Bad Data ❌"
+            }
+
+            if (isvalid) {
+                document.getElementById('results').innerHTML = "Valid Signature ✅ " + actualSigners.length + "/" + thresholdOfSigners
+            }
+            else{
+                document.getElementById('results').innerHTML = "Invalid Signature ❌"
+            }
 
         }
 
