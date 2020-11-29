@@ -46,6 +46,22 @@
 
     </div>
 
+    <div class="buttonbox" id="existingGroup">
+        <div id="button1">
+            <button onclick="newGroup()" class="emojibutton">&nbsp;⬆️👨‍👩‍👧‍👦 Import Group Info</button>
+        </div>
+    </div>
+
+    <div class="keycontainer" id="existingGroupContainer">
+
+        <div class="keys" id="pubKeyText">
+            Group Info
+        </div>
+        <div contenteditable="true" class="keysdisplay" data-placeholder="Enter Group info" id="groupContainer"></div>
+    
+    </div>
+
+
     <div class="namecontainer" id="nameContainer">
 
         <input class="namebox" id="nameEntry" type="text" placeholder="Enter name here" /> <button class="copyButton"
@@ -174,6 +190,349 @@
         </div>
 
     </div>
+
+    <style>
+        /* Add a black background color to the top navigation bar */
+        .emojititle {
+            font-size: 10vw;
+        }
+    
+        .title {
+            font-size: 5vw;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+        }
+    
+        #button1,
+        #button2,
+        #buttonSendMessage {
+            display: inline-block;
+        }
+    
+        .buttonbox {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        #buttonboxpadding{
+            padding-top: 20px;
+        }
+    
+        .titlebox {
+            text-align: center;
+            padding-bottom: 10px;
+        }
+    
+        .namebox {
+    
+            border: 0;
+            outline: 0;
+            font-size: 25px;
+            text-align: center;
+            background: transparent;
+            border-bottom: 2px solid rgb(253, 232, 191);
+            width: 30%;
+        }
+    
+        .roombox {
+    
+            border: 0;
+            outline: 0;
+            font-size: 40px;
+            text-align: center;
+            background: transparent;
+            color: grey;
+            border-bottom: 2px solid rgb(253, 232, 191);
+            min-width: 30%;
+            width: auto;
+        }
+    
+        .keysdisplay {
+            text-align: center;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 25px;
+            overflow: hidden;
+            word-wrap: break-word;
+            border-radius: 25px;
+            border: 2px solid #8d7745;
+            padding: 20px;
+        }
+    
+        .keycontainer {
+            padding-bottom: 30px;
+        }
+    
+    
+        circle {
+            fill: #fadb8d;
+            stroke: #e0acf7;
+            stroke-width: 250;
+            stroke-dasharray: 0 785.39;
+            /* Changes to stroke dash array will affect how filled it is */
+        }
+    
+        #circleobject1 {
+            fill: none;
+            stroke: #ce6df8;
+        }
+    
+        #circleobject2 {
+            fill: none;
+            stroke-width: 10;
+            stroke-dasharray: 785.39 785.39;
+            stroke: black;
+        }
+    
+        svg {
+            transform: rotate(-90deg);
+            background: #fadb8d;
+            border-radius: 50%;
+    
+        }
+    
+        body {
+            background-color: #fef2dc;
+            margin-left: 15%;
+            margin-right: 15%;
+    
+        }
+    
+        .copyButton {
+            border: none;
+            outline: none;
+            background-color: #fef2dc;
+            font-size: 35px;
+        }
+    
+        .copyButton:active {
+            transform: translateY(4px);
+        }
+    
+        .namecontainer {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+    
+        .roomcontainer {
+            display: none;
+            text-align: center;
+            padding-bottom: 20px;
+        }
+    
+        body {
+            background-color: rgb(254, 242, 220);
+        }
+    
+        .emojibutton {
+            font-size: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #fff;
+            border: 0;
+            outline: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            height: 2.5em;
+            padding: 0.5em 0.75em;
+            border-radius: 0.25em;
+            box-sizing: border-box;
+            background-color: #e0acf7;
+            box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            transition-duration: 0.4s;
+            cursor: pointer;
+        }
+    
+        .emojibutton:hover {
+            background-color: #cc70f3;
+            color: white;
+        }
+    
+        .keys {
+            text-align: center;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+    
+        .thresholdselector {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+    
+        #pubKeyDisplay,
+        #nameContainer,
+        #wait,
+        #readybutton,
+        #generateOrLoad,
+        #GeneratedKeyBox,
+        #buttonboxthreshold,
+        #groupinfobox,
+        #proposedMessageDisplay,
+        #buttonboxProposedMessage,
+        #myProgress,
+        #Legend,#aggSigAggKeyDisplay, 
+        #SaveSignatureInfo, #existingGroupContainer, #existingGroup {
+            display: none;
+        }
+    
+        #buttonSavegroup {
+            display: none;
+            margin-left: 40px;
+        }
+    
+        #ThresholdDisplay {
+            display: inline;
+        }
+    
+        #myProgress {
+            position: relative;
+            width: 100%;
+            background-color: #fadb8d;
+    
+        }
+    
+        #currentSigned {
+            position: absolute;
+            width: 0%;
+            height: 50px;
+            background-color: #ce6df8;
+        }
+    
+        #thresholdBar {
+    
+            width: 0%;
+            height: 50px;
+            background-color: #e0acf7;
+        }
+    
+        .colour {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+        }
+    
+        .darkpurp {
+            background: #ce6df8;
+        }
+    
+        .lightpurp {
+            background: #e0acf7;
+        }
+    
+        .yellow {
+            background: #fadb8d;
+        }
+    
+        .Legend {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 20px;
+            height: 50px;
+            padding-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    
+        #readybutton {
+            text-align: center;
+        }
+    
+        .slidecontainer {
+            width: 100%;
+            padding-bottom: 20px;
+            /* Width of the outside container */
+        }
+    
+        /* The slider itself */
+        .slider {
+            -webkit-appearance: none;
+            /* Override default CSS styles */
+            appearance: none;
+            width: 100%;
+            /* Full-width */
+            height: 25px;
+            /* Specified height */
+            background: #d3d3d3;
+            /* Grey background */
+            outline: none;
+            /* Remove outline */
+            opacity: 0.7;
+            /* Set transparency (for mouse-over effects on hover) */
+            -webkit-transition: .2s;
+            /* 0.2 seconds transition on hover */
+            transition: opacity .2s;
+        }
+    
+        /* Mouse-over effects */
+        .slider:hover {
+            opacity: 1;
+            /* Fully shown on mouse-over */
+        }
+    
+        /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            /* Override default look */
+            appearance: none;
+            width: 25px;
+            /* Set a specific slider handle width */
+            height: 25px;
+            /* Slider handle height */
+            background: #4CAF50;
+            /* Green background */
+            cursor: pointer;
+            /* Cursor on hover */
+        }
+    
+        .slider::-moz-range-thumb {
+            width: 25px;
+            /* Set a specific slider handle width */
+            height: 25px;
+            /* Slider handle height */
+            background: #4CAF50;
+            /* Green background */
+            cursor: pointer;
+            /* Cursor on hover */
+        }
+    
+        #selectionFramework {
+            display: none;
+        }
+    
+        .joinedNames {
+            font-size: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #fff;
+            border: 0;
+            outline: 0;
+            float: left;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            height: 2.5em;
+            padding: 0.5em 0.75em;
+            border-radius: 0.25em;
+            box-sizing: border-box;
+            background-color: #16C60C;
+            box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            transition-duration: 0.4s;
+            cursor: pointer;
+        }
+    
+        .joinedNames:hover {
+            background-color: #12970b;
+            color: white;
+        }
+    
+        .emojilink {
+            text-decoration: none;
+        }
+    </style>
 
     <script src="bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
@@ -439,8 +798,11 @@
 
             //or do threshold verification
 
-            document.getElementById("nameContainer").style.display = "block"
-            document.getElementById("buttonbox").style.display = "none"
+            document.getElementById("buttonboxmain").style.display = "none"
+            document.getElementById("existingGroup").style.display = "block"
+            document.getElementById("existingGroupContainer").style.display = "block"
+
+
 
         }
 
@@ -536,344 +898,3 @@
 
 </html>
 
-<style>
-    /* Add a black background color to the top navigation bar */
-    .emojititle {
-        font-size: 10vw;
-    }
-
-    .title {
-        font-size: 5vw;
-        font-family: Arial, Helvetica, sans-serif;
-        font-weight: bold;
-    }
-
-    #button1,
-    #button2,
-    #buttonSendMessage {
-        display: inline-block;
-    }
-
-    .buttonbox {
-        text-align: center;
-        padding-bottom: 20px;
-    }
-    #buttonboxpadding{
-        padding-top: 20px;
-    }
-
-    .titlebox {
-        text-align: center;
-        padding-bottom: 10px;
-    }
-
-    .namebox {
-
-        border: 0;
-        outline: 0;
-        font-size: 25px;
-        text-align: center;
-        background: transparent;
-        border-bottom: 2px solid rgb(253, 232, 191);
-        width: 30%;
-    }
-
-    .roombox {
-
-        border: 0;
-        outline: 0;
-        font-size: 40px;
-        text-align: center;
-        background: transparent;
-        color: grey;
-        border-bottom: 2px solid rgb(253, 232, 191);
-        min-width: 30%;
-        width: auto;
-    }
-
-    .keysdisplay {
-        text-align: center;
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 25px;
-        overflow: hidden;
-        word-wrap: break-word;
-        border-radius: 25px;
-        border: 2px solid #8d7745;
-        padding: 20px;
-    }
-
-    .keycontainer {
-        padding-bottom: 30px;
-    }
-
-
-    circle {
-        fill: #fadb8d;
-        stroke: #e0acf7;
-        stroke-width: 250;
-        stroke-dasharray: 0 785.39;
-        /* Changes to stroke dash array will affect how filled it is */
-    }
-
-    #circleobject1 {
-        fill: none;
-        stroke: #ce6df8;
-    }
-
-    #circleobject2 {
-        fill: none;
-        stroke-width: 10;
-        stroke-dasharray: 785.39 785.39;
-        stroke: black;
-    }
-
-    svg {
-        transform: rotate(-90deg);
-        background: #fadb8d;
-        border-radius: 50%;
-
-    }
-
-    body {
-        background-color: #fef2dc;
-        margin-left: 15%;
-        margin-right: 15%;
-
-    }
-
-    .copyButton {
-        border: none;
-        outline: none;
-        background-color: #fef2dc;
-        font-size: 35px;
-    }
-
-    .copyButton:active {
-        transform: translateY(4px);
-    }
-
-    .namecontainer {
-        text-align: center;
-        padding-bottom: 20px;
-    }
-
-    .roomcontainer {
-        display: none;
-        text-align: center;
-        padding-bottom: 20px;
-    }
-
-    body {
-        background-color: rgb(254, 242, 220);
-    }
-
-    .emojibutton {
-        font-size: 25px;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 600;
-        color: #fff;
-        border: 0;
-        outline: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        height: 2.5em;
-        padding: 0.5em 0.75em;
-        border-radius: 0.25em;
-        box-sizing: border-box;
-        background-color: #e0acf7;
-        box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
-        z-index: 1;
-        transition-duration: 0.4s;
-        cursor: pointer;
-    }
-
-    .emojibutton:hover {
-        background-color: #cc70f3;
-        color: white;
-    }
-
-    .keys {
-        text-align: center;
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 30px;
-        margin-bottom: 10px;
-    }
-
-    .thresholdselector {
-        text-align: center;
-        padding-bottom: 20px;
-    }
-
-    #pubKeyDisplay,
-    #nameContainer,
-    #wait,
-    #readybutton,
-    #generateOrLoad,
-    #GeneratedKeyBox,
-    #buttonboxthreshold,
-    #groupinfobox,
-    #proposedMessageDisplay,
-    #buttonboxProposedMessage,
-    #myProgress,
-    #Legend,#aggSigAggKeyDisplay, #SaveSignatureInfo {
-        display: none;
-    }
-
-    #buttonSavegroup {
-        display: none;
-        margin-left: 40px;
-    }
-
-    #ThresholdDisplay {
-        display: inline;
-    }
-
-    #myProgress {
-        position: relative;
-        width: 100%;
-        background-color: #fadb8d;
-
-    }
-
-    #currentSigned {
-        position: absolute;
-        width: 0%;
-        height: 50px;
-        background-color: #ce6df8;
-    }
-
-    #thresholdBar {
-
-        width: 0%;
-        height: 50px;
-        background-color: #e0acf7;
-    }
-
-    .colour {
-        width: 50px;
-        height: 50px;
-        margin: 5px;
-    }
-
-    .darkpurp {
-        background: #ce6df8;
-    }
-
-    .lightpurp {
-        background: #e0acf7;
-    }
-
-    .yellow {
-        background: #fadb8d;
-    }
-
-    .Legend {
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 20px;
-        height: 50px;
-        padding-top: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    #readybutton {
-        text-align: center;
-    }
-
-    .slidecontainer {
-        width: 100%;
-        padding-bottom: 20px;
-        /* Width of the outside container */
-    }
-
-    /* The slider itself */
-    .slider {
-        -webkit-appearance: none;
-        /* Override default CSS styles */
-        appearance: none;
-        width: 100%;
-        /* Full-width */
-        height: 25px;
-        /* Specified height */
-        background: #d3d3d3;
-        /* Grey background */
-        outline: none;
-        /* Remove outline */
-        opacity: 0.7;
-        /* Set transparency (for mouse-over effects on hover) */
-        -webkit-transition: .2s;
-        /* 0.2 seconds transition on hover */
-        transition: opacity .2s;
-    }
-
-    /* Mouse-over effects */
-    .slider:hover {
-        opacity: 1;
-        /* Fully shown on mouse-over */
-    }
-
-    /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
-    .slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        /* Override default look */
-        appearance: none;
-        width: 25px;
-        /* Set a specific slider handle width */
-        height: 25px;
-        /* Slider handle height */
-        background: #4CAF50;
-        /* Green background */
-        cursor: pointer;
-        /* Cursor on hover */
-    }
-
-    .slider::-moz-range-thumb {
-        width: 25px;
-        /* Set a specific slider handle width */
-        height: 25px;
-        /* Slider handle height */
-        background: #4CAF50;
-        /* Green background */
-        cursor: pointer;
-        /* Cursor on hover */
-    }
-
-    #selectionFramework {
-        display: none;
-    }
-
-    .joinedNames {
-        font-size: 25px;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 600;
-        color: #fff;
-        border: 0;
-        outline: 0;
-        float: left;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        height: 2.5em;
-        padding: 0.5em 0.75em;
-        border-radius: 0.25em;
-        box-sizing: border-box;
-        background-color: #16C60C;
-        box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
-        z-index: 1;
-        transition-duration: 0.4s;
-        cursor: pointer;
-    }
-
-    .joinedNames:hover {
-        background-color: #12970b;
-        color: white;
-    }
-
-    .emojilink {
-        text-decoration: none;
-    }
-</style>
