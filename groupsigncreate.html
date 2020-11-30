@@ -41,14 +41,14 @@
         </div>
 
         <div id="button2">
-            <button onclick="displayExisting()" class="emojibutton">&nbsp;👨‍👩‍👧‍👦 Existing Group</button>
+            <button onclick="existingGroup()" class="emojibutton">&nbsp;👨‍👩‍👧‍👦 Existing Group</button>
         </div>
 
     </div>
 
     <div class="buttonbox" id="existingGroup">
         <div id="button1">
-            <button onclick="newGroup()" class="emojibutton">&nbsp;⬆️👨‍👩‍👧‍👦 Import Group Info</button>
+            <button onclick="getGroupInfo()" class="emojibutton">&nbsp;⬆️👨‍👩‍👧‍👦 Import Group Info</button>
         </div>
     </div>
 
@@ -57,8 +57,14 @@
         <div class="keys" id="pubKeyText">
             Group Info
         </div>
-        <div contenteditable="true" class="keysdisplay" data-placeholder="Enter Group info" id="groupContainer"></div>
+        <div contenteditable="false" class="keysdisplay" data-placeholder="Enter Group info" id="groupContainer"></div>
     
+    </div>
+
+    <div class="buttonbox" id="NextButtonGroup">
+        <div id="button1">
+            <button onclick="getGroupInfo()" class="emojibutton">&nbsp;➡️ Next</button>
+        </div>
     </div>
 
 
@@ -373,7 +379,9 @@
         #buttonboxProposedMessage,
         #myProgress,
         #Legend,#aggSigAggKeyDisplay, 
-        #SaveSignatureInfo, #existingGroupContainer, #existingGroup {
+        #SaveSignatureInfo, 
+        #existingGroupContainer, 
+        #existingGroup, #NextButtonGroup {
             display: none;
         }
     
@@ -609,6 +617,42 @@
             return agg
         }
 
+        function existingGroup(){
+
+            document.getElementById("buttonboxmain").style.display = "none"
+            document.getElementById("existingGroup").style.display = "block"
+            document.getElementById("existingGroupContainer").style.display = "block"
+        }
+
+        function getGroupInfo() {
+            var input = document.createElement('input');
+            input.type = 'file';
+
+            input.onchange = e => {
+                var filetest = e.target.files[0];
+                console.log(filetest.name)
+
+                // setting up the reader
+                var reader = new FileReader();
+                reader.readAsText(filetest, 'UTF-8');
+
+                // here we tell the reader what to do when it's done reading...
+                reader.onload = readerEvent => {
+                var content = readerEvent.target.result; // this is the content!
+
+                document.getElementById("groupContainer").innerText = content
+                document.getElementById("existingGroupContainer").style.display = "block"
+                document.getElementById("NextButtonGroup").style.display = "block"
+                
+                }
+
+
+
+            }
+
+            input.click();
+        }
+
         function getKeys() {
             var input = document.createElement('input');
             input.type = 'file';
@@ -623,7 +667,7 @@
 
                 // here we tell the reader what to do when it's done reading...
                 reader.onload = readerEvent => {
-                    var content = readerEvent.target.result; // this is the content!
+                var content = readerEvent.target.result; // this is the content!
 
                     keys = content.split('\n')
                     publicKey = keys[0].split(':')
@@ -792,7 +836,10 @@
         function displayExisting() {
             document.getElementById("nameContainer").style.display = "block"
             document.getElementById("buttonbox").style.display = "none"
+
         }
+
+        
 
         async function groupInfo() {
             keyArray = []
