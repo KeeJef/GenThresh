@@ -143,7 +143,11 @@
                 return
             }
 
-            isvalid = await myBundle.checkSig(signature, key, message)
+            try {
+                isvalid = await myBundle.checkSig(signature, key, message)
+            } catch (error) {
+                document.getElementById('results').innerHTML = "Invalid Data ❌"
+            }
 
             if (isvalid == true) {
                 
