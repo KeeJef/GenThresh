@@ -88,7 +88,7 @@
             onclick="copyClipboard()">📋</button>
     </div>
 
-    <div class="keycontainer">
+    <div class="keycontainer" id="nameDisplay">
 
         <div class="keys" id="pubKeyText">
         </div>
@@ -205,6 +205,8 @@
         </div>
 
     </div>
+
+    <div class="results" id="results"></div>
 
     <style>
         /* Add a black background color to the top navigation bar */
@@ -396,7 +398,7 @@
         #SaveSignatureInfo,
         #existingGroupContainer,
         #existingGroup,
-        #NextButtonGroup {
+        #NextButtonGroup, #buttonboxpadding, #nameDisplay {
             display: none;
         }
 
@@ -494,6 +496,12 @@
             /* Fully shown on mouse-over */
         }
 
+        .results{
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 30px;
+    }
+
         /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
         .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
@@ -580,6 +588,7 @@
         pubKey = ''
         steps = ''
         thresholdSet = ''
+        infoGroup = ''
         isReady = false
 
         var socket = io.connect("http://localhost:8000"); // Just replace with IP address
@@ -593,6 +602,10 @@
 
         function setUsername(name, roomid) {
             socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid: socket.id, isLeader: true, publicKey: pubKey, thresholdNumber: threshold, signersNumber: signers });
+        };
+
+        function setUsernameExisting(name,roomid,passedinfogroup) {
+            socket.emit('setUsernameExisting', { namewanted: name, roomname: roomid, socketid: socket.id, infoGroup:passedinfogroup});
         };
 
         function getUsers() {
@@ -623,9 +636,29 @@
         }
 
         function ValidateAndFire() {
-            //validate both infos are provided 
-            //validate person is in group
-            //Fire new event to server which prespecifes a useraray
+            
+            infoGroup = document.getElementById("groupContainer").innerText
+            keypair = document.getElementById("keyPairContainer").innerText
+
+            if (infoGroup == "" || keypair == "") {
+                document.getElementById('results').innerHTML = "Please enter Group info and Key pair ❌"
+                return
+            }
+
+            infoGroup = JSON.parse(infoGroup)
+
+            for (let index = 0; index < infoGroup.signingKeys.length; index++) {
+                element = infoGroup.signingKeys[index];
+
+                if (pubKey == element) {
+                    displayNameExisting()
+                    return
+                }
+                
+            }
+
+            document.getElementById('results').innerHTML = "Key pair is not in listed Signing Keys ❌"
+
         }
 
         function bufferToHex(buffer) {
@@ -723,6 +756,7 @@
             userList = data.userlist
             readyUsers = 0
 
+            document.getElementById("nameDisplay").style.display = "block"
             document.getElementById("pubKeyDisplay").style.display = "block"
             document.getElementById("pubKeyDisplay").innerHTML = ""
             document.getElementById("wait").style.display = "block"
@@ -809,6 +843,7 @@
                 document.getElementById("proposedMessageDisplay").style.display = 'none'
                 document.getElementById("myProgress").style.display = 'none'
                 document.getElementById("Legend").style.display = 'none'
+                document.getElementById("buttonboxpadding").style.display = 'block'
                 document.getElementById("SaveSignatureInfo").style.display = 'flex'
 
 
@@ -842,6 +877,21 @@
             document.getElementById("roomcontainer").style.display = "block"
             document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + signers + " Threshold: " + threshold
             getUsers()
+        }
+
+        function displayNameExisting(){
+            document.getElementById("existingGroupContainer").remove()
+            document.getElementById("NextButtonGroup").remove()
+            document.getElementById("results").remove()
+            document.getElementById("existingGroup").remove()
+
+            startSocket()
+            setUsernameExisting(pubKey, randomroom, JSON.stringify(infoGroup))
+            
+            document.getElementById("roombox").value = "GenThresh.org/joinE?" + randomroom
+            document.getElementById("roomcontainer").style.display = "block"
+            document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + infoGroup.numberOfSigners + " Threshold: " + infoGroup.thresholdNumber
+            getUsers() //need a complete different getusers? 
         }
 
         function ready() {

@@ -30,6 +30,33 @@ server.on('connection', function (socket) {
 
    });
 
+   socket.on('setUsernameExisting', function (data) {
+      console.log("User Joined Room " + data.roomname + " with name " + data.namewanted);
+
+      for (let index = 0; index < userArrays.length; index++) {
+         const element1 = userArrays[index];
+
+         if (element1.RoomName == data.roomname) {
+
+            infoGroup = JSON.parse(data.infoGroup) 
+
+            for (let index = 0; index < infoGroup.signingKeys.length; index++) {
+               element = infoGroup.signingKeys[index];
+
+               userObject = {name: data.namewanted, publicKey:element, signers:infoGroup.numberOfSigners, threshold:infoGroup.thresholdNumber, roomFullStatus: false }
+               element1.members.push(userObject);
+               
+            }
+
+            return
+         }
+
+      }
+
+
+
+   });
+
    socket.on('create', function (room) {
       console.log("a new room was created with the name " + room)
       socket.join(room);
