@@ -79,6 +79,7 @@
             privateKey = privateKey[1]
 
             signature = myBundle.signMessage(privateKey, message)
+
             displaySignature(signature)
         };
 
@@ -89,7 +90,7 @@
             sigTextField.style.display = "block";
             sigContainer.style.display = "block";
 
-            sigContainer.innerText = bufferToHex(await signature)
+            sigContainer.innerText = bufferToHex(await signature) 
 
         }
 

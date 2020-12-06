@@ -31,7 +31,7 @@ server.on('connection', function (socket) {
    });
 
    socket.on('setUsernameExisting', function (data) {
-      console.log("User Joined Room " + data.roomname + " with name " + data.namewanted);
+      console.log("User Joined Room " + data.roomname + " with name " + data.pubKey);
 
       for (let index = 0; index < userArrays.length; index++) {
          const element1 = userArrays[index];
@@ -43,7 +43,10 @@ server.on('connection', function (socket) {
             for (let index = 0; index < infoGroup.signingKeys.length; index++) {
                element = infoGroup.signingKeys[index];
 
-               userObject = {name: data.namewanted, publicKey:element, signers:infoGroup.numberOfSigners, threshold:infoGroup.thresholdNumber, roomFullStatus: false }
+               userObject = {name: data.namewanted, publicKey:element, socketid: data.socketid, signers:infoGroup.numberOfSigners, threshold:infoGroup.thresholdNumber, roomFullStatus: false, joinstatus : false}
+               if (data.pubKey == element) {
+                  userObject.joinstatus = true
+               }
                element1.members.push(userObject);
                
             }
@@ -87,6 +90,20 @@ server.on('connection', function (socket) {
 
          if (element.RoomName == data.roomid) {
             server.sockets.in(data.roomid).emit('getUsers', { userlist: element.members });
+            return
+         }
+
+      }
+
+   });
+
+   socket.on('getExistingUsers', function (data) {
+
+      for (let index = 0; index < userArrays.length; index++) {
+         const element = userArrays[index];
+
+         if (element.RoomName == data.roomid) {
+            server.sockets.in(data.roomid).emit('getLoadedUsers', { userlist: element.members });
             return
          }
 
