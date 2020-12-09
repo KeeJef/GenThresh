@@ -826,7 +826,7 @@
                 readycounter ++
 
                 name = userList[index].publicKey;
-                name = name.replace(/(.{7})..+/, "$1&hellip;");
+                name = name.substr(0,4)  + "..." + name.substr(name.length - 4)
                 socketchoice = userList[index].socketid
                 document.getElementById("pubKeyDisplay").innerHTML += "<div id=" + socketchoice + "" + " class=\"joinedNames\">" + name + "</div>"
 

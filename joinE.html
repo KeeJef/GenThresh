@@ -57,9 +57,6 @@
         <div class="buttonbox" id="generateOrLoad">
 
             <div id="button1">
-                <button onclick="generateNewKeypair()" class="emojibutton">&nbsp;🔑 Generate Keypair</button>
-            </div>
-            <div id="button1">
                 <button onclick="getKeys()" class="emojibutton">&nbsp;⬆️💾Import Keypair</button>
             </div>
 
@@ -77,11 +74,21 @@
         <div class="buttonbox" id="buttonboxthreshold">
 
             <div id="button1">
-                <button onclick="nameChoose()" class="emojibutton">&nbsp;➡️ Next</button>
+                <button onclick="nameChoose()" class="emojibutton">&nbsp;➡️ Next</button> 
+                <!-- interrupt this -->
             </div>
 
         </div>
 
+    </div>
+
+    <div class="keycontainer" id="nameDisplay">
+
+        <div class="keys" id="pubKeyText">
+        </div>
+        <div class="keysdisplay" id="pubKeyDisplay">
+
+        </div>
     </div>
 
     <div class="keys" id="wait"></div>
@@ -122,6 +129,7 @@
     </div>
 
     <div id="roomIsFull" class="keys">Room is full please contact the operator</div>
+    <div id="wrongKeys" class="keys">You imported a key which is not in this room</div>
 
     <div class="keysdisplay" id="aggSigAggKeyDisplay"></div>
 
@@ -162,6 +170,10 @@
             socket.emit('create', chosenRoom);
         }
 
+        function getExistingUsers() {
+            socket.emit('getExistingUsers', { roomid: chosenRoom });
+        };
+
         function setUsername(name, roomid) {
             socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid: socket.id, isLeader: false, publicKey: pubKey });
         };
@@ -170,9 +182,16 @@
             socket.emit('checkRoom', { roomid: chosenRoom })
         }
 
+        function checkCorrectRoom(){
+            socket.emit('checkCorrectRoom', { roomid: chosenRoom, publicKey:pubKey })
+        }
+
         function nameChoose() {
             document.getElementById("GenerateFramework").style.display = 'none'
-            document.getElementById("nameContainer").style.display = 'block'
+            checkCorrectRoom()
+            startSocket()
+            getExistingUsers()
+
         }
 
         function aggregateKeys(keyArray) {
@@ -186,11 +205,6 @@
             return agg
         }
 
-        function getUsers() {
-            socket.emit('getUsers', { roomid: chosenRoom });
-            document.getElementById("readybutton").style.display = 'block'
-            document.getElementById("GenerateFramework").style.display = 'none'
-        };
 
         socket.on('roomFullEvent', function (data) {
             if (data == true) {
@@ -198,23 +212,44 @@
             }
         });
 
-        socket.on('getUsers', function (data) {
+        socket.on('wrongKeyEvent', function (data) {
+            if (data == true) {
+                wrongKeys()
+            }
+        });
+
+        socket.on('getLoadedUsers', function (data) {
             userList = data.userlist
+            signers = 0
             readyUsers = 0
 
+            document.getElementById("nameDisplay").style.display = "block"
             document.getElementById("pubKeyDisplay").style.display = "block"
             document.getElementById("pubKeyDisplay").innerHTML = ""
+            document.getElementById("wait").style.display = "block"
 
+           
 
             for (let index = 0; index < userList.length; index++) {
+                
 
-                name = userList[index].name;
+                if (userList[index].joinstatus == false) {
+                        continue
+                    }
+                
+                signers++
+
+                name = userList[index].publicKey;
+                name = name.substr(0,4)  + "..." + name.substr(name.length - 4)
+
                 socketchoice = userList[index].socketid
                 document.getElementById("pubKeyDisplay").innerHTML += "<div id=" + socketchoice + "" + " class=\"joinedNames\">" + name + "</div>"
+                
                 if (userList[index].readyStatus == true) {
                     document.getElementById(socketchoice).innerText += "✔️"
                     readyUsers++
                 }
+            
                 if (userList[index].isLeader == true) {
                     signers = userList[index].signers
                     threshold = userList[index].threshold
@@ -230,13 +265,15 @@
                     //Freeze getinfo Array when everyone is joined
                     frozenUserList = userList
                 }
-
             }
 
             if (readyUsers == signers) {
 
                 document.getElementById("groupinfobox").style.display = "block"
             }
+
+            document.getElementById("wait").innerText = "Waiting for Signers " + userList.length + " Out of " + signers
+
         })
 
 
@@ -247,6 +284,12 @@
 
         function roomIsFull() {
             document.getElementById("roomIsFull").style.display = "block"
+            document.getElementById("generateOrLoad").style.display = "none"
+
+        }
+
+        function wrongKeys() {
+            document.getElementById("wrongKeys").style.display = "block"
             document.getElementById("generateOrLoad").style.display = "none"
 
         }
@@ -323,14 +366,6 @@
             }
         })
 
-        function getName() {
-            yourName = randomEmoji() + " " + document.getElementById("nameEntry").value;
-            startSocket()
-            setUsername(yourName, chosenRoom)
-            document.getElementById("nameContainer").remove()
-            getUsers()
-
-        }
 
         function GenerateOrLoad() {
             document.getElementById("generateOrLoad").style.display = "block"
@@ -486,6 +521,7 @@
     #myProgress,
     #Legend,
     #roomIsFull,
+    #wrongKeys,
     #aggSigAggKeyDisplay,
     #SaveSignatureInfo {
         display: none;

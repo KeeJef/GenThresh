@@ -60,6 +60,7 @@ server.on('connection', function (socket) {
 
    });
 
+
    socket.on('create', function (room) {
       console.log("a new room was created with the name " + room)
       socket.join(room);
@@ -111,8 +112,6 @@ server.on('connection', function (socket) {
 
    });
 
-   // Load a room 
-
    socket.on('readyUp', function (data) {
 
       for (let index1 = 0; index1 < userArrays.length; index1++) {
@@ -124,7 +123,7 @@ server.on('connection', function (socket) {
 
             if (room.members[index].socketid == socket.id) {
                userArrays[index1].members[index].readyStatus = true
-               server.sockets.in(data.roomname).emit('getUsers', { userlist: userArrays[index1].members });
+               server.sockets.in(data.roomname).emit('getUsers', { userlist: userArrays[index1].members }); //dont fire get users in existing group
                return
             }
             
@@ -151,6 +150,30 @@ server.on('connection', function (socket) {
             }
          
             server.sockets.in(data.roomname).emit('getUsers', { userlist: userArrays[index1].members });
+            
+          }
+
+         }
+
+   });
+
+   socket.on('checkCorrectRoom', function (data) {
+
+      for (let index1 = 0; index1 < userArrays.length; index1++) {
+         room = userArrays[index1];
+
+         if (room.RoomName == data.roomid) {
+
+          for (let index = 0; index < room.members.length; index++) {
+
+            if (data.publicKey == room.members[index].publicKey) {
+               room.members[index].joinstatus = true
+               return
+            }
+
+            }
+         
+            server.to(socket.id).emit('wrongKeyEvent', true);
             
           }
 
