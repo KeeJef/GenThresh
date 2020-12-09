@@ -60,12 +60,14 @@
         <div class="keys" id="GroupInfoText">
             Group Info
         </div>
-        <div data-placeholder="Upload group info here" contenteditable="true" class="keysdisplay" id="groupContainer"></div>
+        <div data-placeholder="Upload group info here" contenteditable="true" class="keysdisplay" id="groupContainer">
+        </div>
 
         <div class="keys" id="KeypairText">
             Key Pair
         </div>
-        <div data-placeholder="Upload keypair here" contenteditable="true" class="keysdisplay" id="keyPairContainer"></div>
+        <div data-placeholder="Upload keypair here" contenteditable="true" class="keysdisplay" id="keyPairContainer">
+        </div>
 
     </div>
 
@@ -161,9 +163,17 @@
     </div>
 
     <div class="keys" id="wait"></div>
+
     <div id="readybutton"><button class="copyButton" id="enterName" onclick="readyUp(randomroom)">Are you
             Ready?✔️</button>
     </div>
+
+    <div id="readybuttonExisting"><button class="copyButton" id="enterName" onclick="readyUpExisting(randomroom)">Are
+            you
+            Ready?✔️</button>
+    </div>
+
+
 
     <div class="keycontainer" id="proposedMessageDisplay">
 
@@ -339,7 +349,8 @@
         body {
             background-color: rgb(254, 242, 220);
         }
-        #KeypairText{
+
+        #KeypairText {
             padding-top: 20px;
         }
 
@@ -397,8 +408,11 @@
         #aggSigAggKeyDisplay,
         #SaveSignatureInfo,
         #existingGroupContainer,
+        #readybuttonExisting,
         #existingGroup,
-        #NextButtonGroup, #buttonboxpadding, #nameDisplay {
+        #NextButtonGroup,
+        #buttonboxpadding,
+        #nameDisplay {
             display: none;
         }
 
@@ -460,9 +474,10 @@
             justify-content: center;
         }
 
-        #readybutton {
+        #readybutton, #readybuttonExisting {
             text-align: center;
         }
+
 
         .slidecontainer {
             width: 100%;
@@ -496,11 +511,11 @@
             /* Fully shown on mouse-over */
         }
 
-        .results{
-    text-align: center;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 30px;
-    }
+        .results {
+            text-align: center;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 30px;
+        }
 
         /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
         .slider::-webkit-slider-thumb {
@@ -529,10 +544,10 @@
         }
 
         .keysdisplay:empty:before {
-        content: attr(data-placeholder);
-        color: grey;
-        font-size: 2vw;
-    }
+            content: attr(data-placeholder);
+            color: grey;
+            font-size: 2vw;
+        }
 
 
         #selectionFramework {
@@ -604,8 +619,8 @@
             socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid: socket.id, isLeader: true, publicKey: pubKey, thresholdNumber: threshold, signersNumber: signers });
         };
 
-        function setUsernameExisting(fullPubKey,roomid,passedinfogroup) {
-            socket.emit('setUsernameExisting', { pubKey: fullPubKey, roomname: roomid, socketid: socket.id, infoGroup:passedinfogroup});
+        function setUsernameExisting(fullPubKey, roomid, passedinfogroup) {
+            socket.emit('setUsernameExisting', { pubKey: fullPubKey, roomname: roomid, socketid: socket.id, infoGroup: passedinfogroup });
         };
 
         function getUsers() {
@@ -640,7 +655,7 @@
         }
 
         function ValidateAndFire() {
-            
+
             infoGroup = document.getElementById("groupContainer").innerText
             keypair = document.getElementById("keyPairContainer").innerText
 
@@ -660,7 +675,7 @@
                     displayNameExisting()
                     return
                 }
-                
+
             }
 
             document.getElementById('results').innerHTML = "Key pair is not in listed Signing Keys ❌"
@@ -753,6 +768,13 @@
             socket.emit('readyUp', { roomname: roomid, socketid: socket.id });
         };
 
+        function readyUpExisting(roomid) {
+            isReady = true
+            document.getElementById("readybuttonExisting").style.display = "none"
+            socket.emit('readyUpExisting', { roomname: roomid, socketid: socket.id });
+        };
+
+
         function roomFull(roomid) {
             socket.emit('roomFull', { roomname: roomid });
         };
@@ -815,7 +837,7 @@
             document.getElementById("pubKeyDisplay").style.display = "block"
             document.getElementById("pubKeyDisplay").innerHTML = ""
             document.getElementById("wait").style.display = "block"
-            
+
 
             for (let index = 0; index < userList.length; index++) {
 
@@ -823,10 +845,10 @@
                     continue
                 }
 
-                readycounter ++
+                readycounter++
 
                 name = userList[index].publicKey;
-                name = name.substr(0,4)  + "..." + name.substr(name.length - 4)
+                name = name.substr(0, 4) + "..." + name.substr(name.length - 4)
                 socketchoice = userList[index].socketid
                 document.getElementById("pubKeyDisplay").innerHTML += "<div id=" + socketchoice + "" + " class=\"joinedNames\">" + name + "</div>"
 
@@ -839,7 +861,7 @@
 
             if (isReady == false && readycounter == signers) {
                 document.getElementById("wait").innerText = "Waiting for everyone to ready up "
-                ready()
+                readyExisting()
 
             }
             else {
@@ -943,7 +965,7 @@
             getUsers()
         }
 
-        function displayNameExisting(){
+        function displayNameExisting() {
             document.getElementById("existingGroupContainer").remove()
             document.getElementById("NextButtonGroup").remove()
             document.getElementById("results").remove()
@@ -951,7 +973,7 @@
 
             startSocket()
             setUsernameExisting(pubKey, randomroom, JSON.stringify(infoGroup))
-            
+
             document.getElementById("roombox").value = "GenThresh.org/joinE?" + randomroom
             document.getElementById("roomcontainer").style.display = "block"
             document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + infoGroup.numberOfSigners + " Threshold: " + infoGroup.thresholdNumber
@@ -961,6 +983,11 @@
         function ready() {
             document.getElementById("wait").style.display = "none"
             document.getElementById("readybutton").style.display = "block"
+        }
+
+        function readyExisting() {
+            document.getElementById("wait").style.display = "none"
+            document.getElementById("readybuttonExisting").style.display = "block"
         }
 
 

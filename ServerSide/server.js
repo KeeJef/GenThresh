@@ -136,6 +136,30 @@ server.on('connection', function (socket) {
 
    });
 
+   socket.on('readyUpExisting', function (data) {
+
+      for (let index1 = 0; index1 < userArrays.length; index1++) {
+         room = userArrays[index1];
+
+         if (room.RoomName == data.roomname) {
+
+          for (let index = 0; index < room.members.length; index++) {
+
+            if (room.members[index].socketid == socket.id) {
+               userArrays[index1].members[index].readyStatus = true
+               server.sockets.in(data.roomname).emit('getLoadedUsers', { userlist: userArrays[index1].members }); //dont fire get users in existing group
+               return
+            }
+            
+          }
+
+         }
+         
+
+      }
+
+   });
+
    socket.on('roomFull', function (data) {
 
       for (let index1 = 0; index1 < userArrays.length; index1++) {
@@ -206,6 +230,8 @@ server.on('connection', function (socket) {
 
 
    socket.on('disconnect', function () {
+
+      //because this is calling getUsers instead of getloadedusers
 
       for (let index1 = 0; index1 < userArrays.length; index1++) {
          const membersArray = userArrays[index1].members;
