@@ -92,7 +92,7 @@
     </div>
 
     <div class="keys" id="wait"></div>
-    <div id="readybutton"><button class="copyButton" id="enterName" onclick="readyUp(chosenRoom)">Are you
+    <div id="readybutton"><button class="copyButton" id="enterName" onclick="readyUpExisting(chosenRoom)">Are you
             Ready?✔️</button>
     </div>
 
@@ -172,6 +172,7 @@
 
         function getExistingUsers() {
             socket.emit('getExistingUsers', { roomid: chosenRoom });
+            document.getElementById("readybutton").style.display = 'block'
         };
 
         function setUsername(name, roomid) {
@@ -217,6 +218,8 @@
                 wrongKeys()
             }
         });
+
+        //get loaded users not being called on ready up existing
 
         socket.on('getLoadedUsers', function (data) {
             userList = data.userlist
@@ -272,15 +275,20 @@
                 document.getElementById("groupinfobox").style.display = "block"
             }
 
-            document.getElementById("wait").innerText = "Waiting for Signers " + userList.length + " Out of " + signers
+                            
+                document.getElementById("wait").innerText = "Waiting for Signers " + userList.length + " Out of " + signers
+
+
 
         })
 
 
-        function readyUp(roomid) {
+        function readyUpExisting(roomid) {
+            isReady = true
             document.getElementById("readybutton").style.display = "none"
-            socket.emit('readyUp', { roomname: roomid, socketid: socket.id });
+            socket.emit('readyUpExisting', { roomname: roomid, socketid: socket.id });
         };
+
 
         function roomIsFull() {
             document.getElementById("roomIsFull").style.display = "block"
