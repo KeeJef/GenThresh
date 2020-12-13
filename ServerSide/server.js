@@ -43,6 +43,7 @@ server.on('connection', function (socket) {
             for (let index = 0; index < infoGroup.signingKeys.length; index++) {
                element = infoGroup.signingKeys[index];
 
+               //SocketIDS are mapped here which ingores actual socket ID's 
                userObject = {name: data.namewanted, publicKey:element, socketid: data.socketid, signers:infoGroup.numberOfSigners, threshold:infoGroup.thresholdNumber, roomFullStatus: false, joinstatus : false}
                if (data.pubKey == element) {
                   userObject.joinstatus = true
