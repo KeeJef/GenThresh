@@ -44,9 +44,9 @@ server.on('connection', function (socket) {
                element = infoGroup.signingKeys[index];
 
                //SocketIDS are mapped here which ingores actual socket ID's 
-               userObject = {name: data.namewanted, publicKey:element, socketid: data.socketid, signers:infoGroup.numberOfSigners, threshold:infoGroup.thresholdNumber, roomFullStatus: false, joinstatus : false}
+               userObject = {name: data.namewanted, publicKey:element, socketid: data.socketid, isLeader: data.isLeader, signers:infoGroup.numberOfSigners, threshold:infoGroup.thresholdNumber, roomFullStatus: false, joinstatus : false}
                if (data.pubKey == element) {
-                  userObject.joinstatus = true
+                  userObject.joinstatus = true //detects who caller is 
                }
                element1.members.push(userObject);
                
@@ -182,6 +182,27 @@ server.on('connection', function (socket) {
 
    });
 
+   socket.on('roomFullExisting', function (data) {
+
+      for (let index1 = 0; index1 < userArrays.length; index1++) {
+         room = userArrays[index1];
+
+         if (room.RoomName == data.roomname) {
+
+          for (let index = 0; index < room.members.length; index++) {
+
+            room.members[index].roomFullStatus = true
+
+            }
+         
+            server.sockets.in(data.roomname).emit('getLoadedUsers', { userlist: userArrays[index1].members });
+            
+          }
+
+         }
+
+   });
+
    socket.on('checkCorrectRoom', function (data) {
 
       for (let index1 = 0; index1 < userArrays.length; index1++) {
@@ -193,6 +214,7 @@ server.on('connection', function (socket) {
 
             if (data.publicKey == room.members[index].publicKey) {
                room.members[index].joinstatus = true
+               room.members[index].socketid = socket.id
                return
             }
 

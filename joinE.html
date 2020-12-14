@@ -271,12 +271,16 @@
             }
 
             if (readyUsers == signers) {
-
                 document.getElementById("groupinfobox").style.display = "block"
             }
 
+            if (signers == userList.length) {
+                document.getElementById("wait").innerText = ""
+            } else {
+                document.getElementById("wait").innerText = "Waiting for " + signers + " Signers Out of " + userList.length
+            }
                             
-                document.getElementById("wait").innerText = "Waiting for Signers " + userList.length + " Out of " + signers
+                
 
 
 
@@ -369,7 +373,7 @@
 
                 document.getElementById("aggSigAggKeyDisplay").style.display = "block"
                 SignatureObject = { aggregateKey: finalAggKeys, aggregateSignature: finalAggSig, signerIndexes: signerIndex, message: globalMessage }
-                document.getElementById("aggSigAggKeyDisplay").innerHTML += JSON.stringify(SignatureObject)
+                document.getElementById("aggSigAggKeyDisplay").innerHTML = JSON.stringify(SignatureObject)
 
             }
         })

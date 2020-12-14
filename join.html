@@ -318,7 +318,7 @@
 
                 document.getElementById("aggSigAggKeyDisplay").style.display = "block"
                 SignatureObject = { aggregateKey: finalAggKeys, aggregateSignature: finalAggSig, signerIndexes: signerIndex, message: globalMessage }
-                document.getElementById("aggSigAggKeyDisplay").innerHTML += JSON.stringify(SignatureObject)
+                document.getElementById("aggSigAggKeyDisplay").innerHTML = JSON.stringify(SignatureObject)
 
             }
         })

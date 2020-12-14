@@ -168,9 +168,7 @@
             Ready?✔️</button>
     </div>
 
-    <div id="readybuttonExisting"><button class="copyButton" id="enterName" onclick="readyUpExisting(randomroom)">Are
-            you
-            Ready?✔️</button>
+    <div id="readybuttonExisting"><button class="copyButton" id="enterName" onclick="readyUpExisting(randomroom)">Are you Ready?✔️</button>
     </div>
 
 
@@ -620,7 +618,7 @@
         };
 
         function setUsernameExisting(fullPubKey, roomid, passedinfogroup) {
-            socket.emit('setUsernameExisting', { pubKey: fullPubKey, roomname: roomid, socketid: socket.id, infoGroup: passedinfogroup });
+            socket.emit('setUsernameExisting', { pubKey: fullPubKey, roomname: roomid, socketid: socket.id,isLeader: true, infoGroup: passedinfogroup });
         };
 
         function getUsers() {
@@ -667,6 +665,9 @@
             infoGroup = JSON.parse(infoGroup)
             signers = infoGroup.numberOfSigners
             threshold = infoGroup.thresholdNumber
+
+            steps = 100 / signers
+            thresholdSet = threshold * steps
 
             for (let index = 0; index < infoGroup.signingKeys.length; index++) {
                 element = infoGroup.signingKeys[index];
@@ -779,6 +780,10 @@
             socket.emit('roomFull', { roomname: roomid });
         };
 
+        function roomFullExisting(roomid) {
+            socket.emit('roomFullExisting', { roomname: roomid });
+        };
+
 
         socket.on('getUsers', function (data) {
             userList = data.userlist
@@ -879,7 +884,7 @@
             if (readyUsers == signers && frozenUserList.length == 0) {
                 //Freeze getinfo Array when everyone is joined
                 frozenUserList = userList
-                roomFull(randomroom)
+                roomFullExisting(randomroom)
 
 
             }
@@ -949,7 +954,7 @@
 
                 document.getElementById("aggSigAggKeyDisplay").style.display = "block"
                 SignatureObject = { aggregateKey: finalAggKeys, aggregateSignature: finalAggSig, signerIndexes: signerIndex, message: globalMessage }
-                document.getElementById("aggSigAggKeyDisplay").innerHTML += JSON.stringify(SignatureObject)
+                document.getElementById("aggSigAggKeyDisplay").innerHTML = JSON.stringify(SignatureObject)
             }
         })
 
