@@ -16,6 +16,7 @@ server.on('connection', function (socket) {
 
       for (let index = 0; index < userArrays.length; index++) {
          const element = userArrays[index];
+         element.existingroom = false
 
          if (element.RoomName == data.roomname) {
 
@@ -35,6 +36,7 @@ server.on('connection', function (socket) {
 
       for (let index = 0; index < userArrays.length; index++) {
          const element1 = userArrays[index];
+         element1.existingroom = true
 
          if (element1.RoomName == data.roomname) {
 
@@ -272,7 +274,13 @@ server.on('connection', function (socket) {
                   return
                }
 
-               server.sockets.in(userArrays[index1].RoomName).emit('getUsers', { userlist: userArrays[index1].members });
+               if (userArrays[index1].existingroom == true) {
+                  server.sockets.in(userArrays[index1].RoomName).emit('getLoadedUsers', { userlist: userArrays[index1].members });
+               }else{
+                  server.sockets.in(userArrays[index1].RoomName).emit('getUsers', { userlist: userArrays[index1].members });
+               }
+
+               
 
             }
 
