@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     <title>GenThresh</title>
     <meta name="description" content="Generate Threshold Signatures">
-    <meta name="Kee Jefferys" content="SitePoint">
+    <meta name="viewport" content="width=device-width" charset="utf-8">
 
 </head>
 <div class="titlebox">
@@ -22,30 +22,31 @@
 
 <div class="buttonbox">
 
-    <div id="button1">
+    <div id="button">
         <button onclick="getKeys()" class="emojibutton">&nbsp; ⬆️💾 Import Keys
         </button>
     </div>
-    <div id="button2">
+    <div id="button1">
         <button onclick="signArbMessage()" class="emojibutton">&nbsp;✍️ Sign
         </button>
     </div>
+</div>
 
-    <div class="keycontainer">
+<div class="keycontainer">
 
-        <div class="keys" id="pubKeyText">
-            Message
-        </div>
-        <div contenteditable="true" class="keysdisplay" placeholder="Test" id="messageContainer"></div>
-
-        <div class="keys" id="signatureText">
-            Signature
-        </div>
-        <div class="keysdisplay" id="signatureContainer"></div>
-
+    <div class="keys" id="pubKeyText">
+        Message
     </div>
+    <div contenteditable="true" class="keysdisplay" placeholder="Test" id="messageContainer"></div>
+
+    <div class="keys" id="signatureText">
+        Signature
+    </div>
+    <div class="keysdisplay" id="signatureContainer"></div>
 
 </div>
+
+
 
 <style>
     /* Add a black background color to the top navigation bar */
@@ -60,18 +61,20 @@
     }
 
 
+    #button,
     #button1 {
         display: inline-block;
-        padding-bottom: 30px;
+        padding-bottom: 10px;
     }
 
-    #button2 {
-        display: none;
-        padding-bottom: 30px;
+    [contenteditable]:focus {
+        outline: 0px solid transparent;
     }
 
     .buttonbox {
         text-align: center;
+
+        padding-bottom: 10px;
     }
 
     .titlebox {
@@ -129,16 +132,20 @@
         border-radius: 25px;
         border: 2px solid #8d7745;
         padding: 20px;
-        
         text-align: left;
+        max-height: 300px;
+        overflow: hidden;
+        overflow-y: auto;
 
     }
 
     #signatureContainer,
-    #signatureText {
+    #signatureText,
+    #button1 {
         display: none;
     }
-    #signatureText{
+
+    #signatureText {
         padding-top: 20px;
     }
 
@@ -146,8 +153,41 @@
         padding-bottom: 30px;
     }
 
-    .emojilink{
+    .emojilink {
         text-decoration: none;
+    }
+
+    @media (max-width: 650px) {
+
+        .emojititle {
+            font-size: 25vw;
+        }
+
+        .title {
+            font-size: 10vw;
+        }
+    }
+
+    @media (max-width: 445px) {
+
+        .emojititle {
+            font-size: 25vw;
+        }
+
+        .title {
+            font-size: 10vw;
+        }
+
+        body {
+            margin-left: 5%;
+            margin-right: 5%;
+        }
+
+        .emojibutton {
+            width: 210px;
+            height: 3em;
+        }
+
     }
 </style>
 
@@ -223,8 +263,7 @@
                 window.content = content
             }
 
-            var T = document.getElementById("button2");
-            T.style.display = "inline-block";
+            document.getElementById("button1").style.display = "inline-block"
 
         }
 
@@ -232,13 +271,5 @@
     }
 
 </script>
-
-</script>
-
-
-<script>
-
-</script>
-
 
 </html>

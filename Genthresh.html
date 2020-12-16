@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" href="favicon.png" />
   <title>GenThresh</title>
   <meta name="description" content="Generate Threshold Signatures">
-  <meta name="Kee Jefferys" content="SitePoint">
+  <meta name="viewport" content="width=device-width" charset="utf-8">
 
 </head>
 
@@ -23,28 +23,28 @@
 
   <div class="buttonbox">
 
-    <div id="button1">
+    <div id="button">
       <button onclick="window.location='generate.html'" class="emojibutton">&nbsp;🔑 Generate
       </button>
     </div>
 
-    <div id="button2">
+    <div id="button">
       <button onclick="window.location='signsingle.html'" class="emojibutton">&nbsp;✍️ Sign
       </button>
     </div>
 
 
-    <div id="button2">
+    <div id="button">
       <button onclick="window.location='groupsigncreate.html'" class="emojibutton">&nbsp;👨‍👩‍👧‍👦 Group Sign
       </button>
     </div>
 
-    <div id="button2">
+    <div id="button">
       <button onclick="window.location='aggregate.html'" class="emojibutton">&nbsp;💫 Aggregate
       </button>
     </div>
 
-    <div id="button2">
+    <div id="button">
       <button onclick="window.location='verify.html'" class="emojibutton">&nbsp;👀 Verify
       </button>
     </div>
@@ -68,9 +68,9 @@
     font-weight: bold;
   }
 
-  #button1,
-  #button2 {
+  #button {
     display: inline-block;
+    padding-bottom: 10px;
   }
 
   .buttonbox {
@@ -111,5 +111,26 @@
   .emojibutton:hover {
     background-color: #cc70f3;
     color: white;
+  }
+
+  @media (max-width: 625px) {
+
+    .emojititle {
+      font-size: 25vw;
+    }
+
+    .title {
+      font-size: 10vw;
+    }
+
+    .emojibutton {
+      width: 200px;
+      height: 2.8em;
+    }
+
+    #button {
+      padding-bottom: 10px;
+    }
+
   }
 </style>

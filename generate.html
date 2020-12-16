@@ -7,8 +7,8 @@
   <link rel="icon" type="image/png" href="favicon.png" />
   <title>GenThresh</title>
   <meta name="description" content="Generate Threshold Signatures">
-  <meta name="Kee Jefferys" content="SitePoint">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width" charset="utf-8">
+
 
 </head>
 
@@ -24,12 +24,12 @@
 
   <div class="buttonbox">
 
-    <div id="button1">
+    <div id="button">
       <button onclick="generateNewKeypair()" class="emojibutton">&nbsp;🔑 Generate Keypair
       </button>
     </div>
 
-    <div id="button2">
+    <div id="button">
       <button onclick="download_txt()" class="emojibutton">&nbsp;💾 Save Keypair
       </button>
     </div>
@@ -58,14 +58,14 @@
     font-weight: bold;
   }
 
-  #button1,
-  #button2 {
+  #button {
     display: inline-block;
-    padding-bottom: 30px;
+    padding-bottom: 10px;
   }
 
   .buttonbox {
     text-align: center;
+    padding-bottom: 10px;
   }
 
   .titlebox {
@@ -103,6 +103,9 @@
     border-radius: 25px;
     border: 2px solid #8d7745;
     padding: 20px;
+    max-height: 300px;
+    overflow: hidden;
+    overflow-y: auto;
 
   }
 
@@ -146,6 +149,30 @@
 
   .emojilink {
     text-decoration: none;
+  }
+
+  @media (max-width: 625px) {
+
+    .emojititle {
+      font-size: 25vw;
+    }
+
+    .title {
+      font-size: 10vw;
+    }
+
+    body {
+
+      margin-left: 5%;
+      margin-right: 5%;
+
+    }
+
+    .emojibutton {
+      width: 200px;
+      height: 2.8em;
+    }
+
   }
 </style>
 

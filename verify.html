@@ -7,7 +7,8 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     <title>GenThresh</title>
     <meta name="description" content="Generate Threshold Signatures">
-    <meta name="Kee Jefferys" content="SitePoint">
+    <meta name="viewport" content="width=device-width" charset="utf-8">
+
 
 </head>
 <div class="titlebox">
@@ -27,20 +28,19 @@
     </div>
 
     <div id="button2">
-        <button onclick="checkSignature()" class="emojibutton">&nbsp;👀 Verify</button>
-    </div>
-
-    <div id="button3">
         <button onclick="groupVerifyDisplay()" class="emojibutton">&nbsp;👨‍👩‍👧‍👦 Verify Group</button>
     </div>
 
+    <div id="button3">
+        <button onclick="checkSignature()" class="emojibutton">&nbsp;👀 Verify</button>
+    </div>
+
     <div id="button4">
-        <button onclick="importFileKeys(groupContainer,'')" class="emojibutton">&nbsp;⬆️👨‍👩‍👧‍👦 Import Group
-            Info</button>
+        <button onclick="importFileKeys(groupContainer,'')" class="emojibutton">&nbsp;⬆️👨‍👩‍👧‍👦 Import Group</button>
     </div>
 
     <div id="button5">
-        <button onclick="importFileKeys(sigContainer,'')" class="emojibutton">&nbsp;⬆️✍️ Import Group Signature</button>
+        <button onclick="importFileKeys(sigContainer,'')" class="emojibutton">&nbsp;⬆️✍️ Import Signatures</button>
     </div>
 
     <div id="button6">
@@ -53,17 +53,6 @@
 <div class="keycontainer" id="mainContainer">
 
 
-    <div class="containers" id="left">
-        <div class="keys" id="signatureBanner">
-            Signature
-        </div>
-        <div contenteditable="true" contenteditable data-placeholder="Enter signature" class="keysdisplay"
-            id="signatureContainer"></div>
-
-    </div>
-
-
-    <!-- Hidden Signature divs above hidden key divs below -->
     <div class="containers" id="middle">
 
         <div class="keys" id="keyBanner">
@@ -73,8 +62,14 @@
             placeholder="Test" id="keyContainer"></div>
     </div>
 
+    <div class="containers" id="left">
+        <div class="keys" id="signatureBanner">
+            Signature
+        </div>
+        <div contenteditable="true" contenteditable data-placeholder="Enter signature" class="keysdisplay"
+            id="signatureContainer"></div>
 
-    <!-- Hidden Signature divs above hidden key divs below -->
+    </div>
 
     <div class="containers" id="right">
 
@@ -117,27 +112,36 @@
     }
 
 
-    #button1,#button2,#button3 {
+    #button1,
+    #button2,
+    #button3 {
         display: inline-block;
-        padding-bottom: 30px;
+        padding-bottom: 10px;
     }
 
-    #button4,#button5,#button6{
+    #button4,
+    #button5,
+    #button6 {
         display: none;
-        padding-bottom: 30px;
+        padding-bottom: 10px;
     }
 
-    #secondContainer{
+    #secondContainer {
         display: none;
     }
 
     .buttonbox {
         text-align: center;
+        padding-bottom: 10px;
     }
 
     .titlebox {
         text-align: center;
         padding-bottom: 30px;
+    }
+
+    [contenteditable]:focus {
+        outline: 0px solid transparent;
     }
 
     body {
@@ -223,15 +227,16 @@
     .keysdisplay:empty:before {
         content: attr(data-placeholder);
         color: grey;
-        font-size: 2vw;
+        font-size: 25px;
     }
 
     .keycontainer {
-        padding-bottom: 30px;
+        padding-bottom: 10px;
     }
 
     .containers {
         width: 80%;
+        padding-bottom: 10px;
     }
 
     #left,
@@ -248,12 +253,12 @@
 
     #middle {
         width: 33%;
-        
+
     }
 
     #right {
         width: 33%;
-        
+
     }
 
     #keyBox {
@@ -270,14 +275,45 @@
         padding-top: 20px;
     }
 
-    .results{
-    text-align: center;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 30px;
+    .results {
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 30px;
     }
 
     .emojilink {
         text-decoration: none;
+    }
+
+    @media (max-width: 1000px) {
+
+    #left,#middle,#right {
+        display: block;
+        width: auto;
+    }
+
+    }
+
+    @media (max-width: 445px) {
+
+        .emojititle {
+            font-size: 25vw;
+        }
+
+        .title {
+            font-size: 10vw;
+        }
+
+        body {
+            margin-left: 5%;
+            margin-right: 5%;
+        }
+
+        .emojibutton {
+            width: 210px;
+            height: 3em;
+        }
+
     }
 </style>
 
