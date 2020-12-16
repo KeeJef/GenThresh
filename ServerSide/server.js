@@ -256,8 +256,6 @@ server.on('connection', function (socket) {
 
    socket.on('disconnect', function () {
 
-      //because this is calling getUsers instead of getloadedusers
-
       for (let index1 = 0; index1 < userArrays.length; index1++) {
          const membersArray = userArrays[index1].members;
 

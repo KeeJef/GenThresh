@@ -47,101 +47,6 @@
 
 </div>
 
-<body>
-
-    <script src="bundle.js"></script>
-
-    <script>
-
-
-        function bufferToHex(buffer) {
-            return [...new Uint8Array(buffer)]
-                .map(b => b.toString(16).padStart(2, "0"))
-                .join("");
-        }
-
-        function signArbMessage() {
-            messageObject = document.getElementById("messageContainer")
-            message = messageObject.innerText;
-
-            if (message == "") {
-
-                messageDisplay = document.getElementById("pubKeyText")
-                messageDisplay.innerHTML = "Please add a message"
-                return
-            }
-
-            messageDisplay = document.getElementById("pubKeyText")
-            messageDisplay.innerHTML = "Message"
-
-            keys = window.content.split('\n')
-            privateKey = keys[1].split(':')
-            privateKey = privateKey[1]
-
-            signature = myBundle.signMessage(privateKey, message)
-
-            displaySignature(signature)
-        };
-
-        async function displaySignature(signature) {
-
-            var sigTextField = document.getElementById("signatureText");
-            var sigContainer = document.getElementById("signatureContainer");
-            sigTextField.style.display = "block";
-            sigContainer.style.display = "block";
-
-            sigContainer.innerText = bufferToHex(await signature) 
-
-        }
-
-        function aggregateSignature(signatureArray) {
-            agg = myBundle.aggSig(signatureArray)
-            return agg
-        }
-
-        function aggregateKeys(keyArray) {
-            singleKey = myBundle.aggKey(keyArray)
-            return singleKey
-        }
-
-        function getKeys() {
-            var input = document.createElement('input');
-            input.type = 'file';
-
-            input.onchange = e => {
-                var filetest = e.target.files[0];
-                console.log(filetest.name)
-
-                // setting up the reader
-                var reader = new FileReader();
-                reader.readAsText(filetest, 'UTF-8');
-
-                // here we tell the reader what to do when it's done reading...
-                reader.onload = readerEvent => {
-                    var content = readerEvent.target.result; // this is the content!
-                    window.content = content
-                }
-
-                var T = document.getElementById("button2");
-                T.style.display = "inline-block";
-
-            }
-
-            input.click();
-        }
-
-    </script>
-
-    </script>
-
-
-    <script>
-
-    </script>
-</body>
-
-</html>
-
 <style>
     /* Add a black background color to the top navigation bar */
     .emojititle {
@@ -245,3 +150,95 @@
         text-decoration: none;
     }
 </style>
+
+<script src="bundle.js"></script>
+<script>
+
+
+    function bufferToHex(buffer) {
+        return [...new Uint8Array(buffer)]
+            .map(b => b.toString(16).padStart(2, "0"))
+            .join("");
+    }
+
+    function signArbMessage() {
+        messageObject = document.getElementById("messageContainer")
+        message = messageObject.innerText;
+
+        if (message == "") {
+
+            messageDisplay = document.getElementById("pubKeyText")
+            messageDisplay.innerHTML = "Please add a message"
+            return
+        }
+
+        messageDisplay = document.getElementById("pubKeyText")
+        messageDisplay.innerHTML = "Message"
+
+        keys = window.content.split('\n')
+        privateKey = keys[1].split(':')
+        privateKey = privateKey[1]
+
+        signature = myBundle.signMessage(privateKey, message)
+
+        displaySignature(signature)
+    };
+
+    async function displaySignature(signature) {
+
+        var sigTextField = document.getElementById("signatureText");
+        var sigContainer = document.getElementById("signatureContainer");
+        sigTextField.style.display = "block";
+        sigContainer.style.display = "block";
+
+        sigContainer.innerText = bufferToHex(await signature)
+
+    }
+
+    function aggregateSignature(signatureArray) {
+        agg = myBundle.aggSig(signatureArray)
+        return agg
+    }
+
+    function aggregateKeys(keyArray) {
+        singleKey = myBundle.aggKey(keyArray)
+        return singleKey
+    }
+
+    function getKeys() {
+        var input = document.createElement('input');
+        input.type = 'file';
+
+        input.onchange = e => {
+            var filetest = e.target.files[0];
+            console.log(filetest.name)
+
+            // setting up the reader
+            var reader = new FileReader();
+            reader.readAsText(filetest, 'UTF-8');
+
+            // here we tell the reader what to do when it's done reading...
+            reader.onload = readerEvent => {
+                var content = readerEvent.target.result; // this is the content!
+                window.content = content
+            }
+
+            var T = document.getElementById("button2");
+            T.style.display = "inline-block";
+
+        }
+
+        input.click();
+    }
+
+</script>
+
+</script>
+
+
+<script>
+
+</script>
+
+
+</html>

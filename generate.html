@@ -46,42 +46,6 @@
 
 </body>
 
-<script src="bundle.js"></script>
-
-<script>
-
-  function bufferToHex(buffer) {
-    return [...new Uint8Array(buffer)]
-      .map(b => b.toString(16).padStart(2, "0"))
-      .join("");
-  }
-  function generateNewKeypair() {
-    var array = new Uint8Array(64);
-    privKey = window.crypto.getRandomValues(array) // This needs to be review for security
-    pubKey = myBundle.generatePubKey(privKey); // calling code from the bundle
-    
-    document.getElementById("pubKeyDisplay").innerHTML = '<div>Public Key:</div>' + bufferToHex(pubKey) + '\n';
-    document.getElementById("pubKeyDisplay").innerHTML += '<div class ="publickey">Private Key:</div>' + bufferToHex(privKey)
-  }
-
-  function download_txt() {
-    var textToSave = document.getElementById("pubKeyDisplay").textContent;
-    var hiddenElement = document.createElement('a');
-    hiddenElement.href = 'data:attachment/text,' + encodeURI(textToSave);
-    hiddenElement.target = '_blank';
-    let today = new Date().toISOString().slice(0, 10)
-    hiddenElement.download = 'BLSKEY' + today + '.txt';
-    hiddenElement.click();
-  }
-
-  function copyClipboard() {
-    var copyText = document.getElementById("pubKeyDisplay");
-    navigator.clipboard.writeText(copyText.textContent)
-  } 
-</script>
-
-</html>
-
 <style>
   /* Add a black background color to the top navigation bar */
   .emojititle {
@@ -127,12 +91,12 @@
     margin-bottom: 10px;
   }
 
-  .publickey{
+  .publickey {
     padding-top: 20px;
   }
 
   .keysdisplay {
-    
+
     font-family: Arial, Helvetica, sans-serif;
     font-size: 25px;
     word-wrap: break-word;
@@ -180,7 +144,42 @@
     color: white;
   }
 
-  .emojilink{
-        text-decoration: none;
-    }
+  .emojilink {
+    text-decoration: none;
+  }
 </style>
+
+<script src="bundle.js"></script>
+<script>
+
+  function bufferToHex(buffer) {
+    return [...new Uint8Array(buffer)]
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
+  }
+  function generateNewKeypair() {
+    var array = new Uint8Array(64);
+    privKey = window.crypto.getRandomValues(array) // This needs to be review for security
+    pubKey = myBundle.generatePubKey(privKey); // calling code from the bundle
+
+    document.getElementById("pubKeyDisplay").innerHTML = '<div>Public Key:</div>' + bufferToHex(pubKey) + '\n';
+    document.getElementById("pubKeyDisplay").innerHTML += '<div class ="publickey">Private Key:</div>' + bufferToHex(privKey)
+  }
+
+  function download_txt() {
+    var textToSave = document.getElementById("pubKeyDisplay").textContent;
+    var hiddenElement = document.createElement('a');
+    hiddenElement.href = 'data:attachment/text,' + encodeURI(textToSave);
+    hiddenElement.target = '_blank';
+    let today = new Date().toISOString().slice(0, 10)
+    hiddenElement.download = 'BLSKEY' + today + '.txt';
+    hiddenElement.click();
+  }
+
+  function copyClipboard() {
+    var copyText = document.getElementById("pubKeyDisplay");
+    navigator.clipboard.writeText(copyText.textContent)
+  } 
+</script>
+
+</html>
