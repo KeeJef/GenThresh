@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     <title>GenThresh</title>
     <meta name="description" content="Generate Threshold Signatures">
+    <meta name="viewport" content="width=device-width" charset="utf-8">
 
 </head>
 
@@ -30,8 +31,8 @@
 
 <div class="namecontainer" id="nameContainer">
 
-    <input class="namebox" id="nameEntry" type="text" placeholder="Enter name here" /> <button class="copyButton"
-        id="enterName" onclick="getName()">✔️</button>
+    <div data-placeholder="Your name" contenteditable="true" class="names" id="nameEntry"></div>
+    <button class="copyButton" id="enterName" onclick="getName()">✔️</button>
 
 </div>
 
@@ -94,6 +95,7 @@
     <div class="keysdisplay" id="proposedMessageBox"></div>
 </div>
 
+
 <div class="buttonbox" id="signOrNot">
 
     <div id="button1">
@@ -122,11 +124,12 @@
 
 <div class="keysdisplay" id="aggSigAggKeyDisplay"></div>
 
+<div class="mobileKeyDisplay" id="mobileKeyDisplay"></div>
+
 <div class="buttonbox" id="buttonboxpadding">
 
     <div id="button1">
-        <button onclick="downloadsigs()" class="emojibutton" id="SaveSignatureInfo">&nbsp;💾 Save Signature
-            info</button>
+        <button onclick="downloadsigs()" class="emojibutton" id="SaveSignatureInfo">&nbsp;💾 Save Signature</button>
     </div>
 
 </div>
@@ -146,6 +149,7 @@
     #button1,
     #button2 {
         display: inline-block;
+        padding-bottom: 10px;
     }
 
     #buttonSavegroup {
@@ -245,11 +249,18 @@
         border-radius: 25px;
         border: 2px solid #8d7745;
         padding: 20px;
+        min-height: 150px;
+        max-height: 300px;
+        overflow: hidden;
+        overflow-y: auto;
+    }
 
+    #proposedMessageBox {
+        min-height: 0;
     }
 
     .keycontainer {
-        padding-bottom: 30px;
+        padding-bottom: 10px;
     }
 
     body {
@@ -277,6 +288,8 @@
     .namecontainer {
         text-align: center;
         padding-bottom: 20px;
+        align-items: center;
+        justify-content: center;
     }
 
     .roomcontainer {
@@ -380,6 +393,118 @@
     .emojilink {
         text-decoration: none;
     }
+
+    .mobileKeyDisplay {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 20px;
+        padding-top: 20px;
+        text-align: center;
+    }
+
+    [contenteditable]:focus {
+        outline: 0px solid transparent;
+    }
+
+    .names {
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 25px;
+        width: 50%;
+        overflow: hidden;
+        border-bottom: 2px solid rgb(253, 232, 191);
+        padding: 15px;
+    }
+
+    .names:empty:before {
+        content: attr(data-placeholder);
+        color: grey;
+        font-size: 2vw;
+    }
+
+    @media (max-width: 700px) {
+
+        .roombox {
+            font-size: 25px;
+        }
+
+    }
+
+
+    @media (max-width: 445px) {
+
+        .emojititle {
+            font-size: 25vw;
+        }
+
+        .title {
+            font-size: 10vw;
+        }
+
+        body {
+            margin-left: 10%;
+            margin-right: 10%;
+        }
+
+        .emojibutton {
+            width: 200px;
+            height: 3em;
+        }
+
+        .namebox {
+            font-size: 17px;
+        }
+
+        .copyButton {
+            font-size: 30px;
+        }
+
+        #SVGSelector {
+            display: none;
+        }
+
+        .names:empty:before {
+            font-size: 20px;
+        }
+
+        #ThresholdDisplay {
+            display: none;
+        }
+
+        .roombox {
+            font-size: 17px;
+        }
+
+        #pubKeyDisplay {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        #buttonSavegroup {
+            margin-left: 0;
+        }
+
+        #nameDisplay {
+            padding-bottom: 10px;
+        }
+
+        #Legend,
+        #myProgress {
+            display: none !important;
+        }
+
+        #proposedMessageDisplay {
+            padding-bottom: 0px;
+        }
+
+        #wait {
+            font-size: 20px;
+        }
+
+        #buttonSendMessage {
+            padding-top: 10px;
+        }
+
+    }
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
@@ -419,7 +544,7 @@
 
     function nameChoose() {
         document.getElementById("GenerateFramework").style.display = 'none'
-        document.getElementById("nameContainer").style.display = 'block'
+        document.getElementById("nameContainer").style.display = 'flex'
     }
 
     function aggregateKeys(keyArray) {
@@ -538,6 +663,8 @@
         signerCount++
         document.getElementById("currentSigned").style.width = signerCount * steps + "%"
         document.getElementById("thresholdBar").style.width = thresholdSet + "%"
+        document.getElementById("mobileKeyDisplay").innerText = signerCount + " signers of " + signers
+
 
         if (signerCount >= threshold) {
 
@@ -571,7 +698,7 @@
     })
 
     function getName() {
-        yourName = randomEmoji() + " " + document.getElementById("nameEntry").value;
+        yourName = randomEmoji() + " " + document.getElementById("nameEntry").innerText;
         startSocket()
         setUsername(yourName, chosenRoom)
         document.getElementById("nameContainer").remove()

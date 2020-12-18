@@ -679,6 +679,10 @@
         overflow-x: auto;
         }
 
+        #proposedMessageBox,#messageContainer{
+        min-height: 0;
+    }
+
         #buttonSavegroup{
             margin-left: 0;
         }
@@ -973,7 +977,7 @@
             readycounter++
 
             name = userList[index].publicKey;
-            name = name.substr(0, 4) + "..." + name.substr(name.length - 4)
+            name = name.substr(0, 3) + "..." + name.substr(name.length - 3)
             socketchoice = userList[index].socketid
             document.getElementById("pubKeyDisplay").innerHTML += "<div id=" + socketchoice + "" + " class=\"joinedNames\">" + name + "</div>"
 

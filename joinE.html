@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     <title>GenThresh</title>
     <meta name="description" content="Generate Threshold Signatures">
+    <meta name="viewport" content="width=device-width" charset="utf-8">
 
 </head>
 
@@ -27,13 +28,6 @@
     <div id="buttonSavegroup">
         <button onclick="groupInfo()" class="emojibutton">&nbsp;💾 Save Group Info</button>
     </div>
-
-</div>
-
-<div class="namecontainer" id="nameContainer">
-
-    <input class="namebox" id="nameEntry" type="text" placeholder="Enter name here" /> <button class="copyButton"
-        id="enterName" onclick="getName()">✔️</button>
 
 </div>
 
@@ -132,11 +126,12 @@
 
 <div class="keysdisplay" id="aggSigAggKeyDisplay"></div>
 
+<div class="mobileKeyDisplay" id="mobileKeyDisplay"></div>
+
 <div class="buttonbox" id="buttonboxpadding">
 
     <div id="button1">
-        <button onclick="downloadsigs()" class="emojibutton" id="SaveSignatureInfo">&nbsp;💾 Save Signature
-            info</button>
+        <button onclick="downloadsigs()" class="emojibutton" id="SaveSignatureInfo">&nbsp;💾 Save Signature</button>
     </div>
 
 </div>
@@ -166,7 +161,6 @@
     #pubKeyDisplay,
     #GeneratedKeyBox,
     #buttonboxthreshold,
-    #nameContainer,
     #groupinfobox,
     #ProposedMessageDisplay,
     #signOrNot,
@@ -256,11 +250,18 @@
         border-radius: 25px;
         border: 2px solid #8d7745;
         padding: 20px;
+        min-height: 150px;
+        max-height: 300px;
+        overflow: hidden;
+        overflow-y: auto;
+    }
 
+    #proposedMessageBox {
+        min-height: 0;
     }
 
     .keycontainer {
-        padding-bottom: 30px;
+        padding-bottom: 10px;
     }
 
     body {
@@ -283,11 +284,6 @@
 
     .copyButton:active {
         transform: translateY(4px);
-    }
-
-    .namecontainer {
-        text-align: center;
-        padding-bottom: 20px;
     }
 
     .roomcontainer {
@@ -391,6 +387,98 @@
     .emojilink {
         text-decoration: none;
     }
+
+    .mobileKeyDisplay {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 20px;
+        padding-top: 20px;
+        text-align: center;
+    }
+
+    @media (max-width: 700px) {
+
+        .roombox {
+            font-size: 25px;
+        }
+
+    }
+
+
+    @media (max-width: 445px) {
+
+        .emojititle {
+            font-size: 25vw;
+        }
+
+        .title {
+            font-size: 10vw;
+        }
+
+        body {
+            margin-left: 10%;
+            margin-right: 10%;
+        }
+
+        .emojibutton {
+            width: 200px;
+            height: 3em;
+        }
+
+        .namebox {
+            font-size: 17px;
+        }
+
+        .copyButton {
+            font-size: 30px;
+        }
+
+        #SVGSelector {
+            display: none;
+        }
+
+        .names:empty:before {
+            font-size: 20px;
+        }
+
+        #ThresholdDisplay {
+            display: none;
+        }
+
+        .roombox {
+            font-size: 17px;
+        }
+
+        #pubKeyDisplay {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        #buttonSavegroup {
+            margin-left: 0;
+        }
+
+        #nameDisplay {
+            padding-bottom: 10px;
+        }
+
+        #Legend,
+        #myProgress {
+            display: none !important;
+        }
+
+        #proposedMessageDisplay {
+            padding-bottom: 0px;
+        }
+
+        #wait {
+            font-size: 20px;
+        }
+
+        #buttonSendMessage {
+            padding-top: 10px;
+        }
+
+    }
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
@@ -493,7 +581,7 @@
             signers++
 
             name = userList[index].publicKey;
-            name = name.substr(0, 4) + "..." + name.substr(name.length - 4)
+            name = name.substr(0, 3) + "..." + name.substr(name.length - 3)
 
             socketchoice = userList[index].socketid
             document.getElementById("pubKeyDisplay").innerHTML += "<div id=" + socketchoice + "" + " class=\"joinedNames\">" + name + "</div>"
@@ -596,6 +684,7 @@
         signerCount++
         document.getElementById("currentSigned").style.width = signerCount * steps + "%"
         document.getElementById("thresholdBar").style.width = thresholdSet + "%"
+        document.getElementById("mobileKeyDisplay").innerText = signerCount + " signers of " + signers
 
         if (signerCount >= threshold) {
 
