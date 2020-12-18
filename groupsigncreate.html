@@ -82,7 +82,7 @@
     <div class="namecontainer" id="nameContainer">
 
 
-        <div contenteditable="true" class="names" id="nameEntry" placeholder="Test"></div>
+        <div data-placeholder="Your name" contenteditable="true" class="names" id="nameEntry" ></div>
         <button class="copyButton" id="enterName" onclick="getName()">✔️</button>
 
     </div>
@@ -105,7 +105,7 @@
 
     <div id="selectionFramework">
 
-        <div class="thresholdselector">
+        <div class="thresholdselector" id = "SVGSelector">
             <!-- Fixed Size SVG fucks things up, maybe scrap this? -->
             <svg width="250" height="250">
                 <circle id="circleobject" r="125" cx="125" cy="125" />
@@ -210,11 +210,12 @@
 
     <div class="keysdisplay" id="aggSigAggKeyDisplay"></div>
 
+    <div class="mobileKeyDisplay" id="mobileKeyDisplay"></div>
+
     <div class="buttonbox" id="buttonboxpadding">
 
         <div id="button1">
-            <button onclick="downloadsigs()" class="emojibutton" id="SaveSignatureInfo">&nbsp;💾 Save Signature
-                info</button>
+            <button onclick="downloadsigs()" class="emojibutton" id="SaveSignatureInfo">&nbsp;💾 Save Signature</button>
         </div>
 
     </div>
@@ -365,7 +366,7 @@
     .roomcontainer {
         display: none;
         text-align: center;
-        padding-bottom: 20px;
+        padding-bottom: 10px;
     }
 
     body {
@@ -496,6 +497,13 @@
         justify-content: center;
     }
 
+    .mobileKeyDisplay{
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 20px;
+        padding-top: 20px;
+        text-align: center;
+    }
+
     #readybutton,
     #readybuttonExisting {
         text-align: center;
@@ -572,6 +580,11 @@
         font-size: 2vw;
     }
 
+    .names:empty:before {
+        content: attr(data-placeholder);
+        color: grey;
+        font-size: 2vw;
+    }
 
     #selectionFramework {
         display: none;
@@ -610,6 +623,15 @@
         text-decoration: none;
     }
 
+    @media (max-width: 700px) {
+
+        .roombox{
+            font-size: 25px;
+        }
+
+    }
+
+
     @media (max-width: 445px) {
 
         .emojititle {
@@ -635,6 +657,49 @@
         }
         .copyButton{
             font-size: 30px;
+        }
+        #SVGSelector{
+            display: none;
+        }
+
+        .names:empty:before{
+            font-size: 20px;
+        }
+
+        #ThresholdDisplay{
+            display: none;
+        }
+
+        .roombox{
+            font-size: 17px;
+        }
+
+        #pubKeyDisplay{
+        max-width: 100%;
+        overflow-x: auto;
+        }
+
+        #buttonSavegroup{
+            margin-left: 0;
+        }
+        #nameDisplay{
+            padding-bottom: 10px;
+        }
+
+        #Legend, #myProgress{
+            display: none !important;
+        }
+
+        #proposedMessageDisplay{
+            padding-bottom: 0px;
+        }
+
+        #wait{
+            font-size: 20px;
+        }
+
+        #buttonSendMessage{
+            padding-top: 10px;
         }
 
     }
@@ -983,6 +1048,7 @@
         signerCount++
         document.getElementById("currentSigned").style.width = signerCount * steps + "%"
         document.getElementById("thresholdBar").style.width = thresholdSet + "%"
+        document.getElementById("mobileKeyDisplay").innerText = signerCount + " signers of "+ signers
 
         if (signerCount >= threshold) {
 
@@ -1019,7 +1085,7 @@
         setUsername(yourName, randomroom)
         document.getElementById("nameContainer").remove()
         document.getElementById("buttonboxmain").style.display = "none"
-        document.getElementById("roombox").value = "GenThresh.org/join?" + randomroom
+        document.getElementById("roombox").value = "genthresh.org/join?" + randomroom
         document.getElementById("roomcontainer").style.display = "block"
         document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + signers + " Threshold: " + threshold
         getUsers()
@@ -1034,7 +1100,7 @@
         startSocket()
         setUsernameExisting(pubKey, randomroom, JSON.stringify(infoGroup))
 
-        document.getElementById("roombox").value = "GenThresh.org/joinE?" + randomroom
+        document.getElementById("roombox").value = "genthresh.org/joinE?" + randomroom
         document.getElementById("roomcontainer").style.display = "block"
         document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + infoGroup.numberOfSigners + " Threshold: " + infoGroup.thresholdNumber
         getExistingUsers()
