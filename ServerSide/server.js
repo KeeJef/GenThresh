@@ -1,10 +1,3 @@
-const io = require("socket.io")({
-   cors: {
-     origin: "http://localhost:8080",
-     methods: ["GET", "POST"]
-   }
- });
-
 server = io.listen(8000);
 
 userArrays = []; //This is all being stored in memory which is bad
