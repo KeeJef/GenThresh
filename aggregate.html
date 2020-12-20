@@ -7,7 +7,8 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     <title>GenThresh</title>
     <meta name="description" content="Generate Threshold Signatures">
-    <meta name="Kee Jefferys" content="SitePoint">
+    <meta name="viewport" content="width=device-width" charset="utf-8">
+
 
 </head>
 <div class="titlebox">
@@ -64,139 +65,6 @@
 
 </div>
 
-
-<body>
-
-    <script src="bundle.js"></script>
-
-    <script>
-
-
-        sigContain = document.getElementById("signatureContainer")
-        keyContain = document.getElementById("keyContainer")
-        function sigAggregationButton() {
-
-            document.getElementById("button1").innerHTML = "<button onclick=\"importFile(sigContain)\" class=\"emojibutton\">&nbsp;⬆️💾 Import Signatures <span class=\"tooltiptext\">Accepts a .csv of raw signatures</span></button>"
-            document.getElementById("button2").innerHTML = "<button onclick=\"aggregateSignature()\" class=\"emojibutton\">&nbsp;💫 Aggregate Signatures</button>"
-            document.getElementById("signatureBanner").style.display = "block";
-            document.getElementById("signatureContainer").style.display = "block";
-
-        }
-
-        function keyAggregationButton() {
-
-            document.getElementById("button1").innerHTML = "<button onclick=\"importFile(keyContain)\" class=\"emojibutton\">&nbsp;⬆️💾 Import Keys <span class=\"tooltiptext\">Accepts a .csv of raw keys</span></button>"
-            document.getElementById("button2").innerHTML = "<button onclick=\"aggregateKeys()\" class=\"emojibutton\">&nbsp;💫 Aggregate Keys</button>"
-            document.getElementById("keyBanner").style.display = "block";
-            document.getElementById("keyContainer").style.display = "block";
-
-        }
-
-
-
-        function bufferToHex(buffer) {
-            return [...new Uint8Array(buffer)]
-                .map(b => b.toString(16).padStart(2, "0"))
-                .join("");
-        }
-
-
-        async function displaySignature(signature) {
-
-            var sigTextField = document.getElementById("signatureText");
-            var sigContainer = document.getElementById("signatureContainer");
-            sigTextField.style.display = "block";
-            sigContainer.style.display = "block";
-
-            sigContainer.innerText = bufferToHex(await signature)
-
-        }
-
-        async function aggregateSignature() {
-
-            signatureText = document.getElementById("signatureContainer").innerText
-
-            if (signatureText == "") {
-
-                document.getElementById("signatureBanner").innerHTML = "Please enter valid Signatures"
-                return
-            }
-
-            signatureArray = signatureText.split(',')
-            agg = myBundle.aggSig(signatureArray)
-
-            sigBox = document.getElementById("signatureBox");
-            sigBox.style.display = "block";
-
-            container = document.getElementById("signatureDisplayBox");
-            container.innerHTML = bufferToHex(await agg)
-            container.style.display = "block";
-
-            //call function to unhide the display and show agg
-            return agg
-
-        }
-
-        async function aggregateKeys() {
-
-
-            keyText = document.getElementById("keyContainer").innerText
-
-            if (keyText == "") {
-
-                document.getElementById("keyBanner").innerHTML = "Please enter valid keys"
-                return
-            }
-
-            keyArray = keyText.split(',')
-            singleKey =  await myBundle.aggKey(keyArray)
-
-            keyBox = document.getElementById("keyBox");
-            keyBox.style.display = "block";
-
-            container = document.getElementById("keyDisplayBox");
-            container.innerHTML = bufferToHex(await singleKey)
-            container.style.display = "block";
-
-
-        }
-
-        function importFile(elementToChange) {
-            var input = document.createElement('input');
-            input.type = 'file';
-
-            input.onchange = e => {
-                var filetest = e.target.files[0];
-                console.log(filetest.name)
-
-                // setting up the reader
-                var reader = new FileReader();
-                reader.readAsText(filetest, 'UTF-8');
-
-                // here we tell the reader what to do when it's done reading...
-                reader.onload = readerEvent => {
-                    var content = readerEvent.target.result; // this is the content!
-                    elementToChange.innerHTML = content // this is not agnostic!
-
-                }
-
-            }
-
-            input.click();
-        }
-
-    </script>
-
-    </script>
-
-
-    <script>
-
-    </script>
-</body>
-
-</html>
-
 <style>
     /* Add a black background color to the top navigation bar */
     .emojititle {
@@ -212,12 +80,12 @@
 
     #button1 {
         display: inline-block;
-        padding-bottom: 30px;
+        padding-bottom: 10px;
     }
 
     #button2 {
         display: inline-block;
-        padding-bottom: 30px;
+        padding-bottom: 10px;
     }
 
     .buttonbox {
@@ -328,7 +196,8 @@
     .keycontainer {
         padding-bottom: 30px;
     }
-    #keyBox{
+
+    #keyBox {
 
         padding-top: 20px;
 
@@ -341,4 +210,147 @@
     .emojilink {
         text-decoration: none;
     }
+
+    @media (max-width: 445px) {
+
+        .emojititle {
+            font-size: 25vw;
+        }
+
+        .title {
+            font-size: 10vw;
+        }
+
+        body {
+            margin-left: 5%;
+            margin-right: 5%;
+        }
+
+        .emojibutton {
+            width: 210px;
+            height: 3em;
+        }
+
+    }
 </style>
+
+<script src="bundle.js"></script>
+<script>
+
+
+    sigContain = document.getElementById("signatureContainer")
+    keyContain = document.getElementById("keyContainer")
+    function sigAggregationButton() {
+
+        document.getElementById("button1").innerHTML = "<button onclick=\"importFile(sigContain)\" class=\"emojibutton\">&nbsp;⬆️💾 Import Signatures <span class=\"tooltiptext\">Accepts a .csv of raw signatures</span></button>"
+        document.getElementById("button2").innerHTML = "<button onclick=\"aggregateSignature()\" class=\"emojibutton\">&nbsp;💫 Aggregate Signatures</button>"
+        document.getElementById("signatureBanner").style.display = "block";
+        document.getElementById("signatureContainer").style.display = "block";
+
+    }
+
+    function keyAggregationButton() {
+
+        document.getElementById("button1").innerHTML = "<button onclick=\"importFile(keyContain)\" class=\"emojibutton\">&nbsp;⬆️💾 Import Keys <span class=\"tooltiptext\">Accepts a .csv of raw keys</span></button>"
+        document.getElementById("button2").innerHTML = "<button onclick=\"aggregateKeys()\" class=\"emojibutton\">&nbsp;💫 Aggregate Keys</button>"
+        document.getElementById("keyBanner").style.display = "block";
+        document.getElementById("keyContainer").style.display = "block";
+
+    }
+
+
+
+    function bufferToHex(buffer) {
+        return [...new Uint8Array(buffer)]
+            .map(b => b.toString(16).padStart(2, "0"))
+            .join("");
+    }
+
+
+    async function displaySignature(signature) {
+
+        var sigTextField = document.getElementById("signatureText");
+        var sigContainer = document.getElementById("signatureContainer");
+        sigTextField.style.display = "block";
+        sigContainer.style.display = "block";
+
+        sigContainer.innerText = bufferToHex(await signature)
+
+    }
+
+    async function aggregateSignature() {
+
+        signatureText = document.getElementById("signatureContainer").innerText
+
+        if (signatureText == "") {
+
+            document.getElementById("signatureBanner").innerHTML = "Please enter valid Signatures"
+            return
+        }
+
+        signatureArray = signatureText.split(',')
+        agg = myBundle.aggSig(signatureArray)
+
+        sigBox = document.getElementById("signatureBox");
+        sigBox.style.display = "block";
+
+        container = document.getElementById("signatureDisplayBox");
+        container.innerHTML = bufferToHex(await agg)
+        container.style.display = "block";
+
+        //call function to unhide the display and show agg
+        return agg
+
+    }
+
+    async function aggregateKeys() {
+
+
+        keyText = document.getElementById("keyContainer").innerText
+
+        if (keyText == "") {
+
+            document.getElementById("keyBanner").innerHTML = "Please enter valid keys"
+            return
+        }
+
+        keyArray = keyText.split(',')
+        singleKey = await myBundle.aggKey(keyArray)
+
+        keyBox = document.getElementById("keyBox");
+        keyBox.style.display = "block";
+
+        container = document.getElementById("keyDisplayBox");
+        container.innerHTML = bufferToHex(await singleKey)
+        container.style.display = "block";
+
+
+    }
+
+    function importFile(elementToChange) {
+        var input = document.createElement('input');
+        input.type = 'file';
+
+        input.onchange = e => {
+            var filetest = e.target.files[0];
+            console.log(filetest.name)
+
+            // setting up the reader
+            var reader = new FileReader();
+            reader.readAsText(filetest, 'UTF-8');
+
+            // here we tell the reader what to do when it's done reading...
+            reader.onload = readerEvent => {
+                var content = readerEvent.target.result; // this is the content!
+                elementToChange.innerHTML = content // this is not agnostic!
+
+            }
+
+        }
+
+        input.click();
+    }
+
+</script>
+
+</html>

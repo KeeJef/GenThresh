@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     <title>GenThresh</title>
     <meta name="description" content="Generate Threshold Signatures">
-    <meta name="Kee Jefferys" content="SitePoint">
+    <meta name="viewport" content="width=device-width" charset="utf-8">
 
 </head>
 <div class="titlebox">
@@ -22,124 +22,31 @@
 
 <div class="buttonbox">
 
-    <div id="button1">
+    <div id="button">
         <button onclick="getKeys()" class="emojibutton">&nbsp; ⬆️💾 Import Keys
         </button>
     </div>
-    <div id="button2">
+    <div id="button1">
         <button onclick="signArbMessage()" class="emojibutton">&nbsp;✍️ Sign
         </button>
     </div>
+</div>
 
-    <div class="keycontainer">
+<div class="keycontainer">
 
-        <div class="keys" id="pubKeyText">
-            Message
-        </div>
-        <div contenteditable="true" class="keysdisplay" placeholder="Test" id="messageContainer"></div>
-
-        <div class="keys" id="signatureText">
-            Signature
-        </div>
-        <div class="keysdisplay" id="signatureContainer"></div>
-
+    <div class="keys" id="pubKeyText">
+        Message
     </div>
+    <div contenteditable="true" class="keysdisplay" placeholder="Test" id="messageContainer"></div>
+
+    <div class="keys" id="signatureText">
+        Signature
+    </div>
+    <div class="keysdisplay" id="signatureContainer"></div>
 
 </div>
 
-<body>
 
-    <script src="bundle.js"></script>
-
-    <script>
-
-
-        function bufferToHex(buffer) {
-            return [...new Uint8Array(buffer)]
-                .map(b => b.toString(16).padStart(2, "0"))
-                .join("");
-        }
-
-        function signArbMessage() {
-            messageObject = document.getElementById("messageContainer")
-            message = messageObject.innerText;
-
-            if (message == "") {
-
-                messageDisplay = document.getElementById("pubKeyText")
-                messageDisplay.innerHTML = "Please add a message"
-                return
-            }
-
-            messageDisplay = document.getElementById("pubKeyText")
-            messageDisplay.innerHTML = "Message"
-
-            keys = window.content.split('\n')
-            privateKey = keys[1].split(':')
-            privateKey = privateKey[1]
-
-            signature = myBundle.signMessage(privateKey, message)
-            displaySignature(signature)
-        };
-
-        async function displaySignature(signature) {
-
-            var sigTextField = document.getElementById("signatureText");
-            var sigContainer = document.getElementById("signatureContainer");
-            sigTextField.style.display = "block";
-            sigContainer.style.display = "block";
-
-            sigContainer.innerText = bufferToHex(await signature)
-
-        }
-
-        function aggregateSignature(signatureArray) {
-            agg = myBundle.aggSig(signatureArray)
-            return agg
-        }
-
-        function aggregateKeys(keyArray) {
-            singleKey = myBundle.aggKey(keyArray)
-            return singleKey
-        }
-
-        function getKeys() {
-            var input = document.createElement('input');
-            input.type = 'file';
-
-            input.onchange = e => {
-                var filetest = e.target.files[0];
-                console.log(filetest.name)
-
-                // setting up the reader
-                var reader = new FileReader();
-                reader.readAsText(filetest, 'UTF-8');
-
-                // here we tell the reader what to do when it's done reading...
-                reader.onload = readerEvent => {
-                    var content = readerEvent.target.result; // this is the content!
-                    window.content = content
-                }
-
-                var T = document.getElementById("button2");
-                T.style.display = "inline-block";
-
-            }
-
-            input.click();
-        }
-
-    </script>
-
-    </script>
-
-
-    <script>
-
-    </script>
-</body>
-
-</html>
 
 <style>
     /* Add a black background color to the top navigation bar */
@@ -154,18 +61,20 @@
     }
 
 
+    #button,
     #button1 {
         display: inline-block;
-        padding-bottom: 30px;
+        padding-bottom: 10px;
     }
 
-    #button2 {
-        display: none;
-        padding-bottom: 30px;
+    [contenteditable]:focus {
+        outline: 0px solid transparent;
     }
 
     .buttonbox {
         text-align: center;
+
+        padding-bottom: 10px;
     }
 
     .titlebox {
@@ -223,16 +132,20 @@
         border-radius: 25px;
         border: 2px solid #8d7745;
         padding: 20px;
-        
         text-align: left;
+        max-height: 300px;
+        overflow: hidden;
+        overflow-y: auto;
 
     }
 
     #signatureContainer,
-    #signatureText {
+    #signatureText,
+    #button1 {
         display: none;
     }
-    #signatureText{
+
+    #signatureText {
         padding-top: 20px;
     }
 
@@ -240,7 +153,123 @@
         padding-bottom: 30px;
     }
 
-    .emojilink{
+    .emojilink {
         text-decoration: none;
     }
+
+    @media (max-width: 650px) {
+
+        .emojititle {
+            font-size: 25vw;
+        }
+
+        .title {
+            font-size: 10vw;
+        }
+    }
+
+    @media (max-width: 445px) {
+
+        .emojititle {
+            font-size: 25vw;
+        }
+
+        .title {
+            font-size: 10vw;
+        }
+
+        body {
+            margin-left: 5%;
+            margin-right: 5%;
+        }
+
+        .emojibutton {
+            width: 210px;
+            height: 3em;
+        }
+
+    }
 </style>
+
+<script src="bundle.js"></script>
+<script>
+
+
+    function bufferToHex(buffer) {
+        return [...new Uint8Array(buffer)]
+            .map(b => b.toString(16).padStart(2, "0"))
+            .join("");
+    }
+
+    function signArbMessage() {
+        messageObject = document.getElementById("messageContainer")
+        message = messageObject.innerText;
+
+        if (message == "") {
+
+            messageDisplay = document.getElementById("pubKeyText")
+            messageDisplay.innerHTML = "Please add a message"
+            return
+        }
+
+        messageDisplay = document.getElementById("pubKeyText")
+        messageDisplay.innerHTML = "Message"
+
+        keys = window.content.split('\n')
+        privateKey = keys[1].split(':')
+        privateKey = privateKey[1]
+
+        signature = myBundle.signMessage(privateKey, message)
+
+        displaySignature(signature)
+    };
+
+    async function displaySignature(signature) {
+
+        var sigTextField = document.getElementById("signatureText");
+        var sigContainer = document.getElementById("signatureContainer");
+        sigTextField.style.display = "block";
+        sigContainer.style.display = "block";
+
+        sigContainer.innerText = bufferToHex(await signature)
+
+    }
+
+    function aggregateSignature(signatureArray) {
+        agg = myBundle.aggSig(signatureArray)
+        return agg
+    }
+
+    function aggregateKeys(keyArray) {
+        singleKey = myBundle.aggKey(keyArray)
+        return singleKey
+    }
+
+    function getKeys() {
+        var input = document.createElement('input');
+        input.type = 'file';
+
+        input.onchange = e => {
+            var filetest = e.target.files[0];
+            console.log(filetest.name)
+
+            // setting up the reader
+            var reader = new FileReader();
+            reader.readAsText(filetest, 'UTF-8');
+
+            // here we tell the reader what to do when it's done reading...
+            reader.onload = readerEvent => {
+                var content = readerEvent.target.result; // this is the content!
+                window.content = content
+            }
+
+            document.getElementById("button1").style.display = "inline-block"
+
+        }
+
+        input.click();
+    }
+
+</script>
+
+</html>

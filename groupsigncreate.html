@@ -7,7 +7,8 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     <title>GenThresh</title>
     <meta name="description" content="Generate Threshold Signatures">
-    <meta name="Kee Jefferys" content="SitePoint">
+    <meta name="viewport" content="width=device-width" charset="utf-8">
+
 
 </head>
 
@@ -37,7 +38,7 @@
     <div class="buttonbox" id="buttonboxmain">
 
         <div id="button1">
-            <button onclick="newGroup()" class="emojibutton">&nbsp;✨ New Group Ceremony</button>
+            <button onclick="newGroup()" class="emojibutton">&nbsp;✨ New Group</button>
         </div>
 
         <div id="button2">
@@ -48,7 +49,7 @@
 
     <div class="buttonbox" id="existingGroup">
         <div id="button1">
-            <button onclick="getFile('Info')" class="emojibutton">&nbsp;⬆️👨‍👩‍👧‍👦 Import Group Info</button>
+            <button onclick="getFile('Info')" class="emojibutton">&nbsp;⬆️👨‍👩‍👧‍👦 Import Group</button>
         </div>
         <div id="button2">
             <button onclick="getFile('ExistingKey')" class="emojibutton">&nbsp;⬆️💾 Import Keypair</button>
@@ -60,12 +61,14 @@
         <div class="keys" id="GroupInfoText">
             Group Info
         </div>
-        <div data-placeholder="Upload group info here" contenteditable="true" class="keysdisplay" id="groupContainer"></div>
+        <div data-placeholder="Upload group info here" contenteditable="true" class="keysdisplay" id="groupContainer">
+        </div>
 
         <div class="keys" id="KeypairText">
             Key Pair
         </div>
-        <div data-placeholder="Upload keypair here" contenteditable="true" class="keysdisplay" id="keyPairContainer"></div>
+        <div data-placeholder="Upload keypair here" contenteditable="true" class="keysdisplay" id="keyPairContainer">
+        </div>
 
     </div>
 
@@ -78,14 +81,17 @@
 
     <div class="namecontainer" id="nameContainer">
 
-        <input class="namebox" id="nameEntry" type="text" placeholder="Enter name here" /> <button class="copyButton"
-            id="enterName" onclick="getName()">✔️</button>
+
+        <div data-placeholder="Your name" contenteditable="true" class="names" id="nameEntry" ></div>
+        <button class="copyButton" id="enterName" onclick="getName()">✔️</button>
 
     </div>
 
     <div class="roomcontainer" id="roomcontainer">
-        <input class="roombox" id="roombox" type="text" readonly /> <button class="copyButton"
-            onclick="copyClipboard()">📋</button>
+
+        <input class="roombox" id="roombox" type="text" readonly /> 
+        <button class="copyButton" onclick="copyClipboard()">📋</button>
+
     </div>
 
     <div class="keycontainer" id="nameDisplay">
@@ -99,8 +105,8 @@
 
     <div id="selectionFramework">
 
-        <div class="thresholdselector">
-
+        <div class="thresholdselector" id = "SVGSelector">
+            <!-- Fixed Size SVG fucks things up, maybe scrap this? -->
             <svg width="250" height="250">
                 <circle id="circleobject" r="125" cx="125" cy="125" />
                 <circle id="circleobject1" r="125" cx="125" cy="125" />
@@ -161,9 +167,16 @@
     </div>
 
     <div class="keys" id="wait"></div>
+
     <div id="readybutton"><button class="copyButton" id="enterName" onclick="readyUp(randomroom)">Are you
             Ready?✔️</button>
     </div>
+
+    <div id="readybuttonExisting"><button class="copyButton" id="enterName" onclick="readyUpExisting(randomroom)">Are
+            you Ready?✔️</button>
+    </div>
+
+
 
     <div class="keycontainer" id="proposedMessageDisplay">
 
@@ -197,347 +210,537 @@
 
     <div class="keysdisplay" id="aggSigAggKeyDisplay"></div>
 
+    <div class="mobileKeyDisplay" id="mobileKeyDisplay"></div>
+
     <div class="buttonbox" id="buttonboxpadding">
 
         <div id="button1">
-            <button onclick="downloadsigs()" class="emojibutton" id="SaveSignatureInfo">&nbsp;💾 Save Signature
-                info</button>
+            <button onclick="downloadsigs()" class="emojibutton" id="SaveSignatureInfo">&nbsp;💾 Save Signature</button>
         </div>
 
     </div>
 
     <div class="results" id="results"></div>
 
-    <style>
-        /* Add a black background color to the top navigation bar */
-        .emojititle {
-            font-size: 10vw;
-        }
 
-        .title {
-            font-size: 5vw;
-            font-family: Arial, Helvetica, sans-serif;
-            font-weight: bold;
-        }
+</body>
 
-        #button1,
-        #button2,
-        #buttonSendMessage {
-            display: inline-block;
-        }
-
-        .buttonbox {
-            text-align: center;
-            padding-bottom: 20px;
-        }
-
-        #buttonboxpadding {
-            padding-top: 20px;
-        }
-
-        .titlebox {
-            text-align: center;
-            padding-bottom: 10px;
-        }
-
-        .namebox {
-
-            border: 0;
-            outline: 0;
-            font-size: 25px;
-            text-align: center;
-            background: transparent;
-            border-bottom: 2px solid rgb(253, 232, 191);
-            width: 30%;
-        }
-
-        .roombox {
-
-            border: 0;
-            outline: 0;
-            font-size: 40px;
-            text-align: center;
-            background: transparent;
-            color: grey;
-            border-bottom: 2px solid rgb(253, 232, 191);
-            min-width: 30%;
-            width: auto;
-        }
-
-        .keysdisplay {
-            text-align: center;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 25px;
-            overflow: hidden;
-            word-wrap: break-word;
-            border-radius: 25px;
-            border: 2px solid #8d7745;
-            padding: 20px;
-        }
-
-        .keycontainer {
-            padding-bottom: 30px;
-        }
-
-
-        circle {
-            fill: #fadb8d;
-            stroke: #e0acf7;
-            stroke-width: 250;
-            stroke-dasharray: 0 785.39;
-            /* Changes to stroke dash array will affect how filled it is */
-        }
-
-        #circleobject1 {
-            fill: none;
-            stroke: #ce6df8;
-        }
-
-        #circleobject2 {
-            fill: none;
-            stroke-width: 10;
-            stroke-dasharray: 785.39 785.39;
-            stroke: black;
-        }
-
-        svg {
-            transform: rotate(-90deg);
-            background: #fadb8d;
-            border-radius: 50%;
-
-        }
-
-        body {
-            background-color: #fef2dc;
-            margin-left: 15%;
-            margin-right: 15%;
-
-        }
-
-        .copyButton {
-            border: none;
-            outline: none;
-            background-color: #fef2dc;
-            font-size: 35px;
-        }
-
-        .copyButton:active {
-            transform: translateY(4px);
-        }
-
-        .namecontainer {
-            text-align: center;
-            padding-bottom: 20px;
-        }
-
-        .roomcontainer {
-            display: none;
-            text-align: center;
-            padding-bottom: 20px;
-        }
-
-        body {
-            background-color: rgb(254, 242, 220);
-        }
-        #KeypairText{
-            padding-top: 20px;
-        }
-
-        .emojibutton {
-            font-size: 25px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            color: #fff;
-            border: 0;
-            outline: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            height: 2.5em;
-            padding: 0.5em 0.75em;
-            border-radius: 0.25em;
-            box-sizing: border-box;
-            background-color: #e0acf7;
-            box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
-            z-index: 1;
-            transition-duration: 0.4s;
-            cursor: pointer;
-        }
-
-        .emojibutton:hover {
-            background-color: #cc70f3;
-            color: white;
-        }
-
-        .keys {
-            text-align: center;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 30px;
-            margin-bottom: 10px;
-        }
-
-        .thresholdselector {
-            text-align: center;
-            padding-bottom: 20px;
-        }
-
-        #pubKeyDisplay,
-        #nameContainer,
-        #wait,
-        #readybutton,
-        #generateOrLoad,
-        #GeneratedKeyBox,
-        #buttonboxthreshold,
-        #groupinfobox,
-        #proposedMessageDisplay,
-        #buttonboxProposedMessage,
-        #myProgress,
-        #Legend,
-        #aggSigAggKeyDisplay,
-        #SaveSignatureInfo,
-        #existingGroupContainer,
-        #existingGroup,
-        #NextButtonGroup, #buttonboxpadding, #nameDisplay {
-            display: none;
-        }
-
-        #buttonSavegroup {
-            display: none;
-            margin-left: 40px;
-        }
-
-        #ThresholdDisplay {
-            display: inline;
-        }
-
-        #myProgress {
-            position: relative;
-            width: 100%;
-            background-color: #fadb8d;
-
-        }
-
-        #currentSigned {
-            position: absolute;
-            width: 0%;
-            height: 50px;
-            background-color: #ce6df8;
-        }
-
-        #thresholdBar {
-
-            width: 0%;
-            height: 50px;
-            background-color: #e0acf7;
-        }
-
-        .colour {
-            width: 50px;
-            height: 50px;
-            margin: 5px;
-        }
-
-        .darkpurp {
-            background: #ce6df8;
-        }
-
-        .lightpurp {
-            background: #e0acf7;
-        }
-
-        .yellow {
-            background: #fadb8d;
-        }
-
-        .Legend {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 20px;
-            height: 50px;
-            padding-top: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #readybutton {
-            text-align: center;
-        }
-
-        .slidecontainer {
-            width: 100%;
-            padding-bottom: 20px;
-            /* Width of the outside container */
-        }
-
-        /* The slider itself */
-        .slider {
-            -webkit-appearance: none;
-            /* Override default CSS styles */
-            appearance: none;
-            width: 100%;
-            /* Full-width */
-            height: 25px;
-            /* Specified height */
-            background: #d3d3d3;
-            /* Grey background */
-            outline: none;
-            /* Remove outline */
-            opacity: 0.7;
-            /* Set transparency (for mouse-over effects on hover) */
-            -webkit-transition: .2s;
-            /* 0.2 seconds transition on hover */
-            transition: opacity .2s;
-        }
-
-        /* Mouse-over effects */
-        .slider:hover {
-            opacity: 1;
-            /* Fully shown on mouse-over */
-        }
-
-        .results{
-    text-align: center;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 30px;
+<style>
+    /* Add a black background color to the top navigation bar */
+    .emojititle {
+        font-size: 10vw;
     }
 
-        /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            /* Override default look */
-            appearance: none;
-            width: 25px;
-            /* Set a specific slider handle width */
-            height: 25px;
-            /* Slider handle height */
-            background: #4CAF50;
-            /* Green background */
-            cursor: pointer;
-            /* Cursor on hover */
-        }
+    .title {
+        font-size: 5vw;
+        font-family: Arial, Helvetica, sans-serif;
+        font-weight: bold;
+    }
 
-        .slider::-moz-range-thumb {
-            width: 25px;
-            /* Set a specific slider handle width */
-            height: 25px;
-            /* Slider handle height */
-            background: #4CAF50;
-            /* Green background */
-            cursor: pointer;
-            /* Cursor on hover */
-        }
+    input {
+        min-width: 100%;
+        max-width: 100%;
+    }
 
-        .keysdisplay:empty:before {
+    #button1,
+    #button2,
+    #buttonSendMessage {
+        display: inline-block;
+        padding-bottom: 10px;
+    }
+
+    .buttonbox {
+        text-align: center;
+        padding-bottom: 20px;
+    }
+
+    #buttonboxpadding {
+        padding-top: 20px;
+    }
+
+    .titlebox {
+        text-align: center;
+        padding-bottom: 10px;
+    }
+
+    .roombox {
+
+        border: 0;
+        outline: 0;
+        font-size: 40px;
+        text-align: center;
+        background: transparent;
+        color: grey;
+        border-bottom: 2px solid rgb(253, 232, 191);
+        min-width: 30%;
+        width: auto;
+    }
+
+    [contenteditable]:focus {
+        outline: 0px solid transparent;
+    }
+
+    .keysdisplay {
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 25px;
+        overflow: hidden;
+        word-wrap: break-word;
+        border-radius: 25px;
+        border: 2px solid #8d7745;
+        padding: 20px;
+        min-height: 150px;
+        max-height: 300px;
+        overflow: hidden;
+        overflow-y: auto;
+    }
+
+    .names {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 25px;
+    width: 50%;
+    overflow: hidden;
+    border-bottom: 2px solid rgb(253, 232, 191);
+    padding: 15px;
+    }
+
+    .keycontainer {
+        padding-bottom: 30px;
+    }
+
+
+    circle {
+        fill: #fadb8d;
+        stroke: #e0acf7;
+        stroke-width: 250;
+        stroke-dasharray: 0 785.39;
+        /* Changes to stroke dash array will affect how filled it is */
+    }
+
+    #circleobject1 {
+        fill: none;
+        stroke: #ce6df8;
+    }
+
+    #circleobject2 {
+        fill: none;
+        stroke-width: 10;
+        stroke-dasharray: 785.39 785.39;
+        stroke: black;
+    }
+
+    svg {
+        transform: rotate(-90deg);
+        background: #fadb8d;
+        border-radius: 50%;
+
+    }
+
+    body {
+        background-color: #fef2dc;
+        margin-left: 15%;
+        margin-right: 15%;
+
+    }
+
+    .copyButton {
+        border: none;
+        outline: none;
+        background-color: #fef2dc;
+        font-size: 35px;
+    }
+
+    .copyButton:active {
+        transform: translateY(4px);
+    }
+
+    .namecontainer {
+        text-align: center;
+        padding-bottom: 20px;
+
+    align-items: center;
+    justify-content: center;
+    }
+
+    .roomcontainer {
+        display: none;
+        text-align: center;
+        padding-bottom: 10px;
+    }
+
+    body {
+        background-color: rgb(254, 242, 220);
+    }
+
+    #KeypairText {
+        padding-top: 20px;
+    }
+
+    .emojibutton {
+        font-size: 25px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        color: #fff;
+        border: 0;
+        outline: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        height: 2.5em;
+        padding: 0.5em 0.75em;
+        border-radius: 0.25em;
+        box-sizing: border-box;
+        background-color: #e0acf7;
+        box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        transition-duration: 0.4s;
+        cursor: pointer;
+    }
+
+    .emojibutton:hover {
+        background-color: #cc70f3;
+        color: white;
+    }
+
+    .keys {
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 30px;
+        margin-bottom: 10px;
+    }
+
+    .thresholdselector {
+        text-align: center;
+        padding-bottom: 20px;
+    }
+
+    #pubKeyDisplay,
+    #nameContainer,
+    #wait,
+    #readybutton,
+    #generateOrLoad,
+    #GeneratedKeyBox,
+    #buttonboxthreshold,
+    #groupinfobox,
+    #proposedMessageDisplay,
+    #buttonboxProposedMessage,
+    #myProgress,
+    #Legend,
+    #aggSigAggKeyDisplay,
+    #SaveSignatureInfo,
+    #existingGroupContainer,
+    #readybuttonExisting,
+    #existingGroup,
+    #NextButtonGroup,
+    #buttonboxpadding,
+    #nameDisplay {
+        display: none;
+    }
+
+    #buttonSavegroup {
+        display: none;
+        margin-left: 40px;
+    }
+
+    #ThresholdDisplay {
+        display: inline;
+    }
+
+    #myProgress {
+        position: relative;
+        width: 100%;
+        background-color: #fadb8d;
+
+    }
+
+    #currentSigned {
+        position: absolute;
+        width: 0%;
+        height: 50px;
+        background-color: #ce6df8;
+    }
+
+    #thresholdBar {
+
+        width: 0%;
+        height: 50px;
+        background-color: #e0acf7;
+    }
+
+    .colour {
+        width: 50px;
+        height: 50px;
+        margin: 5px;
+    }
+
+    .darkpurp {
+        background: #ce6df8;
+    }
+
+    .lightpurp {
+        background: #e0acf7;
+    }
+
+    .yellow {
+        background: #fadb8d;
+    }
+
+    .Legend {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 20px;
+        height: 50px;
+        padding-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .mobileKeyDisplay{
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 20px;
+        padding-top: 20px;
+        text-align: center;
+    }
+
+    #readybutton,
+    #readybuttonExisting {
+        text-align: center;
+    }
+
+
+    .slidecontainer {
+        width: 100%;
+        padding-bottom: 20px;
+        /* Width of the outside container */
+    }
+
+    /* The slider itself */
+    .slider {
+        -webkit-appearance: none;
+        /* Override default CSS styles */
+        appearance: none;
+        width: 100%;
+        /* Full-width */
+        height: 25px;
+        /* Specified height */
+        background: #d3d3d3;
+        /* Grey background */
+        outline: none;
+        /* Remove outline */
+        opacity: 0.7;
+        /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: .2s;
+        /* 0.2 seconds transition on hover */
+        transition: opacity .2s;
+    }
+
+    /* Mouse-over effects */
+    .slider:hover {
+        opacity: 1;
+        /* Fully shown on mouse-over */
+    }
+
+    .results {
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 30px;
+    }
+
+    /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        /* Override default look */
+        appearance: none;
+        width: 25px;
+        /* Set a specific slider handle width */
+        height: 25px;
+        /* Slider handle height */
+        background: #4CAF50;
+        /* Green background */
+        cursor: pointer;
+        /* Cursor on hover */
+    }
+
+    .slider::-moz-range-thumb {
+        width: 25px;
+        /* Set a specific slider handle width */
+        height: 25px;
+        /* Slider handle height */
+        background: #4CAF50;
+        /* Green background */
+        cursor: pointer;
+        /* Cursor on hover */
+    }
+
+    .keysdisplay:empty:before {
         content: attr(data-placeholder);
         color: grey;
         font-size: 2vw;
     }
 
+    .names:empty:before {
+        content: attr(data-placeholder);
+        color: grey;
+        font-size: 2vw;
+    }
 
-        #selectionFramework {
+    #selectionFramework {
+        display: none;
+    }
+
+    .joinedNames {
+        font-size: 25px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        color: #fff;
+        border: 0;
+        outline: 0;
+        float: left;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        height: 2.5em;
+        padding-bottom: 10px;
+        padding: 0.5em 0.75em;
+        border-radius: 0.25em;
+        box-sizing: border-box;
+        background-color: #16C60C;
+        box-shadow: 0 0.15em 1em rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        transition-duration: 0.4s;
+        cursor: pointer;
+    }
+
+    .joinedNames:hover {
+        background-color: #12970b;
+        color: white;
+    }
+
+    .emojilink {
+        text-decoration: none;
+    }
+
+    @media (max-width: 700px) {
+
+        .roombox{
+            font-size: 25px;
+        }
+
+    }
+
+
+    @media (max-width: 445px) {
+
+        .emojititle {
+            font-size: 25vw;
+        }
+
+        .title {
+            font-size: 10vw;
+        }
+
+        body {
+            margin-left: 10%;
+            margin-right: 10%;
+        }
+
+        .emojibutton {
+            width: 200px;
+            height: 3em;
+        }
+
+        .namebox {
+            font-size: 17px;
+        }
+        .copyButton{
+            font-size: 30px;
+        }
+        #SVGSelector{
             display: none;
         }
+
+        .names:empty:before{
+            font-size: 20px;
+        }
+
+        #ThresholdDisplay{
+            display: none;
+        }
+
+        .roombox{
+            font-size: 17px;
+        }
+
+        #pubKeyDisplay{
+        max-width: 100%;
+        overflow-x: auto;
+        }
+
+        #proposedMessageBox,#messageContainer{
+        min-height: 0;
+    }
+
+        #buttonSavegroup{
+            margin-left: 0;
+        }
+        #nameDisplay{
+            padding-bottom: 10px;
+        }
+
+        #Legend, #myProgress{
+            display: none !important;
+        }
+
+        #proposedMessageDisplay{
+            padding-bottom: 0px;
+        }
+
+        #wait{
+            font-size: 20px;
+        }
+
+        #buttonSendMessage{
+            padding-top: 10px;
+        }
+
+    }
+</style>
+
+<script src="bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.3/socket.io.js"></script>
+<script>
+
+    yourName = ''
+    threshold = ''
+    signers = ''
+    userList = []
+    frozenUserList = []
+    signatureArray = []
+    privKey = ''
+    globalMessage = ''
+    signerCount = 0
+    pubKey = ''
+    steps = ''
+    thresholdSet = ''
+    infoGroup = ''
+    isReady = false
+
+    var socket = io.connect("http://localhost:8000"); // Just replace with IP address
+
+    function startSocket() {
+
+        randomroom = Math.random().toString(36).substr(2, 7)
+        socket.emit('create', randomroom);
+
+    }
+
+    function setUsername(name, roomid) {
+        socket.emit('setUsername', { namewanted: name, roomname: roomid, socketid: socket.id, isLeader: true, publicKey: pubKey, thresholdNumber: threshold, signersNumber: signers });
+    };
+
 
         .joinedNames {
             font-size: 25px;
@@ -645,358 +848,478 @@
                 return
             }
 
-            infoGroup = JSON.parse(infoGroup)
+    function getUsers() {
+        socket.emit('getUsers', { roomid: randomroom });
+    };
 
-            for (let index = 0; index < infoGroup.signingKeys.length; index++) {
-                element = infoGroup.signingKeys[index];
+    function getExistingUsers() {
+        socket.emit('getExistingUsers', { roomid: randomroom });
+    };
 
-                if (pubKey == element) {
-                    displayNameExisting()
-                    return
-                }
-                
+    function GenerateOrLoad() {
+        signers = document.getElementById("numberOfSigners").value
+        threshold = document.getElementById("threshold").value
+
+        //Used Later when displaying threshold signed
+        steps = 100 / signers
+        thresholdSet = threshold * steps
+
+        document.getElementById("selectionFramework").style.display = "none"
+        document.getElementById("generateOrLoad").style.display = "block"
+    }
+
+    function generateNewKeypair() {
+        var array = new Uint8Array(64);
+        privKey = bufferToHex(window.crypto.getRandomValues(array)) // This needs to be review for security
+        pubKey = bufferToHex(myBundle.generatePubKey(privKey)); // calling code from the bundle
+        document.getElementById("GeneratedKeyBox").style.display = "block"
+        document.getElementById("pubKeyDisplayPublic").innerHTML = '<div>Public Key:</div>' + pubKey + '\n';
+        document.getElementById("pubKeyDisplayPublic").innerHTML += '<div class ="publickey">Private Key:</div>' + privKey
+        document.getElementById("buttonboxthreshold").style.display = "block"
+
+    }
+
+    function ValidateAndFire() {
+
+        infoGroup = document.getElementById("groupContainer").innerText
+        keypair = document.getElementById("keyPairContainer").innerText
+
+        if (infoGroup == "" || keypair == "") {
+            document.getElementById('results').innerHTML = "Please enter Group info and Key pair ❌"
+            return
+        }
+
+        infoGroup = JSON.parse(infoGroup)
+        signers = infoGroup.numberOfSigners
+        threshold = infoGroup.thresholdNumber
+
+        steps = 100 / signers
+        thresholdSet = threshold * steps
+
+        for (let index = 0; index < infoGroup.signingKeys.length; index++) {
+            element = infoGroup.signingKeys[index];
+
+            if (pubKey == element) {
+                displayNameExisting()
+                return
             }
 
-            document.getElementById('results').innerHTML = "Key pair is not in listed Signing Keys ❌"
-
         }
 
-        function bufferToHex(buffer) {
-            return [...new Uint8Array(buffer)]
-                .map(b => b.toString(16).padStart(2, "0"))
-                .join("");
-        }
+        document.getElementById('results').innerHTML = "Key pair is not in listed Signing Keys ❌"
 
-        function aggregateKeys(keyArray) {
-            singleKey = myBundle.aggKey(keyArray)
-            return singleKey
-        }
+    }
+
+    function bufferToHex(buffer) {
+        return [...new Uint8Array(buffer)]
+            .map(b => b.toString(16).padStart(2, "0"))
+            .join("");
+    }
+
+    function aggregateKeys(keyArray) {
+        singleKey = myBundle.aggKey(keyArray)
+        return singleKey
+    }
 
 
-        function aggregateSignature(signatureArray) {
-            agg = myBundle.aggSig(signatureArray)
-            return agg
-        }
+    function aggregateSignature(signatureArray) {
+        agg = myBundle.aggSig(signatureArray)
+        return agg
+    }
 
-        function existingGroup() {
-            document.getElementById("buttonboxmain").style.display = "none"
-            document.getElementById("existingGroup").style.display = "block"
-            document.getElementById("NextButtonGroup").style.display = "block"
-            document.getElementById("existingGroupContainer").style.display = "block"
-        }
+    function existingGroup() {
+        document.getElementById("buttonboxmain").style.display = "none"
+        document.getElementById("existingGroup").style.display = "block"
+        document.getElementById("NextButtonGroup").style.display = "block"
+        document.getElementById("existingGroupContainer").style.display = "block"
+    }
 
-        function getFile(type) {
-            var input = document.createElement('input');
-            input.type = 'file';
+    function getFile(type) {
+        var input = document.createElement('input');
+        input.type = 'file';
 
-            input.onchange = e => {
-                var filetest = e.target.files[0];
-                console.log(filetest.name)
+        input.onchange = e => {
+            var filetest = e.target.files[0];
+            console.log(filetest.name)
 
-                // setting up the reader
-                var reader = new FileReader();
-                reader.readAsText(filetest, 'UTF-8');
+            // setting up the reader
+            var reader = new FileReader();
+            reader.readAsText(filetest, 'UTF-8');
 
-                // here we tell the reader what to do when it's done reading...
-                reader.onload = readerEvent => {
-                    var content = readerEvent.target.result; // this is the content!
+            // here we tell the reader what to do when it's done reading...
+            reader.onload = readerEvent => {
+                var content = readerEvent.target.result; // this is the content!
 
-                    if (type == 'ExistingKey') {
-                        keys = content.split('\n')
-                        publicKey = keys[0].split(':')
-                        privateKey = keys[1].split(':')
-                        pubKey = publicKey[1]
-                        privKey = privateKey[1]
+                if (type == 'ExistingKey') {
+                    keys = content.split('\n')
+                    publicKey = keys[0].split(':')
+                    privateKey = keys[1].split(':')
+                    pubKey = publicKey[1]
+                    privKey = privateKey[1]
 
-                        document.getElementById("keyPairContainer").innerHTML = '<div>Public Key:</div>' + pubKey + '\n';
-                        document.getElementById("keyPairContainer").innerHTML += '<div class ="publickey">Private Key:</div>' + privKey
-
-                    }
-
-                    if (type == 'NewKey') {
-                        keys = content.split('\n')
-                        publicKey = keys[0].split(':')
-                        privateKey = keys[1].split(':')
-                        pubKey = publicKey[1]
-                        privKey = privateKey[1]
-
-                        document.getElementById("GeneratedKeyBox").style.display = "block"
-                        document.getElementById("pubKeyDisplayPublic").innerHTML = '<div>Public Key:</div>' + pubKey + '\n';
-                        document.getElementById("pubKeyDisplayPublic").innerHTML += '<div class ="publickey">Private Key:</div>' + privKey
-                        document.getElementById("buttonboxthreshold").style.display = "block"
-                    }
-
-                    if (type == 'Info') {
-
-                        document.getElementById("groupContainer").innerText = content
-
-                    }
+                    document.getElementById("keyPairContainer").innerHTML = '<div>Public Key:</div>' + pubKey + '\n';
+                    document.getElementById("keyPairContainer").innerHTML += '<div class ="publickey">Private Key:</div>' + privKey
 
                 }
 
+                if (type == 'NewKey') {
+                    keys = content.split('\n')
+                    publicKey = keys[0].split(':')
+                    privateKey = keys[1].split(':')
+                    pubKey = publicKey[1]
+                    privKey = privateKey[1]
 
+                    document.getElementById("GeneratedKeyBox").style.display = "block"
+                    document.getElementById("pubKeyDisplayPublic").innerHTML = '<div>Public Key:</div>' + pubKey + '\n';
+                    document.getElementById("pubKeyDisplayPublic").innerHTML += '<div class ="publickey">Private Key:</div>' + privKey
+                    document.getElementById("buttonboxthreshold").style.display = "block"
+                }
+
+                if (type == 'Info') {
+
+                    document.getElementById("groupContainer").innerText = content
+
+                }
 
             }
 
-            input.click();
+
+
         }
 
-        function readyUp(roomid) {
-            isReady = true
+        input.click();
+    }
+
+    function readyUp(roomid) {
+        isReady = true
+        document.getElementById("readybutton").style.display = "none"
+        socket.emit('readyUp', { roomname: roomid, socketid: socket.id });
+    };
+
+    function readyUpExisting(roomid) {
+        isReady = true
+        document.getElementById("readybuttonExisting").style.display = "none"
+        socket.emit('readyUpExisting', { roomname: roomid, socketid: socket.id });
+    };
+
+
+    function roomFull(roomid) {
+        socket.emit('roomFull', { roomname: roomid });
+    };
+
+    function roomFullExisting(roomid) {
+        socket.emit('roomFullExisting', { roomname: roomid });
+    };
+
+
+    socket.on('getUsers', function (data) {
+        userList = data.userlist
+        readyUsers = 0
+
+        document.getElementById("nameDisplay").style.display = "block"
+        document.getElementById("pubKeyDisplay").style.display = "block"
+        document.getElementById("pubKeyDisplay").innerHTML = ""
+        document.getElementById("wait").style.display = "block"
+        document.getElementById("wait").innerText = "Waiting for Signers " + userList.length + " Out of " + signers //not accurate
+
+        for (let index = 0; index < userList.length; index++) {
+
+            name = userList[index].name;
+            socketchoice = userList[index].socketid
+            document.getElementById("pubKeyDisplay").innerHTML += "<div id=" + socketchoice + "" + " class=\"joinedNames\">" + name + "</div>"
+            if (userList[index].readyStatus == true) {
+                document.getElementById(socketchoice).innerText += "✔️"
+                readyUsers++
+            }
+
+        }
+
+        if (isReady == false && userList.length == signers) {
+            document.getElementById("wait").innerText = "Waiting for everyone to ready up "
+            ready()
+
+        }
+        else {
             document.getElementById("readybutton").style.display = "none"
-            socket.emit('readyUp', { roomname: roomid, socketid: socket.id });
-        };
-
-        function roomFull(roomid) {
-            socket.emit('roomFull', { roomname: roomid });
-        };
-
-
-        socket.on('getUsers', function (data) {
-            userList = data.userlist
-            readyUsers = 0
-
-            document.getElementById("nameDisplay").style.display = "block"
-            document.getElementById("pubKeyDisplay").style.display = "block"
-            document.getElementById("pubKeyDisplay").innerHTML = ""
-            document.getElementById("wait").style.display = "block"
-            document.getElementById("wait").innerText = "Waiting for Signers " + userList.length + " Out of " + signers
-
-            for (let index = 0; index < userList.length; index++) {
-
-                name = userList[index].name;
-                socketchoice = userList[index].socketid
-                document.getElementById("pubKeyDisplay").innerHTML += "<div id=" + socketchoice + "" + " class=\"joinedNames\">" + name + "</div>"
-                if (userList[index].readyStatus == true) {
-                    document.getElementById(socketchoice).innerText += "✔️"
-                    readyUsers++
-                }
-
-            }
-
-            if (isReady == false && userList.length == signers) {
-                document.getElementById("wait").innerText = "Waiting for everyone to ready up "
-                ready()
-
-            }
-            else {
-                document.getElementById("readybutton").style.display = "none"
-            }
-
-            if (readyUsers >= signers) {
-                document.getElementById("wait").style.display = "none"
-                document.getElementById("proposedMessageDisplay").style.display = "block"
-                document.getElementById("buttonboxProposedMessage").style.display = "block"
-                document.getElementById("buttonSavegroup").style.display = "inline-block"
-                document.getElementById("roomcontainer").style.display = "none"
-
-            }
-            if (readyUsers == signers && frozenUserList.length == 0) {
-                //Freeze getinfo Array when everyone is joined
-                frozenUserList = userList
-                roomFull(randomroom)
-
-
-            }
-        })
-
-
-        var user;
-        socket.on('userExists', function (data) {
-            document.getElementById('error-container').innerHTML = data;
-        });
-
-        async function sendMessage() {
-            arrayPosition = 0
-            message = document.getElementById('messageContainer').innerText;
-            globalMessage = message
-            signature = await myBundle.signMessage(privKey, message)
-            signature = bufferToHex(signature)
-
-            if (message) {
-                document.getElementById("buttonSendMessage").style.display = "none"
-                document.getElementById("messageContainer").contentEditable = false
-                document.getElementById("myProgress").style.display = "block"
-                document.getElementById("Legend").style.display = "flex"
-
-                for (let index = 0; index < frozenUserList.length; index++) {
-                    element = frozenUserList[index];
-
-                    if (element.publicKey == pubKey) {
-                        arrayPosition = index
-                        break
-                    }
-
-                }
-
-                socket.emit('msg', { message: message, signature: signature, roomid: randomroom, publicKey: pubKey, leaderstatus: true, arrayPosition: arrayPosition });
-            }
-        }
-        socket.on('newmsg', async function (data) {
-            signatureArray.push({ message: data.msg, signature: data.signature, publicKey: data.publicKey, arrayPosition: data.arrayPosition })
-            signerCount++
-            document.getElementById("currentSigned").style.width = signerCount * steps + "%"
-            document.getElementById("thresholdBar").style.width = thresholdSet + "%"
-
-            if (signerCount >= threshold) {
-
-                document.getElementById("proposedMessageDisplay").style.display = 'none'
-                document.getElementById("myProgress").style.display = 'none'
-                document.getElementById("Legend").style.display = 'none'
-                document.getElementById("buttonboxpadding").style.display = 'block'
-                document.getElementById("SaveSignatureInfo").style.display = 'flex'
-
-
-                aggregateKeyArray = []
-                aggregateSignatureArray = []
-                signerIndex = []
-                for (let index = 0; index < signatureArray.length; index++) {
-                    signerIndex.push(signatureArray[index].arrayPosition)
-                    aggregateKeyArray.push(signatureArray[index].publicKey);
-                    aggregateSignatureArray.push(signatureArray[index].signature);
-                }
-
-                finalAggKeys = await aggregateKeys(aggregateKeyArray)
-                finalAggKeys = bufferToHex(finalAggKeys)
-                finalAggSig = await aggregateSignature(aggregateSignatureArray)
-                finalAggSig = bufferToHex(finalAggSig)
-
-                document.getElementById("aggSigAggKeyDisplay").style.display = "block"
-                SignatureObject = { aggregateKey: finalAggKeys, aggregateSignature: finalAggSig, signerIndexes: signerIndex, message: globalMessage }
-                document.getElementById("aggSigAggKeyDisplay").innerHTML += JSON.stringify(SignatureObject)
-            }
-        })
-
-        function getName() {
-            yourName = "👑 " + document.getElementById("nameEntry").value;
-            startSocket()
-            setUsername(yourName, randomroom)
-            document.getElementById("nameContainer").remove()
-            document.getElementById("buttonboxmain").style.display = "none"
-            document.getElementById("roombox").value = "GenThresh.org/join?" + randomroom
-            document.getElementById("roomcontainer").style.display = "block"
-            document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + signers + " Threshold: " + threshold
-            getUsers()
         }
 
-        function displayNameExisting(){
-            document.getElementById("existingGroupContainer").remove()
-            document.getElementById("NextButtonGroup").remove()
-            document.getElementById("results").remove()
-            document.getElementById("existingGroup").remove()
-
-            startSocket()
-            setUsernameExisting(pubKey, randomroom, JSON.stringify(infoGroup))
-            
-            document.getElementById("roombox").value = "GenThresh.org/joinE?" + randomroom
-            document.getElementById("roomcontainer").style.display = "block"
-            document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + infoGroup.numberOfSigners + " Threshold: " + infoGroup.thresholdNumber
-            getUsers() //need a complete different getusers? 
-        }
-
-        function ready() {
+        if (readyUsers >= signers) {
             document.getElementById("wait").style.display = "none"
-            document.getElementById("readybutton").style.display = "block"
-        }
-
-
-
-        function displayExisting() {
-            document.getElementById("nameContainer").style.display = "block"
-            document.getElementById("buttonbox").style.display = "none"
+            document.getElementById("proposedMessageDisplay").style.display = "block"
+            document.getElementById("buttonboxProposedMessage").style.display = "block"
+            document.getElementById("buttonSavegroup").style.display = "inline-block"
+            document.getElementById("roomcontainer").style.display = "none"
 
         }
+        if (readyUsers == signers && frozenUserList.length == 0) {
+            //Freeze getinfo Array when everyone is joined
+            frozenUserList = userList
+            roomFull(randomroom)
 
 
+        }
+    })
 
-        async function groupInfo() {
-            keyArray = []
+    socket.on('getLoadedUsers', function (data) {
+        userList = data.userlist
+        readyUsers = 0
+        readycounter = 0
+
+        document.getElementById("nameDisplay").style.display = "block"
+        document.getElementById("pubKeyDisplay").style.display = "block"
+        document.getElementById("pubKeyDisplay").innerHTML = ""
+        document.getElementById("wait").style.display = "block"
+
+
+        for (let index = 0; index < userList.length; index++) {
+
+            if (userList[index].joinstatus == false) {
+                continue
+            }
+
+            readycounter++
+
+            name = userList[index].publicKey;
+            name = name.substr(0, 3) + "..." + name.substr(name.length - 3)
+            socketchoice = userList[index].socketid
+            document.getElementById("pubKeyDisplay").innerHTML += "<div id=" + socketchoice + "" + " class=\"joinedNames\">" + name + "</div>"
+
+            if (userList[index].readyStatus == true) {
+                document.getElementById(socketchoice).innerText += "✔️"
+                readyUsers++
+            }
+
+        }
+
+        if (isReady == false && readycounter == signers) {
+            document.getElementById("wait").innerText = "Waiting for everyone to ready up "
+            readyExisting()
+
+        }
+        else {
+            document.getElementById("readybutton").style.display = "none"
+        }
+
+        if (readyUsers >= signers) {
+            document.getElementById("wait").style.display = "none"
+            document.getElementById("proposedMessageDisplay").style.display = "block"
+            document.getElementById("buttonboxProposedMessage").style.display = "block"
+            document.getElementById("buttonSavegroup").style.display = "inline-block"
+            document.getElementById("roomcontainer").style.display = "none"
+
+        }
+        if (readyUsers == signers && frozenUserList.length == 0) {
+            //Freeze getinfo Array when everyone is joined
+            frozenUserList = userList
+            roomFullExisting(randomroom)
+
+
+        }
+        document.getElementById("wait").innerText = "Waiting for Signers " + readycounter + " Out of " + signers
+    })
+
+
+    var user;
+    socket.on('userExists', function (data) {
+        document.getElementById('error-container').innerHTML = data;
+    });
+
+    async function sendMessage() {
+        arrayPosition = 0
+        message = document.getElementById('messageContainer').innerText;
+        globalMessage = message
+        signature = await myBundle.signMessage(privKey, message)
+        signature = bufferToHex(signature)
+
+        if (message) {
+            document.getElementById("buttonSendMessage").style.display = "none"
+            document.getElementById("messageContainer").contentEditable = false
+            document.getElementById("myProgress").style.display = "block"
+            document.getElementById("Legend").style.display = "flex"
 
             for (let index = 0; index < frozenUserList.length; index++) {
-                const element = frozenUserList[index];
-                keyArray.push(element.publicKey)
+                element = frozenUserList[index];
+
+                if (element.publicKey == pubKey) {
+                    arrayPosition = index
+                    break
+                }
 
             }
-            aggkey = await aggregateKeys(keyArray)
-            aggkey = bufferToHex(aggkey)
 
-            proposedDownloadText = { numberOfSigners: signers, thresholdNumber: threshold, signingKeys: keyArray, aggregateKey: aggkey }
-
-            let today = new Date().toISOString().slice(0, 10)
-            filename = 'GroupInfoBLS' + today + '.txt'
-            downloadtext(JSON.stringify(proposedDownloadText), filename)
-
+            socket.emit('msg', { message: message, signature: signature, roomid: randomroom, publicKey: pubKey, leaderstatus: true, arrayPosition: arrayPosition });
         }
+    }
+    socket.on('newmsg', async function (data) {
+        signatureArray.push({ message: data.msg, signature: data.signature, publicKey: data.publicKey, arrayPosition: data.arrayPosition })
+        signerCount++
+        document.getElementById("currentSigned").style.width = signerCount * steps + "%"
+        document.getElementById("thresholdBar").style.width = thresholdSet + "%"
+        document.getElementById("mobileKeyDisplay").innerText = signerCount + " signers of "+ signers
 
-        function downloadsigs() {
-            proposedText = document.getElementById("aggSigAggKeyDisplay").innerText
-            let today = new Date().toISOString().slice(0, 10)
-            proposedFileName = 'SignatureInfoBLS' + today + '.txt'
-            downloadtext(proposedText, proposedFileName)
-        }
+        if (signerCount >= threshold) {
+
+            document.getElementById("proposedMessageDisplay").style.display = 'none'
+            document.getElementById("myProgress").style.display = 'none'
+            document.getElementById("Legend").style.display = 'none'
+            document.getElementById("buttonboxpadding").style.display = 'block'
+            document.getElementById("SaveSignatureInfo").style.display = 'flex'
 
 
-        function downloadtext(proposedMessage, proposedFilename) {
-
-            var hiddenElement = document.createElement('a');
-            hiddenElement.href = 'data:attachment/text,' + encodeURI(proposedMessage);
-            hiddenElement.target = '_blank';
-            let today = new Date().toISOString().slice(0, 10)
-            hiddenElement.download = proposedFilename;
-            hiddenElement.click();
-
-        }
-
-        function newGroup() {
-
-            document.getElementById("buttonboxmain").style.display = "none"
-            document.getElementById("selectionFramework").style.display = "block"
-
-        }
-
-        function thresholdGroup() {
-
-            document.getElementById("GenerateFramework").style.display = "none"
-            displayExisting()
-        }
-
-        function copyClipboard() {
-            var copyText = document.getElementById("roombox");
-            navigator.clipboard.writeText(copyText.value)
-        }
-
-        var input = document.getElementById("nameEntry");
-        input.addEventListener("keyup", function (event) {
-            if (event.keyCode === 13) {
-                event.preventDefault();
-                document.getElementById("enterName").click();
+            aggregateKeyArray = []
+            aggregateSignatureArray = []
+            signerIndex = []
+            for (let index = 0; index < signatureArray.length; index++) {
+                signerIndex.push(signatureArray[index].arrayPosition)
+                aggregateKeyArray.push(signatureArray[index].publicKey);
+                aggregateSignatureArray.push(signatureArray[index].signature);
             }
-        });
-    </script>
 
-    <script>
-        var sliderSigners = document.getElementById("numberOfSigners");
-        var outputSigners = document.getElementById("SignersValue");
+            finalAggKeys = await aggregateKeys(aggregateKeyArray)
+            finalAggKeys = bufferToHex(finalAggKeys)
+            finalAggSig = await aggregateSignature(aggregateSignatureArray)
+            finalAggSig = bufferToHex(finalAggSig)
 
-        var sliderThreshold = document.getElementById("threshold");
-        var outputThreshold = document.getElementById("ThresholdValue");
-
-
-        outputSigners.innerHTML += sliderSigners.value;
-        outputThreshold.innerHTML += sliderThreshold.value;
-
-        sliderSigners.oninput = function () {
-            outputSigners.innerHTML = "Number of Signers: " + this.value;
-            document.getElementById('circleobject').style.strokeDasharray = (this.value * 7.8539) + " 785.39"
-            document.getElementById('threshold').max = this.value
+            document.getElementById("aggSigAggKeyDisplay").style.display = "block"
+            SignatureObject = { aggregateKey: finalAggKeys, aggregateSignature: finalAggSig, signerIndexes: signerIndex, message: globalMessage }
+            document.getElementById("aggSigAggKeyDisplay").innerHTML = JSON.stringify(SignatureObject)
         }
+    })
 
-        sliderThreshold.oninput = function () {
-            outputThreshold.innerHTML = "Threshold of Signers: " + this.value;
-            document.getElementById('circleobject1').style.strokeDasharray = (this.value * 7.8539) + " 785.39"
+    function getName() {
+        yourName = "👑 " + document.getElementById("nameEntry").innerText;
+        startSocket()
+        setUsername(yourName, randomroom)
+        document.getElementById("nameContainer").remove()
+        document.getElementById("buttonboxmain").style.display = "none"
+        document.getElementById("roombox").value = "genthresh.org/join?" + randomroom
+        document.getElementById("roomcontainer").style.display = "block"
+        document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + signers + " Threshold: " + threshold
+        getUsers()
+    }
+
+    function displayNameExisting() {
+        document.getElementById("existingGroupContainer").remove()
+        document.getElementById("NextButtonGroup").remove()
+        document.getElementById("results").remove()
+        document.getElementById("existingGroup").remove()
+
+        startSocket()
+        setUsernameExisting(pubKey, randomroom, JSON.stringify(infoGroup))
+
+        document.getElementById("roombox").value = "genthresh.org/joinE?" + randomroom
+        document.getElementById("roomcontainer").style.display = "block"
+        document.getElementById("ThresholdDisplay").innerHTML = "Signers: " + infoGroup.numberOfSigners + " Threshold: " + infoGroup.thresholdNumber
+        getExistingUsers()
+    }
+
+    function ready() {
+        document.getElementById("wait").style.display = "none"
+        document.getElementById("readybutton").style.display = "block"
+    }
+
+    function readyExisting() {
+        document.getElementById("wait").style.display = "none"
+        document.getElementById("readybuttonExisting").style.display = "block"
+    }
+
+
+
+    function displayExisting() {
+        document.getElementById("nameContainer").style.display = "flex"
+        document.getElementById("buttonbox").style.display = "none"
+
+    }
+
+
+
+    async function groupInfo() {
+        keyArray = []
+
+        for (let index = 0; index < frozenUserList.length; index++) {
+            const element = frozenUserList[index];
+            keyArray.push(element.publicKey)
 
         }
-    </script>
-</body>
+        aggkey = await aggregateKeys(keyArray)
+        aggkey = bufferToHex(aggkey)
+
+        proposedDownloadText = { numberOfSigners: signers, thresholdNumber: threshold, signingKeys: keyArray, aggregateKey: aggkey }
+
+        let today = new Date().toISOString().slice(0, 10)
+        filename = 'GroupInfoBLS' + today + '.txt'
+        downloadtext(JSON.stringify(proposedDownloadText), filename)
+
+    }
+
+    function downloadsigs() {
+        proposedText = document.getElementById("aggSigAggKeyDisplay").innerText
+        let today = new Date().toISOString().slice(0, 10)
+        proposedFileName = 'SignatureInfoBLS' + today + '.txt'
+        downloadtext(proposedText, proposedFileName)
+    }
+
+
+    function downloadtext(proposedMessage, proposedFilename) {
+
+        var hiddenElement = document.createElement('a');
+        hiddenElement.href = 'data:attachment/text,' + encodeURI(proposedMessage);
+        hiddenElement.target = '_blank';
+        let today = new Date().toISOString().slice(0, 10)
+        hiddenElement.download = proposedFilename;
+        hiddenElement.click();
+
+    }
+
+    function newGroup() {
+
+        document.getElementById("buttonboxmain").style.display = "none"
+        document.getElementById("selectionFramework").style.display = "block"
+
+    }
+
+    function thresholdGroup() {
+
+        document.getElementById("GenerateFramework").style.display = "none"
+        displayExisting()
+    }
+
+    function copyClipboard() {
+        var copyText = document.getElementById("roombox");
+        navigator.clipboard.writeText(copyText.value)
+    }
+
+    var input = document.getElementById("nameEntry");
+    input.addEventListener("keyup", function (event) {
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            document.getElementById("enterName").click();
+        }
+    });
+</script>
+
+<script>
+    var sliderSigners = document.getElementById("numberOfSigners");
+    var outputSigners = document.getElementById("SignersValue");
+
+    var sliderThreshold = document.getElementById("threshold");
+    var outputThreshold = document.getElementById("ThresholdValue");
+
+
+    outputSigners.innerHTML += sliderSigners.value;
+    outputThreshold.innerHTML += sliderThreshold.value;
+
+    sliderSigners.oninput = function () {
+        outputSigners.innerHTML = "Number of Signers: " + this.value;
+        document.getElementById('circleobject').style.strokeDasharray = (this.value * 7.8539) + " 785.39"
+        document.getElementById('threshold').max = this.value
+    }
+
+    sliderThreshold.oninput = function () {
+        outputThreshold.innerHTML = "Threshold of Signers: " + this.value;
+        document.getElementById('circleobject1').style.strokeDasharray = (this.value * 7.8539) + " 785.39"
+
+    }
+</script>
 
 </html>

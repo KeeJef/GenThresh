@@ -7,7 +7,8 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     <title>GenThresh</title>
     <meta name="description" content="Generate Threshold Signatures">
-    <meta name="Kee Jefferys" content="SitePoint">
+    <meta name="viewport" content="width=device-width" charset="utf-8">
+
 
 </head>
 <div class="titlebox">
@@ -27,19 +28,19 @@
     </div>
 
     <div id="button2">
-        <button onclick="checkSignature()" class="emojibutton">&nbsp;👀 Verify</button>
-    </div>
-
-    <div id="button3">
         <button onclick="groupVerifyDisplay()" class="emojibutton">&nbsp;👨‍👩‍👧‍👦 Verify Group</button>
     </div>
 
+    <div id="button3">
+        <button onclick="checkSignature()" class="emojibutton">&nbsp;👀 Verify</button>
+    </div>
+
     <div id="button4">
-        <button onclick="importFileKeys(groupContainer,'')" class="emojibutton">&nbsp;⬆️👨‍👩‍👧‍👦 Import Group Info</button>
+        <button onclick="importFileKeys(groupContainer,'')" class="emojibutton">&nbsp;⬆️👨‍👩‍👧‍👦 Import Group</button>
     </div>
 
     <div id="button5">
-        <button onclick="importFileKeys(sigContainer,'')" class="emojibutton">&nbsp;⬆️✍️ Import Group Signature</button>
+        <button onclick="importFileKeys(sigContainer,'')" class="emojibutton">&nbsp;⬆️✍️ Import Signatures</button>
     </div>
 
     <div id="button6">
@@ -49,20 +50,9 @@
 
 </div>
 
-<div class="keycontainer" id = "mainContainer">
+<div class="keycontainer" id="mainContainer">
 
 
-    <div class="containers" id="left">
-        <div class="keys" id="signatureBanner">
-            Signature
-        </div>
-        <div contenteditable="true" contenteditable data-placeholder="Enter signature" class="keysdisplay"
-            id="signatureContainer"></div>
-
-    </div>
-
-
-    <!-- Hidden Signature divs above hidden key divs below -->
     <div class="containers" id="middle">
 
         <div class="keys" id="keyBanner">
@@ -72,8 +62,14 @@
             placeholder="Test" id="keyContainer"></div>
     </div>
 
+    <div class="containers" id="left">
+        <div class="keys" id="signatureBanner">
+            Signature
+        </div>
+        <div contenteditable="true" contenteditable data-placeholder="Enter signature" class="keysdisplay"
+            id="signatureContainer"></div>
 
-    <!-- Hidden Signature divs above hidden key divs below -->
+    </div>
 
     <div class="containers" id="right">
 
@@ -103,168 +99,6 @@
 <div class="results" id="threshold"></div>
 <div class="results" id="results"></div>
 
-
-<body>
-
-    <script src="bundle.js"></script>
-
-    <script>
-
-
-
-        keyContain = document.getElementById("keyContainer")
-
-        function bufferToHex(buffer) {
-            return [...new Uint8Array(buffer)]
-                .map(b => b.toString(16).padStart(2, "0"))
-                .join("");
-        }
-
-        function groupVerifyDisplay(){
-            document.getElementById('mainContainer').remove()
-            document.getElementById('button1').remove()
-            document.getElementById('button2').remove()
-            document.getElementById('button3').remove()
-            document.getElementById('button4').style.display = "inline-block"
-            document.getElementById('button5').style.display = "inline-block"
-            document.getElementById('button6').style.display = "inline-block"
-            document.getElementById('secondContainer').style.display = "block"
-            
-        }
-
-
-        async function checkSignature() {
-
-            signature = document.getElementById('signatureContainer').innerText
-            key = document.getElementById('keyContainer').innerText
-            message = document.getElementById('messageContainer').innerText
-
-            if (signature == "" || key == "" || message == "") {
-                return
-            }
-
-            try {
-                isvalid = await myBundle.checkSig(signature, key, message)
-            } catch (error) {
-                document.getElementById('results').innerHTML = "Invalid Data ❌"
-            }
-
-            if (isvalid == true) {
-                
-                document.getElementById('results').innerHTML = "Valid Signature ✅"
-                
-            }else{
-
-                document.getElementById('results').innerHTML = "Invalid Signature ❌"
-
-            }
-
-            return
-        }
-
-        async function checkSignatureGroup(){
-            loadedKeyArray = []
-            message = ''
-            numberOfSigners = 0
-            thresholdOfSigners = 0
-            aggregateSignature = ''
-            signerIndexes = []
-            actualSigners =[]
-
-            groupInfo = document.getElementById('groupContainer')
-            sigInfo = document.getElementById('sigContainer')
-            
-            if (groupInfo.innerText == '' || sigInfo.innerText == '') {
-                return
-            }
-            
-            jsonGroupInfo = JSON.parse(groupInfo.innerText)
-            loadedKeyArray = jsonGroupInfo.signingKeys
-            numberOfSigners = jsonGroupInfo.numberOfSigners
-            thresholdOfSigners = jsonGroupInfo.thresholdNumber
-
-            jsonSigInfo = JSON.parse(sigInfo.innerText)
-            aggregateSignature = jsonSigInfo.aggregateSignature //updatethis
-            message  = jsonSigInfo.message
-            signerIndexes = jsonSigInfo.signerIndexes
-
-            for (let index = 0; index < signerIndexes.length; index++) {
-                element = signerIndexes[index];
-                actualSigners.push(loadedKeyArray[element])                
-            }
-
-            if (actualSigners.length >= thresholdOfSigners) {
-
-            }
-            else{
-                document.getElementById('threshold').innerHTML = "Threshold not met, only " + actualSigners.length + " out of " + thresholdOfSigners
-                return
-            }
-
-            try {
-                aggregateKey = await myBundle.aggKey(actualSigners)
-            } catch (error) {
-                document.getElementById('results').innerHTML = "Invalid Keys ❌"
-            }
-
-            try {
-                isvalid = await myBundle.checkSig(aggregateSignature, aggregateKey, message) 
-            } catch (error) {
-                document.getElementById('results').innerHTML = "Invalid Signature, Bad Data ❌"
-            }
-
-            if (isvalid) {
-                document.getElementById('results').innerHTML = "Valid Signature ✅ " + actualSigners.length + "/" + thresholdOfSigners
-            }
-            else{
-                document.getElementById('results').innerHTML = "Invalid Signature ❌"
-            }
-
-        }
-
-        function importFileKeys(elementToChange, type) {
-            var input = document.createElement('input');
-            input.type = 'file';
-
-            input.onchange = e => {
-                var filetest = e.target.files[0];
-                console.log(filetest.name)
-
-                // setting up the reader
-                var reader = new FileReader();
-                reader.readAsText(filetest, 'UTF-8');
-
-                // here we tell the reader what to do when it's done reading...
-                reader.onload = readerEvent => {
-                    var content = readerEvent.target.result; // this is the content!
-
-                    if (type == 'keys') {
-                        content = content.split('\n')
-                    content = content[0].split(':')
-                    content = content[1]
-                    }
-
-                    elementToChange.innerHTML = content // this is not agnostic!
-
-                }
-
-            }
-
-            input.click();
-        }
-
-    </script>
-
-    </script>
-
-
-    <script>
-
-    </script>
-</body>
-
-</html>
-
 <style>
     /* Add a black background color to the top navigation bar */
     .emojititle {
@@ -278,27 +112,36 @@
     }
 
 
-    #button1,#button2,#button3 {
+    #button1,
+    #button2,
+    #button3 {
         display: inline-block;
-        padding-bottom: 30px;
+        padding-bottom: 10px;
     }
 
-    #button4,#button5,#button6{
+    #button4,
+    #button5,
+    #button6 {
         display: none;
-        padding-bottom: 30px;
+        padding-bottom: 10px;
     }
 
-    #secondContainer{
+    #secondContainer {
         display: none;
     }
 
     .buttonbox {
         text-align: center;
+        padding-bottom: 10px;
     }
 
     .titlebox {
         text-align: center;
         padding-bottom: 30px;
+    }
+
+    [contenteditable]:focus {
+        outline: 0px solid transparent;
     }
 
     body {
@@ -384,15 +227,16 @@
     .keysdisplay:empty:before {
         content: attr(data-placeholder);
         color: grey;
-        font-size: 2vw;
+        font-size: 25px;
     }
 
     .keycontainer {
-        padding-bottom: 30px;
+        padding-bottom: 10px;
     }
 
     .containers {
         width: 80%;
+        padding-bottom: 10px;
     }
 
     #left,
@@ -409,12 +253,12 @@
 
     #middle {
         width: 33%;
-        
+
     }
 
     #right {
         width: 33%;
-        
+
     }
 
     #keyBox {
@@ -431,13 +275,194 @@
         padding-top: 20px;
     }
 
-    .results{
-    text-align: center;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 30px;
+    .results {
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 30px;
     }
 
     .emojilink {
         text-decoration: none;
     }
+
+    @media (max-width: 1000px) {
+
+    #left,#middle,#right {
+        display: block;
+        width: auto;
+    }
+
+    }
+
+    @media (max-width: 445px) {
+
+        .emojititle {
+            font-size: 25vw;
+        }
+
+        .title {
+            font-size: 10vw;
+        }
+
+        body {
+            margin-left: 5%;
+            margin-right: 5%;
+        }
+
+        .emojibutton {
+            width: 210px;
+            height: 3em;
+        }
+
+    }
 </style>
+
+<script src="bundle.js"></script>
+<script>
+
+
+
+    keyContain = document.getElementById("keyContainer")
+
+    function bufferToHex(buffer) {
+        return [...new Uint8Array(buffer)]
+            .map(b => b.toString(16).padStart(2, "0"))
+            .join("");
+    }
+
+    function groupVerifyDisplay() {
+        document.getElementById('mainContainer').remove()
+        document.getElementById('button1').remove()
+        document.getElementById('button2').remove()
+        document.getElementById('button3').remove()
+        document.getElementById('button4').style.display = "inline-block"
+        document.getElementById('button5').style.display = "inline-block"
+        document.getElementById('button6').style.display = "inline-block"
+        document.getElementById('secondContainer').style.display = "block"
+
+    }
+
+
+    async function checkSignature() {
+
+        signature = document.getElementById('signatureContainer').innerText
+        key = document.getElementById('keyContainer').innerText
+        message = document.getElementById('messageContainer').innerText
+
+        if (signature == "" || key == "" || message == "") {
+            return
+        }
+
+        try {
+            isvalid = await myBundle.checkSig(signature, key, message)
+        } catch (error) {
+            document.getElementById('results').innerHTML = "Invalid Data ❌"
+        }
+
+        if (isvalid == true) {
+
+            document.getElementById('results').innerHTML = "Valid Signature ✅"
+
+        } else {
+
+            document.getElementById('results').innerHTML = "Invalid Signature ❌"
+
+        }
+
+        return
+    }
+
+    async function checkSignatureGroup() {
+        loadedKeyArray = []
+        message = ''
+        numberOfSigners = 0
+        thresholdOfSigners = 0
+        aggregateSignature = ''
+        signerIndexes = []
+        actualSigners = []
+
+        groupInfo = document.getElementById('groupContainer')
+        sigInfo = document.getElementById('sigContainer')
+
+        if (groupInfo.innerText == '' || sigInfo.innerText == '') {
+            return
+        }
+
+        jsonGroupInfo = JSON.parse(groupInfo.innerText)
+        loadedKeyArray = jsonGroupInfo.signingKeys
+        numberOfSigners = jsonGroupInfo.numberOfSigners
+        thresholdOfSigners = jsonGroupInfo.thresholdNumber
+
+        jsonSigInfo = JSON.parse(sigInfo.innerText)
+        aggregateSignature = jsonSigInfo.aggregateSignature //updatethis
+        message = jsonSigInfo.message
+        signerIndexes = jsonSigInfo.signerIndexes
+
+        for (let index = 0; index < signerIndexes.length; index++) {
+            element = signerIndexes[index];
+            actualSigners.push(loadedKeyArray[element])
+        }
+
+        if (actualSigners.length >= thresholdOfSigners) {
+
+        }
+        else {
+            document.getElementById('threshold').innerHTML = "Threshold not met, only " + actualSigners.length + " out of " + thresholdOfSigners
+            return
+        }
+
+        try {
+            aggregateKey = await myBundle.aggKey(actualSigners)
+        } catch (error) {
+            document.getElementById('results').innerHTML = "Invalid Keys ❌"
+        }
+
+        try {
+            isvalid = await myBundle.checkSig(aggregateSignature, aggregateKey, message)
+        } catch (error) {
+            document.getElementById('results').innerHTML = "Invalid Signature, Bad Data ❌"
+        }
+
+        if (isvalid) {
+            document.getElementById('results').innerHTML = "Valid Signature ✅ " + actualSigners.length + "/" + numberOfSigners
+        }
+        else {
+            document.getElementById('results').innerHTML = "Invalid Signature ❌"
+        }
+
+    }
+
+    function importFileKeys(elementToChange, type) {
+        var input = document.createElement('input');
+        input.type = 'file';
+
+        input.onchange = e => {
+            var filetest = e.target.files[0];
+            console.log(filetest.name)
+
+            // setting up the reader
+            var reader = new FileReader();
+            reader.readAsText(filetest, 'UTF-8');
+
+            // here we tell the reader what to do when it's done reading...
+            reader.onload = readerEvent => {
+                var content = readerEvent.target.result; // this is the content!
+
+                if (type == 'keys') {
+                    content = content.split('\n')
+                    content = content[0].split(':')
+                    content = content[1]
+                }
+
+                elementToChange.innerHTML = content // this is not agnostic!
+
+            }
+
+        }
+
+        input.click();
+    }
+
+</script>
+
+</html>
