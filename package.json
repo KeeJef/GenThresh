@@ -8,7 +8,7 @@
     "babelify": "^10.0.0",
     "gulp-install": "^1.1.0",
     "http-server": "^0.12.3",
-    "noble-bls12-381": "^0.6.0",
+    "noble-bls12-381": "^0.6.1",
     "socket.io": "^3.0.3",
     "tweetnacl": "^1.0.3"
   },

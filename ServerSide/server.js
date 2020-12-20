@@ -1,9 +1,4 @@
-const io = require("socket.io")({
-   cors: {
-     origin: "http://localhost:8080",
-     methods: ["GET", "POST"]
-   }
- });
+const io = require("socket.io")();
 
 server = io.listen(8000);
 

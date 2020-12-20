@@ -5,9 +5,9 @@ function generatePubKey(privKey) {
   return pubKey
 };
 
-async function signMessage(privKey, message) {
+function signMessage(privKey, message) {
   message = new TextEncoder().encode(message)
-  let signature = await bls.sign(message, privKey)
+  let signature = bls.sign(message, privKey)
   return signature
 };
 
