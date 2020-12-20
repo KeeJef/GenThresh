@@ -634,14 +634,14 @@
 
     function roomIsFull() {
         document.getElementById("roomIsFull").style.display = "block"
-        document.getElementById("generateOrLoad").style.display = "none"
-
+        document.getElementById("GenerateFramework").style.display = "none"
+        throw new Error ("Keys not found in group")
     }
 
     function wrongKeys() {
         document.getElementById("wrongKeys").style.display = "block"
-        document.getElementById("generateOrLoad").style.display = "none"
-
+        document.getElementById("enterName").style.display = "none"
+        throw new Error ("Keys not found in group")
     }
 
     function reject() {
@@ -828,13 +828,6 @@
         return emoji
     }
 
-    var input = document.getElementById("nameEntry");
-    input.addEventListener("keyup", function (event) {
-        if (event.keyCode === 13) {
-            event.preventDefault();
-            document.getElementById("enterName").click();
-        }
-    });
 </script>
 
 
