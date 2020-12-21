@@ -1,6 +1,6 @@
 ![Imgur](https://i.imgur.com/PhGhASq.png)
 
-## GenThresh
+## [GenThresh](genthresh.com)
 
 [GenThresh.com](GenThresh.com) uses bls12-381 as implemented [here](https://github.com/paulmillr/noble-bls12-381) to allow you to Generate, Sign, Aggregate and verify BLS signatures. It also allows for the spontaneous creation of rooms (using websockets) where users can automatically aggregate signatures. 
 
