@@ -1,19 +1,33 @@
 <template>
-  <div class="home">
-    <div class="flex justify-center"><img alt="Vue logo" src="../assets/logo.png"></div>
+  <TitleCard title="GenThresh" />
+  <div class="flex flex-row justify-center gap-1 pb-5">
+    <mainButton title="🔑 Generate" />
+    <mainButton title="✍️ Sign" />
+    <mainButton title="👨‍👩‍👧‍👦 Group Sign" />
+    <mainButton title="💫 Aggregate" />
+    <mainButton title="👀 Verify" />
+  </div>
+  <TextDisplay displayText="GenThresh uses BLS12-381 to allow you to generate, sign, aggregate and verify BLS signatures. You may also create rooms using group sign, where you can automatically share and aggregate signatures."/>
+  <div>
     
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import { defineComponent } from "vue";
 
-export default {
-  name: 'HomeView',
+// Components
+import TitleCard from "@/components/TitleCard.vue";
+import mainButton from "@/components/mainButton.vue";
+import TextDisplay from "@/components/TextDisplay.vue";
+
+export default defineComponent({
+  name: "HomeView",
+
   components: {
-    HelloWorld
-  }
-}
+    TitleCard,
+    mainButton,
+    TextDisplay
+  },
+});
 </script>
