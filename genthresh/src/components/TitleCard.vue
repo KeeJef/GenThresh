@@ -1,7 +1,7 @@
 <template>
-  <div class="flex justify-center select-none">
-    <div class="flex flex-col justify-center">
-      <div class="flex text-8xl font-bold">{{this.title}}</div>
+  <div class="flex justify-center">
+    <div @click="$router.push('/')" class="flex flex-col justify-center cursor-pointer">
+      <div class="flex justify-center text-[5vw] font-bold select-none">{{this.title}}</div>
       <div class="flex justify-center text-[10vw]">🧙‍♂️</div>
     </div>
   </div>
