@@ -1,50 +1,51 @@
 <template>
-    <TitleCard title="Generate" />
-    <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
-      <mainButton title="🔑 Generate Keypair" />
-      <mainButton title="💾 Save Keypair" />
-    </div>
+  <TitleCard title="Generate" />
+  <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
+    <mainButton @click="generateKey" title="🔑 Generate Keypair" />
+    <mainButton title="💾 Save Keypair" />
+  </div>
 
-    <div class="flex justify-center text-2xl pb-2">Your Keys<span class="pl-2"><button>📋</button></span></div>
+  <div class="flex justify-center text-2xl pb-2">
+    Your Keys<span class="pl-2"><button>📋</button></span>
+  </div>
 
-    <TextDisplay
-      displayText=""
-    />
+  <TextDisplay :displayText=this.displayText />
+</template>
 
-  </template>
-  
-  <script>
-  import { defineComponent } from "vue";
-  const bls = require('@noble/bls12-381');
-  
-  // Components
-  import TitleCard from "@/components/TitleCard.vue";
-  import mainButton from "@/components/mainButton.vue";
-  import TextDisplay from "@/components/TextDisplay.vue";
-  
-  export default defineComponent({
-    name: "GenerateView",
-    data(){
-      return{
-      msg:"Test"
-      }
+<script>
+import { defineComponent } from "vue";
+const bls = require("@noble/bls12-381");
+
+// Components
+import TitleCard from "@/components/TitleCard.vue";
+import mainButton from "@/components/mainButton.vue";
+import TextDisplay from "@/components/TextDisplay.vue";
+import helpers from '@/helperFunctions/helperFunctions.js'
+
+export default defineComponent({
+  name: "GenerateView",
+  data() {
+    return {
+      displayText: "",
+    };
+  },
+
+  methods: {
+    generateKey() {
+      // Generate Randomness and convert into BLS key
+      var array = new Uint8Array(32);
+      var privKey = crypto.getRandomValues(array);
+      var pubKey = bls.getPublicKey(privKey);
+      this.displayText = helpers.bufferToHex(pubKey);
     },
-  
-    components: {
-      TitleCard,
-      mainButton,
-      TextDisplay,
-    },
+  },
 
-    mounted(){
-    console.log("test")
-    var array = new Uint8Array(64);
-    var privKey = crypto.getRandomValues(array) // This needs to be review for security
-    var pubKey = bls.getPublicKey(privKey);
-    console.log(pubKey)
+  components: {
+    TitleCard,
+    mainButton,
+    TextDisplay,
+  },
 
-    }
-
-  });
-  </script>
-  
+  mounted() {},
+});
+</script>
