@@ -14,7 +14,6 @@
 
 <script>
 import { defineComponent } from "vue";
-const bls = require("@noble/bls12-381");
 
 // Components
 import TitleCard from "@/components/TitleCard.vue";
@@ -35,8 +34,7 @@ export default defineComponent({
       // Generate Randomness and convert into BLS key
       var array = new Uint8Array(32);
       var privKey = crypto.getRandomValues(array);
-      var pubKey = bls.getPublicKey(privKey);
-      this.displayText = helpers.bufferToHex(pubKey);
+      this.displayText = helpers.bufferToHex(helpers.generatePubKey(privKey))
     },
   },
 
