@@ -8,7 +8,7 @@
     <mainButton title="👀 Verify" @click="$router.push('verify')"/>
   </div>
 
-  <TextDisplay
+  <TextDisplay class="text-center"
     displayText="GenThresh uses BLS12-381 to allow you to generate, sign, aggregate and verify BLS signatures. You may also create rooms using group sign, where you can automatically share and aggregate signatures."
   />
 

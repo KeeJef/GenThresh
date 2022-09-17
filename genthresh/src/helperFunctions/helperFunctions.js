@@ -1,6 +1,7 @@
-module.exports = {uint8ArrayToString,bufferToHex, generatePubKey, signMessage, checkSig, verifyMulti, aggSig, aggKey};
+module.exports = {uint8ArrayToString,bufferToHex, generatePubKey, signMessage, checkSig, verifyMulti, aggSig, aggKey, saveFile};
 
 const bls = require("@noble/bls12-381");
+var FileSaver = require('file-saver');
 
 function uint8ArrayToString(array) {
   var str = String.fromCharCode.apply(null, array);
@@ -53,4 +54,10 @@ async function aggKey(keyArray) {
   let singleKey = await bls.aggregatePublicKeys(keyArray)
   console.log("Agg Key :" + bufferToHex(singleKey))
   return singleKey
+}
+
+function saveFile(textToSave){
+  var blob = new Blob([textToSave], {type: "text/plain;charset=utf-8"});
+  let today = new Date().toISOString().slice(0, 10)
+  FileSaver.saveAs(blob, "BLSKEY"+today+".txt");
 }
