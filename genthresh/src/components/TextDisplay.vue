@@ -10,7 +10,7 @@
 
 <script>
 export default {
-  name: "TitleCard",
+  name: "TextDisplay",
 
   data: () => ({}),
   props: {

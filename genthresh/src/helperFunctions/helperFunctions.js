@@ -1,11 +1,10 @@
-module.exports = {uint8ArrayToString,bufferToHex, generatePubKey, signMessage, checkSig, verifyMulti, aggSig, aggKey, saveFile};
+module.exports = {stringToUint8Array,bufferToHex, generatePubKey, signMessage, checkSig, verifyMulti, aggSig, aggKey, saveFile};
 
 const bls = require("@noble/bls12-381");
 var FileSaver = require('file-saver');
 
-function uint8ArrayToString(array) {
-  var str = String.fromCharCode.apply(null, array);
-  return str
+function stringToUint8Array(string) {
+  return Uint8Array.from(Array.from(string).map(letter => letter.charCodeAt(0)));
 }
 
 function bufferToHex(buffer) {
