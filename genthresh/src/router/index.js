@@ -28,12 +28,21 @@ const routes = [
     component: () => import(/* webpackChunkName: "aggregate" */ '../views/AggregateView.vue')
   },
   {
+    path: '/aggregate-keys',
+    name: 'aggregate-keys',
+    component: () => import(/* webpackChunkName: "aggregate-keys" */ '../views/AggregateKeyView.vue')
+  },
+  {
+    path: '/aggregate-sigs',
+    name: 'aggregate-sigs',
+    component: () => import(/* webpackChunkName: "aggregate-sigs" */ '../views/AggregateSigView.vue')
+  },
+
+  {
     path: '/verify',
     name: 'verify',
     component: () => import(/* webpackChunkName: "verify" */ '../views/VerifyView.vue')
   },
-
-
 
 ]
 

@@ -1,6 +1,6 @@
 <template>
     <contenteditable tag="div" :contenteditable="isEditable" v-model="message" :noNL="true" :noHTML="true" @returned="enterPressed" />
-  </template>
+</template>
    
   <script>
   import contenteditable from 'vue-contenteditable'; // Not needed it registered globally
