@@ -4,7 +4,7 @@
     <label for="files" class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600">⬆️💾 Import Key</label>
       <input @change="processKey" id="files" class="hidden" type="file">
     <mainButton @click="validate" title="👀 Verify" />
-    <mainButton title=" 👨‍👩‍👧‍👦 Verify Group" />
+    <mainButton @click="$router.push('verify-group')" title=" 👨‍👩‍👧‍👦 Verify Group" />
   </div>
 
   <div class="flex justify-center text-4xl pb-2">Public Key</div>

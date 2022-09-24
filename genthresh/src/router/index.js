@@ -43,6 +43,11 @@ const routes = [
     name: 'verify',
     component: () => import(/* webpackChunkName: "verify" */ '../views/VerifyView.vue')
   },
+  {
+    path: '/verify-group',
+    name: 'verify-group',
+    component: () => import(/* webpackChunkName: "verify-group" */ '../views/VerifyGroup.vue')
+  },
 
 ]
 
