@@ -50,14 +50,17 @@ export default defineComponent({
       var privKey = crypto.getRandomValues(array);
       this.publicKeyHex = helpers.bufferToHex(helpers.generatePubKey(privKey))
       this.privateKeyHex = helpers.bufferToHex(privKey)
-      this.keyOutput = "Public Key: \n" + this.publicKeyHex +"\n" + "Private Key: \n" + this.privateKeyHex
+      this.keyOutput = {
+        "publicKey": this.publicKeyHex,
+        "privateKey": this.privateKeyHex
+      }
 
     },
     copyKeys(){
       navigator.clipboard.writeText(this.keyOutput)
     },
     saveFile(){
-      helpers.saveFile(this.keyOutput)
+      helpers.saveFile(JSON.stringify(this.keyOutput))
     }
   },
 

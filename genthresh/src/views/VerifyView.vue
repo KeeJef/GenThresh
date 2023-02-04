@@ -38,7 +38,7 @@
   </div>
  <div v-if="signatureChecked">
   <div v-if="isValid" class="flex justify-center text-4xl pb-2">Valid Signature✔️</div>
-  <div v-if="!isValid" class="flex justify-center text-4xl pb-2">Invalid Signature/Data ❌</div>
+  <div v-if="!isValid" class="flex justify-center text-4xl my-4">Invalid Signature/Data ❌</div>
   </div>
 </template>
 
@@ -75,25 +75,20 @@ export default defineComponent({
       var rawFileData = event.target.files[0];
 
       var reader = new FileReader();
-      reader.readAsText(rawFileData, "UTF-8");
+      reader.readAsText(rawFileData, 'UTF-8');
 
       // here we tell the reader what to do when it's done reading...
-      reader.onload = (readerEvent) => {
-        var rawFileData = readerEvent.target.result; // this is the content!
+      reader.onload = readerEvent => {
+          var rawFileData = readerEvent.target.result; // this is the content!
 
-        try {
-          var keys = rawFileData.split('\n')
-          var publicKey = keys[1]
-          if (publicKey == undefined) {
-            throw "Undefined Key"
-          }
-          this.pubKey = publicKey
+          try {
+          this.pubKey = JSON.parse(rawFileData).publicKey
           } catch (error) {
-            window.alert("Key improperly formatted")
+            window.alert("Key improperly formatted, please import a JSON encoded keyfile")
           }
-        //split off public key for verification
-      };
-    },
+          
+      }
+   },
     async validate(){
       if (this.message && this.signature && this.pubKey) {
         try {

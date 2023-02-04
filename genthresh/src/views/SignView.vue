@@ -54,15 +54,10 @@
           var rawFileData = readerEvent.target.result; // this is the content!
 
           try {
-          var keys = rawFileData.split('\n')
-          var privateKey = keys[3]
-          if (privateKey == undefined) {
-            throw "Undefined Key"
-          }
-          this.privKey = privateKey
+          this.privKey = JSON.parse(rawFileData).privateKey
           this.keysImported = true
           } catch (error) {
-            window.alert("Key improperly formatted")
+            window.alert("Key improperly formatted, please import a JSON encoded keyfile")
           }
           
       }
