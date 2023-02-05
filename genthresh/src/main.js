@@ -5,11 +5,14 @@ import vuetify from './plugins/vuetify'
 import { loadFonts } from './plugins/webfontloader'
 import './assets/tailwind.css'
 import { createPinia } from 'pinia'
+import Toast, { POSITION } from "vue-toastification";
+import "vue-toastification/dist/index.css";
 
 loadFonts()
 
 createApp(App)
   .use(createPinia())
+  .use(Toast,{position: POSITION.BOTTOM_RIGHT})
   .use(router)
   .use(vuetify)
   .mount('#app')

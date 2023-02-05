@@ -5,5 +5,7 @@ Sign page allows key generation
 Group sign becomes a downfill page
 Aggregate Signaures accepts CSV or JSON
 Show errors on page
+favicon
+emoji size on small screens
 
 Buttons which require fields to be filled do not show, or show in a different place until fields are filled

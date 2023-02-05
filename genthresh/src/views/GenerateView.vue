@@ -6,22 +6,27 @@
   </div>
 
   <div class="flex justify-center text-3xl pb-2">
-    Your Keys
+    Copy Keys
     <span class="pl-2">
-      <button class="text-3xl hover:opacity-70 active:translate-y-1" @click="this.copyKeys">📋
+      <button
+        class="text-3xl hover:opacity-70 active:translate-y-1"
+        @click="this.copyKeys"
+      >
+        📋
       </button>
     </span>
   </div>
 
   <div class="flex justify-center">
     <div
-      class="w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 text-left"
+      class="w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 text-left xl:w-3/5"
     >
-    <div class="mb-1"> <span class="font-bold">Public Key: </span>{{publicKeyHex}}</div>
-    <div> <span class="font-bold">Private Key: </span>{{privateKeyHex}}</div>
+      <div class="mb-1">
+        <span class="font-bold">Public Key: </span>{{ publicKeyHex }}
+      </div>
+      <div><span class="font-bold">Private Key: </span>{{ privateKeyHex }}</div>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -30,15 +35,20 @@ import { defineComponent } from "vue";
 // Components
 import TitleCard from "@/components/TitleCard.vue";
 import mainButton from "@/components/mainButton.vue";
-import helpers from '@/helperFunctions/helperFunctions.js'
+import helpers from "@/helperFunctions/helperFunctions.js";
+import { useToast } from "vue-toastification";
 
 export default defineComponent({
   name: "GenerateView",
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   data() {
     return {
       publicKeyHex: "",
-      privateKeyHex:"",
-      keyOutput:"",
+      privateKeyHex: "",
+      keyOutput: "",
       toggleCopy: false,
     };
   },
@@ -48,20 +58,21 @@ export default defineComponent({
       // Generate Randomness and convert into BLS key
       var array = new Uint8Array(32);
       var privKey = crypto.getRandomValues(array);
-      this.publicKeyHex = helpers.bufferToHex(helpers.generatePubKey(privKey))
-      this.privateKeyHex = helpers.bufferToHex(privKey)
+      this.publicKeyHex = helpers.bufferToHex(helpers.generatePubKey(privKey));
+      this.privateKeyHex = helpers.bufferToHex(privKey);
       this.keyOutput = {
-        "publicKey": this.publicKeyHex,
-        "privateKey": this.privateKeyHex
-      }
-
+        publicKey: this.publicKeyHex,
+        privateKey: this.privateKeyHex,
+      };
     },
-    copyKeys(){
-      navigator.clipboard.writeText(this.keyOutput)
+    copyKeys() {
+      navigator.clipboard.writeText(JSON.stringify(this.keyOutput));
+      this.toast.success("Copied to Clipboard");
     },
-    saveFile(){
-      helpers.saveFile(JSON.stringify(this.keyOutput))
-    }
+    saveFile() {
+      helpers.saveFile(JSON.stringify(this.keyOutput));
+      this.toast.success("Saved Keypair");
+    },
   },
 
   components: {
@@ -70,7 +81,7 @@ export default defineComponent({
   },
 
   mounted() {
-    this.generateKey()
+    this.generateKey();
   },
 });
 </script>
