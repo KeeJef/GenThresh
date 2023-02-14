@@ -3,7 +3,8 @@
     <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
       <label for="files" class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl cursor-pointer hover:bg-purple-600">⬆️💾 Import Key</label>
       <input @change="processKey" id="files" class="hidden" type="file">
-      <mainButton v-if="keysImported" @click="signMessage" title="✍️ Sign" />
+      <mainButton v-if="!privKey" @click="$router.push('generate')" title="🔑 Generate Keypair" />
+      <mainButton v-if="keysImported || privKey" @click="signMessage" title="✍️ Sign" />
     </div>
 
     <div class="flex justify-center text-2xl pb-2">Private Key</div>
@@ -18,7 +19,7 @@
 
     <div v-if="this.signed" class="flex justify-center text-2xl pb-2">Signature</div>
 
-    <TextDisplay v-if="this.signed"
+    <TextDisplay class="mb-6" v-if="this.signed"
       :displayText=this.signature
     />
 
@@ -35,9 +36,14 @@
   import TextDisplay from "@/components/TextDisplay.vue";
   import EditableArea from "@/components/EditableArea.vue";
   import helpers from '@/helperFunctions/helperFunctions.js'
+  import { useToast } from "vue-toastification";
   
   export default defineComponent({
     name: "SignView",
+    setup() {
+    const toast = useToast();
+    return { toast };
+  },
     data() {
     return {
       keysImported:false,
@@ -62,19 +68,25 @@
           this.privKey = JSON.parse(rawFileData).privateKey
           this.keysImported = true
           } catch (error) {
-            window.alert("Key improperly formatted, please import a JSON encoded keyfile")
+            this.toast.error("Key improperly formatted, please import a JSON encoded keyfile");
           }
           
       }
    },
    async signMessage(){
       if (!this.message) {
-        window.alert("Please enter a message")
+        this.toast.error("Enter a message to sign");
         return
       }
-      var bufferSignature = await helpers.signMessage(this.privKey, this.message)
+      try {
+        var bufferSignature = await helpers.signMessage(this.privKey, this.message)
+      } catch (error) {
+        this.toast.error("Error signing message: " + error.message);
+        return
+      }
       this.signature = helpers.bufferToHex(bufferSignature)
       this.signed = true
+      this.toast.success("Mesage signed successfully");
    }
 
   },

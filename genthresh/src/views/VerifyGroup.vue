@@ -58,10 +58,16 @@ import TitleCard from "@/components/TitleCard.vue";
 import mainButton from "@/components/mainButton.vue";
 import EditableArea from "@/components/EditableArea.vue";
 import helpers from "@/helperFunctions/helperFunctions.js";
+import { useToast } from "vue-toastification";
+
 //import TextDisplay from "@/components/TextDisplay.vue";
 
 export default defineComponent({
   name: "VerifyGroupView",
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   data() {
     return {
       signatureChecked: false,

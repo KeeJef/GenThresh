@@ -50,10 +50,15 @@ import TitleCard from "@/components/TitleCard.vue";
 import mainButton from "@/components/mainButton.vue";
 import EditableArea from "@/components/EditableArea.vue";
 import helpers from '@/helperFunctions/helperFunctions.js'
+import { useToast } from "vue-toastification";
 //import TextDisplay from "@/components/TextDisplay.vue";
 
 export default defineComponent({
   name: "VerifyView",
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   data() {
     return {
       signatureChecked:false,
@@ -84,7 +89,7 @@ export default defineComponent({
           try {
           this.pubKey = JSON.parse(rawFileData).publicKey
           } catch (error) {
-            window.alert("Key improperly formatted, please import a JSON encoded keyfile")
+            this.toast.error("Key improperly formatted, please import a JSON encoded keyfile");
           }
           
       }
@@ -99,7 +104,7 @@ export default defineComponent({
         this.signatureChecked = true
       }
       else{
-        window.alert("Missing signature, public key or message")
+        this.toast.error("Missing signature, public key or message");
       }
     }
   }

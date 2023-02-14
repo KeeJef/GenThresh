@@ -58,5 +58,5 @@ async function aggKey(keyArray) {
 function saveFile(textToSave){
   var blob = new Blob([textToSave], {type: "text/plain;charset=utf-8"});
   let today = new Date().toISOString().slice(0, 10)
-  FileSaver.saveAs(blob, "BLSKEY"+today+".txt");
+  FileSaver.saveAs(blob, "BLSKEY"+today+".json");
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="flex justify-center">
     <div
-      class="w-3/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8"
+      class="w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"
     >
       {{ this.displayText }}
     </div>
