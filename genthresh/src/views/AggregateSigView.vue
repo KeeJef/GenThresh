@@ -23,18 +23,13 @@
   <div class="flex justify-center text-4xl pb-2">Signatures</div>
 
   <div class="flex justify-center mb-4">
-    <EditableArea
-      @click="placeholder"
-      v-model="message"
-      :noHTML="false"
-      class="w-3/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8"
-    ></EditableArea>
-  </div>
+      <EditableArea @click="placeholder" v-model="message" class="w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"></EditableArea>
+    </div>
 
   <div v-if="signatureDisplay">
   <div class="flex justify-center text-4xl pb-2">Signature</div>
 
-  <TextDisplay
+  <TextDisplay class="mb-6"
       :displayText=this.aggregatedSignature
     />
 
@@ -51,9 +46,14 @@ import mainButton from "@/components/mainButton.vue";
 import TextDisplay from "@/components/TextDisplay.vue";
 import EditableArea from "@/components/EditableArea.vue";
 import helpers from '@/helperFunctions/helperFunctions.js'
+import { useToast } from "vue-toastification";
 
 export default defineComponent({
   name: "AggregateSigView",
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   data() {
     return {
       show: true,
@@ -97,14 +97,28 @@ export default defineComponent({
     async aggregateSignatures(){
 
       if (this.message == "" || this.message == "Enter signatures separated by commas like: 89c969...e9bbbc,b5f8be...0ebb53") {
-        window.alert("Invalid signature entry")
+        this.toast.error("Please enter signatures to aggregate");
+        return
+      }
+      var signatureArray = this.message.split(',')
+      try {
+
+        var hexAggregateSignature = await helpers.aggSig(signatureArray)
+        this.aggregatedSignature = await helpers.bufferToHex(hexAggregateSignature)
+        
+      } catch (error) {
+        
+        this.toast.error("Error aggregating signatures: " + error.message);
         return
       }
 
-        var signatureArray = this.message.split(',')
-        var hexAggregateSignature = await helpers.aggSig(signatureArray)
-        this.aggregatedSignature = await helpers.bufferToHex(hexAggregateSignature)
+        this.toast.success("Signatures aggregated successfully");
         this.signatureDisplay = true
+
+        //await for the DOM to update
+        await this.$nextTick()
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+
     }      
           
   },

@@ -1,9 +1,5 @@
+Apply changes made to aggregate signatures page to Aggregate keys page
 Save and read everything in JSON, display can still be text based
 Width changes
-Sign page allows key generation
 Group sign becomes a downfill page
-Aggregate Signaures accepts CSV or JSON
-Show errors on page
-emoji size on small screens
-
 Buttons which require fields to be filled do not show, or show in a different place until fields are filled

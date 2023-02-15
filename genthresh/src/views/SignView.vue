@@ -86,7 +86,10 @@
       }
       this.signature = helpers.bufferToHex(bufferSignature)
       this.signed = true
-      this.toast.success("Mesage signed successfully");
+      this.toast.success("Message signed successfully");
+
+      await this.$nextTick()
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
    }
 
   },
