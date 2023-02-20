@@ -27,7 +27,7 @@
       @click="placeholder"
       v-model="message"
       :noHTML="false"
-      class="w-3/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8"
+      class="w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"
     ></EditableArea>
   </div>
 
@@ -46,9 +46,14 @@ import mainButton from "@/components/mainButton.vue";
 import TextDisplay from "@/components/TextDisplay.vue";
 import EditableArea from "@/components/EditableArea.vue";
 import helpers from "@/helperFunctions/helperFunctions.js";
+import { useToast } from "vue-toastification";
 
 export default defineComponent({
   name: "AggregateView",
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   data() {
     return {
       show: true,
@@ -68,10 +73,7 @@ export default defineComponent({
   },
   methods: {
     placeholder() {
-      if (
-        this.message ==
-        "Enter keys separated by commas like: addf63...b5dcac,b91413...664e9a"
-      ) {
+      if (this.message =="Enter keys separated by commas like: addf63...b5dcac,b91413...664e9a") {
         this.message = "";
       }
     },
@@ -95,14 +97,27 @@ export default defineComponent({
         this.message ==
           "Enter keys separated by commas like: addf63...b5dcac,b91413...664e9a"
       ) {
-        window.alert("Invalid key entry");
+        this.toast.error("Invalid keys: Please enter valid keys");
         return;
       }
 
       var keyArray = this.message.split(",");
+
+      try {
       var hexAggregateKey = await helpers.aggKey(keyArray);
       this.aggregatedKey = await helpers.bufferToHex(hexAggregateKey);
+      } catch (error) {
+
+        this.toast.error("Error aggregating keys: " + error.message);
+        return
+        
+      }
+
+      this.toast.success("Signatures aggregated successfully");
       this.keyDisplay = true;
+
+      await this.$nextTick()
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
     },
   },
 });

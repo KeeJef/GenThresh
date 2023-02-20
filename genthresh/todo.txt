@@ -1,4 +1,3 @@
-Apply changes made to aggregate signatures page to Aggregate keys page
 Save and read everything in JSON, display can still be text based
 Width changes
 Group sign becomes a downfill page
