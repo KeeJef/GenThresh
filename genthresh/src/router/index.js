@@ -48,6 +48,16 @@ const routes = [
     name: 'verify-group',
     component: () => import(/* webpackChunkName: "verify-group" */ '../views/VerifyGroup.vue')
   },
+  {
+    path: '/create-group',
+    name: 'create-group',
+    component: () => import(/* webpackChunkName: "verify-group" */ '../views/CreateGroupView.vue')
+  },
+  {
+    path: '/existing-group',
+    name: 'existing-group',
+    component: () => import(/* webpackChunkName: "verify-group" */ '../views/ExistingGroupView.vue')
+  },
 
 ]
 

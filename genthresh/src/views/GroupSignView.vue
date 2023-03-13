@@ -1,8 +1,8 @@
 <template>
     <TitleCard title="Group Sign" />
     <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
-      <mainButton title="✨ New Group" />
-      <mainButton title="👨‍👩‍👧‍👦 Existing Group" />
+      <mainButton @click="$router.push('create-group')" title="✨ New Group" />
+      <mainButton @click="$router.push('existing-group')" title="👨‍👩‍👧‍👦 Existing Group" />
     </div>
 
   </template>
