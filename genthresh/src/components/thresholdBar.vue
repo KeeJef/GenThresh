@@ -1,8 +1,8 @@
 <template>
     <div class="relative">
         <div style="width:100%" class="absolute bg-yellow-400 h-9"></div>
-        <div :style={width:this.Bar2Width} class=" absolute bg-purple-400 h-9"></div>
-        <div :style={width:this.Bar1Width} class=" absolute bg-purple-600 h-9"></div>
+        <div :style="{width:this.maxNumber+'%'}" class="absolute bg-purple-400 h-9"></div>
+        <div :style="{width:this.threshold+'%'}" class="absolute bg-purple-600 h-9"></div>
     </div>
 </template>
   
@@ -11,8 +11,6 @@
     name: "ThresholdBar",
    
     data: () => ({
-      Bar1Width: "5%",
-      Bar2Width: "30%",
     }),
     props: {
       maxNumber: String,
