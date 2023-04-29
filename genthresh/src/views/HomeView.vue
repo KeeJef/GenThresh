@@ -3,7 +3,7 @@
 
   <TitleCard title="GenThresh" />
   <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
-    <mainButton  title="🔑 Generate" @click="$router.push('generate')"/>
+    <mainButton title="🔑 Generate" @click="$router.push('generate')"/>
     <mainButton title="✍️ Sign" @click="$router.push('sign')"/>
     <mainButton title="👨‍👩‍👧‍👦 Group Sign" @click="$router.push('group-sign')"/>
     <mainButton title="💫 Aggregate" @click="$router.push('aggregate')"/>

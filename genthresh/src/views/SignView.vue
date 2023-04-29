@@ -23,7 +23,6 @@
       :displayText=this.signature
     />
 
-    <modal/>
 
   </template>
   
@@ -67,6 +66,7 @@
           try {
           this.privKey = JSON.parse(rawFileData).privateKey
           this.keysImported = true
+          this.toast.success("Key Imported Successfully");
           } catch (error) {
             this.toast.error("Key improperly formatted, please import a JSON encoded keyfile");
           }

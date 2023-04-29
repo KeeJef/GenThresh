@@ -43,8 +43,8 @@ export default {
 
   data: () => ({}),
   props: {
-    maxNumber: String,
-    threshold: String,
+    maxNumber: Number,
+    threshold: Number,
   },
 };
 </script>
