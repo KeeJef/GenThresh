@@ -38,14 +38,17 @@ import ThresholdSelector from "@/components/ThresholdSelector";
 import mainButton from "@/components/mainButton";
 import keyImportOrGenerateVue from "@/components/keyImportOrGenerate";
 import EditableArea from "@/components/EditableArea";
+import {useSocket, useUserInfo} from "@/store/index";
 import { useToast } from "vue-toastification";
 import { nextTick } from "vue";
 
 export default defineComponent({
   name: "CreateGroupView",
   setup() {
+    const socketStore = useSocket();
+    const userInfoStore = useUserInfo();
     const toast = useToast();
-    return { toast };
+    return { toast, socketStore, userInfoStore };
   },
   data() {
     return {
@@ -94,6 +97,7 @@ export default defineComponent({
         this.toast.error("Please a name")
         return
       }
+      this.userInfoStore.username = this.name
     }
 
   },

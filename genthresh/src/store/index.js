@@ -1,13 +1,30 @@
 import { defineStore } from 'pinia'
 
-export const useCounterStore = defineStore('counter', {
-  state: () => ({ count: 0 }),
-  getters: {
-    double: state => state.count * 2,
+export const useUserInfo = defineStore({
+  id: "userInfo",
+  state: () => {
+    return {username: String, pubKey: String, privKey: String, emoji : String};
   },
-  actions: {
-    increment() {
-      this.count++
-    },
+  getters: {},
+  actions: {},
+});
+
+export const useGroupInfo = defineStore({
+  id: "groupInfo",
+  state: () => {
+    return { threshold: Number, numberOfSigners: Number, groupID: String, memberList: Array};
   },
-})
+  getters: {},
+  actions: {},
+});
+
+
+export const useSocket = defineStore({
+  id: "socketObject",
+  state: () => {
+    return {socketObject: null};
+  },
+  getters: {},
+  actions: {},
+});
+
