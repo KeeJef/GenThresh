@@ -34,7 +34,6 @@ import { defineComponent } from "vue";
 import TitleCard from "@/components/TitleCard.vue";
 import mainButton from "@/components/mainButton.vue";
 import TextDisplay from "@/components/TextDisplay.vue";
-import connectionManager from "@/components/connectionManager.vue";
 
 export default defineComponent({
   name: "HomeView",
@@ -48,7 +47,6 @@ export default defineComponent({
     TitleCard,
     mainButton,
     TextDisplay,
-    connectionManager,
   },
 });
 </script>

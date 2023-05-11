@@ -38,7 +38,9 @@ import ThresholdSelector from "@/components/ThresholdSelector";
 import mainButton from "@/components/mainButton";
 import keyImportOrGenerateVue from "@/components/keyImportOrGenerate";
 import EditableArea from "@/components/EditableArea";
-import {useSocket, useUserInfo} from "@/store/index";
+import { emojiList } from "../composables/emojiList.js";
+import { io } from "socket.io-client";
+import {useSocket, useUserInfo, useGroupInfo} from "@/store/index";
 import { useToast } from "vue-toastification";
 import { nextTick } from "vue";
 
@@ -47,8 +49,9 @@ export default defineComponent({
   setup() {
     const socketStore = useSocket();
     const userInfoStore = useUserInfo();
+    const groupInfoStore = useGroupInfo();
     const toast = useToast();
-    return { toast, socketStore, userInfoStore };
+    return { toast, socketStore, userInfoStore, groupInfoStore };
   },
   data() {
     return {
@@ -97,7 +100,23 @@ export default defineComponent({
         this.toast.error("Please a name")
         return
       }
+      this.userInfoStore.privKey = this.privKey
+      this.userInfoStore.pubKey = this.pubKey
       this.userInfoStore.username = this.name
+      this.userInfoStore.emoji = emojiList[Math.floor(Math.random() * emojiList.length)]
+
+      this.groupInfoStore.threshold = this.threshold
+      this.groupInfoStore.numberOfSigners = this.maxNumber
+      //generate random 7 letter and number group id 
+      this.groupInfoStore.groupID = Math.random().toString(7).substring(2, 9)
+      this.groupInfoStore.memberList = [{username: this.name, emoji: this.userInfoStore.emoji, pubKey: this.pubKey}]
+
+      this.socketStore.socketObject = io.connect("http://localhost:8000");
+      
+      this.socketStore.socketObject.on('connect', () => {
+        console.log('Connected to server');
+      });
+
     }
 
   },
