@@ -8,10 +8,25 @@ const io = require("socket.io")(
 server = io.listen(8000);
 console.log('server started');
 
-userArrays = []; //This is all being stored in memory which is bad
+rooms = {}; //This is all being stored in memory which is bad
 server.on('connection', function (socket) {
    
    console.log('A user connected');
+
+   socket.on('create', function (roomID) {
+
+      if (rooms[roomID] == roomID) {
+         "Room Already Exists"
+         return
+      }
+
+      console.log("a new room was created with the name " + roomID)
+      socket.join(roomID);
+
+      var roomObject = { RoomName: roomID, members: [] };
+      rooms[roomID]=roomObject
+
+   });
 
    socket.on('setUsername', function (data) {
       console.log("User Joined Room " + data.roomname + " with name " + data.namewanted);
@@ -33,62 +48,6 @@ server.on('connection', function (socket) {
 
    });
 
-   socket.on('setUsernameExisting', function (data) {
-      console.log("User Joined Room " + data.roomname + " with name " + data.pubKey);
-
-      for (let index = 0; index < userArrays.length; index++) {
-         const element1 = userArrays[index];
-         element1.existingroom = true
-
-         if (element1.RoomName == data.roomname) {
-
-            infoGroup = JSON.parse(data.infoGroup) 
-
-            for (let index = 0; index < infoGroup.signingKeys.length; index++) {
-               element = infoGroup.signingKeys[index];
-
-               //SocketIDS are mapped here which ingores actual socket ID's 
-               userObject = {name: data.namewanted, publicKey:element, socketid: data.socketid, isLeader: data.isLeader, signers:infoGroup.numberOfSigners, threshold:infoGroup.thresholdNumber, roomFullStatus: false, joinstatus : false}
-               if (data.pubKey == element) {
-                  userObject.joinstatus = true //detects who caller is 
-               }
-               element1.members.push(userObject);
-               
-            }
-
-            return
-         }
-
-      }
-
-
-
-   });
-
-
-   socket.on('create', function (room) {
-      console.log("a new room was created with the name " + room)
-      socket.join(room);
-
-      if (userArrays.length <= 0) {
-         var roomObject = { RoomName: room, members: [] };
-         userArrays.push(roomObject)
-      }
-
-      for (let index = 0; index < userArrays.length; index++) {
-         const element = userArrays[index].RoomName;
-
-         if (room == element) {//dont recreate already created rooms
-            return
-         } else {
-            var roomObject = { RoomName: room, members: []};
-            userArrays.push(roomObject)
-         }
-
-      }
-
-   });
-
    socket.on('getUsers', function (data) {
 
       for (let index = 0; index < userArrays.length; index++) {
@@ -96,20 +55,6 @@ server.on('connection', function (socket) {
 
          if (element.RoomName == data.roomid) {
             server.sockets.in(data.roomid).emit('getUsers', { userlist: element.members });
-            return
-         }
-
-      }
-
-   });
-
-   socket.on('getExistingUsers', function (data) {
-
-      for (let index = 0; index < userArrays.length; index++) {
-         const element = userArrays[index];
-
-         if (element.RoomName == data.roomid) {
-            server.sockets.in(data.roomid).emit('getLoadedUsers', { userlist: element.members });
             return
          }
 
@@ -141,30 +86,6 @@ server.on('connection', function (socket) {
 
    });
 
-   socket.on('readyUpExisting', function (data) {
-
-      for (let index1 = 0; index1 < userArrays.length; index1++) {
-         room = userArrays[index1];
-
-         if (room.RoomName == data.roomname) {
-
-          for (let index = 0; index < room.members.length; index++) {
-
-            if (room.members[index].socketid == socket.id) {
-               userArrays[index1].members[index].readyStatus = true
-               server.sockets.in(data.roomname).emit('getLoadedUsers', { userlist: userArrays[index1].members }); //dont fire get users in existing group
-               return
-            }
-            
-          }
-
-         }
-         
-
-      }
-
-   });
-
    socket.on('roomFull', function (data) {
 
       for (let index1 = 0; index1 < userArrays.length; index1++) {
@@ -179,75 +100,6 @@ server.on('connection', function (socket) {
             }
          
             server.sockets.in(data.roomname).emit('getUsers', { userlist: userArrays[index1].members });
-            
-          }
-
-         }
-
-   });
-
-   socket.on('roomFullExisting', function (data) {
-
-      for (let index1 = 0; index1 < userArrays.length; index1++) {
-         room = userArrays[index1];
-
-         if (room.RoomName == data.roomname) {
-
-          for (let index = 0; index < room.members.length; index++) {
-
-            room.members[index].roomFullStatus = true
-
-            }
-         
-            server.sockets.in(data.roomname).emit('getLoadedUsers', { userlist: userArrays[index1].members });
-            
-          }
-
-         }
-
-   });
-
-   socket.on('checkCorrectRoom', function (data) {
-
-      for (let index1 = 0; index1 < userArrays.length; index1++) {
-         room = userArrays[index1];
-
-         if (room.RoomName == data.roomid) {
-
-          for (let index = 0; index < room.members.length; index++) {
-
-            if (data.publicKey == room.members[index].publicKey) {
-               room.members[index].joinstatus = true
-               room.members[index].socketid = socket.id
-               return
-            }
-
-            }
-         
-            server.to(socket.id).emit('wrongKeyEvent', true);
-            
-          }
-
-         }
-
-   });
-
-   socket.on('checkRoom', function (data) {
-
-      for (let index1 = 0; index1 < userArrays.length; index1++) {
-         room = userArrays[index1];
-
-         if (room.RoomName == data.roomid) {
-
-          for (let index = 0; index < room.members.length; index++) {
-
-            if (room.members[index].roomFullStatus == true) {
-               server.to(socket.id).emit('roomFullEvent', true);
-               return
-            }
-            
-            }
-            server.to(socket.id).emit('roomFullEvent', false);     
             
           }
 

@@ -51,12 +51,12 @@ const routes = [
   {
     path: '/create-group',
     name: 'create-group',
-    component: () => import(/* webpackChunkName: "verify-group" */ '../views/CreateGroupView.vue')
+    component: () => import(/* webpackChunkName: "create-group" */ '../views/CreateGroupView.vue')
   },
   {
-    path: '/existing-group',
-    name: 'existing-group',
-    component: () => import(/* webpackChunkName: "verify-group" */ '../views/ExistingGroupView.vue')
+    path: '/lobby',
+    name: 'lobby',
+    component: () => import(/* webpackChunkName: "lobby" */ '../views/LobbyView.vue')
   },
 
 ]
