@@ -18,11 +18,6 @@ const routes = [
     component: () => import(/* webpackChunkName: "sign" */ '../views/SignView.vue')
   },
   {
-    path: '/group-sign',
-    name: 'group-sign',
-    component: () => import(/* webpackChunkName: "group-sign" */ '../views/GroupSignView.vue')
-  },
-  {
     path: '/aggregate',
     name: 'aggregate',
     component: () => import(/* webpackChunkName: "aggregate" */ '../views/AggregateView.vue')

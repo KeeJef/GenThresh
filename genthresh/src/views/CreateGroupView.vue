@@ -129,8 +129,8 @@ export default defineComponent({
 
       this.groupInfoStore.threshold = this.threshold;
       this.groupInfoStore.numberOfSigners = this.maxNumber;
-      //generate random 7 letter and number group id
-      this.groupInfoStore.groupID = Math.random().toString(7).substring(2, 9);
+      //generate random 3 number group id
+      this.groupInfoStore.groupID = Math.random().toString(7).substring(2, 5);
       this.groupInfoStore.memberList = [
         {
           username: this.name,

@@ -1,7 +1,7 @@
 <template>
     <TitleCard title="Aggregate" />
     <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
-      <mainButton @click="$router.push('aggregate-sigs')" title="✍ Aggregate Signatures" />
+      <mainButton @click="$router.push('aggregate-sigs')" title="✍ Aggregate Sigs" />
       <mainButton @click="$router.push('aggregate-keys')"  title="🔑 Aggregate Keys" />
     </div>
 

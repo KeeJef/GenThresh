@@ -1,7 +1,7 @@
 <template>
   <TitleCard title="Verify" />
   <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
-    <label for="files" class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600">⬆️💾 Import Key</label>
+    <label for="files" class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600 min-w-[290px] sm:min-w-0">⬆️💾 Import Key</label>
       <input @change="processKey" id="files" class="hidden" type="file">
     <mainButton @click="validate" title="👀 Verify" />
     <mainButton @click="$router.push('verify-group')" title=" 👨‍👩‍👧‍👦 Verify Group" />
@@ -13,7 +13,7 @@
     <EditableArea
       v-model="pubKey"
       :noHTML="false"
-      class="w-3/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8"
+      class="w-4/5 h-32 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"
     ></EditableArea>
   </div>
 
@@ -23,7 +23,7 @@
     <EditableArea
       v-model="signature"
       :noHTML="false"
-      class="w-3/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8"
+      class="w-4/5 h-32 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"
     ></EditableArea>
   </div>
 
@@ -33,7 +33,7 @@
     <EditableArea
       v-model="message"
       :noHTML="false"
-      class="w-3/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8"
+      class="w-4/5 h-32 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"
     ></EditableArea>
   </div>
  <div v-if="signatureChecked">

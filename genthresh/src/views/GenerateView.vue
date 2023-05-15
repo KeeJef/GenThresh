@@ -1,8 +1,8 @@
 <template>
   <TitleCard title="Generate" />
   <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
-    <mainButton @click="generateKey" title="🔑 Generate Keypair" />
-    <mainButton @click="saveFile" title="💾 Save Keypair" />
+    <mainButton @click="generateKey" title="🔑 Generate Keys" />
+    <mainButton @click="saveFile" title="💾 Save Keys" />
   </div>
 
   <div class="flex justify-center text-3xl pb-2">
@@ -17,7 +17,7 @@
     </span>
   </div>
 
-  <div class="flex justify-center">
+  <div class="flex justify-center pb-10">
     <div
       class="w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 text-left xl:w-3/5"
     >

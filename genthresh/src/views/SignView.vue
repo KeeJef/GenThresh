@@ -1,9 +1,9 @@
 <template>
     <TitleCard title="Sign"/>
     <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
-      <label for="files" class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl cursor-pointer hover:bg-purple-600">⬆️💾 Import Key</label>
+      <label for="files" class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl cursor-pointer hover:bg-purple-600 min-w-[290px] sm:min-w-0">⬆️💾 Import Key</label>
       <input @change="processKey" id="files" class="hidden" type="file">
-      <mainButton v-if="!privKey" @click="$router.push('generate')" title="🔑 Generate Keypair" />
+      <mainButton v-if="!privKey" @click="$router.push('generate')" title="🔑 Generate Keys" />
       <mainButton v-if="keysImported || privKey" @click="signMessage" title="✍️ Sign" />
     </div>
 

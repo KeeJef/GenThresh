@@ -5,7 +5,7 @@
   <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
     <mainButton title="🔑 Generate" @click="$router.push('generate')"/>
     <mainButton title="✍️ Sign" @click="$router.push('sign')"/>
-    <mainButton title="👨‍👩‍👧‍👦 Group Sign" @click="$router.push('group-sign')"/>
+    <mainButton title="👨‍👩‍👧‍👦 Group Sign" @click="$router.push('create-group')"/>
     <mainButton title="💫 Aggregate" @click="$router.push('aggregate')"/>
     <mainButton title="👀 Verify" @click="$router.push('verify')"/>
   </div>
@@ -14,7 +14,7 @@
     displayText="GenThresh uses BLS12-381 to allow you to generate, sign, aggregate and verify BLS signatures. You may also create rooms using group sign, where you can automatically share and aggregate signatures."
   />
 
-  <div class="flex justify-center">
+  <div class="flex justify-center pb-5">
     <div class="flex justify-center">
       <a
         class="text-xl text-gray-500"
