@@ -1,5 +1,5 @@
 <template>
-    <contenteditable tag="div" :contenteditable="isEditable" v-model="message" :noNL="true" :noHTML="true" @returned="enterPressed" />
+    <contenteditable tag="div" :contenteditable="isEditable" v-model="message" :noNL="true" :noHTML="true" @keydown.enter="enterPressed" />
 </template>
    
   <script>
@@ -16,7 +16,8 @@
     },
     methods : {
       enterPressed(){
-        alert('Enter Pressed');
+        //pass event up 
+        this.$emit('enterPressed');
       }
     }
   }

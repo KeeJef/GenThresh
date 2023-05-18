@@ -53,6 +53,11 @@ const routes = [
     name: 'lobby',
     component: () => import(/* webpackChunkName: "lobby" */ '../views/LobbyView.vue')
   },
+  {
+    path: '/j',
+    name: 'join',
+    component: () => import(/* webpackChunkName: "lobby" */ '../views/JoinView.vue')
+  }
 
 ]
 

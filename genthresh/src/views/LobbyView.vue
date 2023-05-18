@@ -1,7 +1,7 @@
 <template>
   <TitleCard title="Lobby" />
-  <div class="pb-5">
-    <mainButton @click="modalToggle=!modalToggle" title="💌 Invite users" />
+  <div class="pb-5 flex justify-center">
+    <mainButton id="main button" @click="modalToggle=!modalToggle" title="💌 Invite users" />
     <modalPopup
       v-if="modalToggle"
       @modalClose="this.modalToggle = false"

@@ -1,19 +1,5 @@
 <template>
-  <TitleCard title="Create Group" />
-
-  <div
-    ref="setThreshold"
-    class="pb-10"
-    :class="{ 'opacity-10 pointer-events-none select-none': !setThreshold }"
-  >
-    <thresholdSelector
-      @maxNumberChange="this.maxNumber = $event"
-      @thresholdChange="this.threshold = $event"
-    ></thresholdSelector>
-    <div class="flex justify-center pt-10">
-      <mainButton @click="scrollToImport" title="⏭️ Next" />
-    </div>
-  </div>
+  <TitleCard title="Join Group" />
 
   <div
     ref="importKey"
@@ -52,10 +38,7 @@
 
 <script>
 import { defineComponent } from "vue";
-
-// Components
 import TitleCard from "@/components/TitleCard";
-import ThresholdSelector from "@/components/ThresholdSelector";
 import mainButton from "@/components/mainButton";
 import keyImportOrGenerateVue from "@/components/keyImportOrGenerate";
 import EditableArea from "@/components/EditableArea";
@@ -66,7 +49,7 @@ import { useToast } from "vue-toastification";
 import { nextTick } from "vue";
 
 export default defineComponent({
-  name: "CreateGroupView",
+  name: "JoinView",
   setup() {
     const socketStore = useSocket();
     const userInfoStore = useUserInfo();
@@ -74,15 +57,13 @@ export default defineComponent({
     const toast = useToast();
     return { toast, socketStore, userInfoStore, groupInfoStore };
   },
+
   data() {
     return {
-      threshold: 10,
-      maxNumber: 30,
       keysImported: false,
       privKey: "",
       pubKey: "",
-      setThreshold: true,
-      importKey: false,
+      importKey: true,
       enterName: false,
       name: "",
       toastError : false,
@@ -91,11 +72,11 @@ export default defineComponent({
 
   components: {
     TitleCard,
-    ThresholdSelector,
     mainButton,
     keyImportOrGenerateVue,
     EditableArea,
   },
+
   methods: {
     async scrollToImport() {
       this.setThreshold = false;
@@ -128,25 +109,13 @@ export default defineComponent({
       this.userInfoStore.emoji =
         emojiList[Math.floor(Math.random() * emojiList.length)];
 
-      this.groupInfoStore.threshold = this.threshold;
-      this.groupInfoStore.numberOfSigners = this.maxNumber;
-      //generate random 3 number group id
-      this.groupInfoStore.groupID = Math.random().toString(7).substring(2, 5);
-      this.groupInfoStore.memberList = [
-        {
-          username: this.name,
-          emoji: this.userInfoStore.emoji,
-          pubKey: this.pubKey,
-        },
-      ];
-
       this.socketStore.socketObject = io.connect("http://localhost:8000");
 
       //connect to server
 
       this.socketStore.socketObject.on("connect", () => {
 
-      this.socketStore.socketObject.emit('create',this.groupInfoStore.groupID)
+      //this.socketStore.socketObject.emit('create',this.groupInfoStore.groupID)
       this.$router.push("lobby");
 
       });
@@ -163,7 +132,9 @@ export default defineComponent({
 
     },
   },
+  mounted(){
+    //read groupID from url after ? and set it in groupInfoStore
+    this.groupInfoStore.groupID = this.$route.query.groupID;
+  }
 });
 </script>
-
-<style></style>
