@@ -98,7 +98,7 @@ export default defineComponent({
       this.$refs.enterName.scrollIntoView({});
       window.scrollBy(0, -15);
     },
-    startGroup() {
+    async startGroup() {
       if (!this.name) {
         this.toast.error("Please enter a name");
         return;
@@ -109,13 +109,21 @@ export default defineComponent({
       this.userInfoStore.emoji =
         emojiList[Math.floor(Math.random() * emojiList.length)];
 
-      this.socketStore.socketObject = io.connect("http://localhost:8000");
+      //this.socketStore.socketObject = io.connect("http://localhost:8000");
+      this.socketStore.socketObject = io.connect(this.socketStore.baseURL+":"+this.socketStore.ioPort)
 
       //connect to server
 
       this.socketStore.socketObject.on("connect", () => {
-
-      //this.socketStore.socketObject.emit('create',this.groupInfoStore.groupID)
+      //use join function to join group send groupID, username, pubKey, emoji
+      
+        this.socketStore.socketObject.emit("join", {
+          groupID: this.groupInfoStore.groupID,
+          username: this.userInfoStore.username,
+          pubKey: this.userInfoStore.pubKey,
+          emoji: this.userInfoStore.emoji,
+        });
+        //redirect to lobby
       this.$router.push("lobby");
 
       });
@@ -134,7 +142,7 @@ export default defineComponent({
   },
   mounted(){
     //read groupID from url after ? and set it in groupInfoStore
-    this.groupInfoStore.groupID = this.$route.query.groupID;
+    this.groupInfoStore.groupID = this.$route.href.split("?")[1];
   }
 });
 </script>

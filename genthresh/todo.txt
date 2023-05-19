@@ -1,4 +1,2 @@
-Save and read everything in JSON, display can still be text based
-Width changes
-Group sign becomes a downfill page
-Buttons which require fields to be filled do not show, or show in a different place until fields are filled
+Allow generation of keys when creating and joining group 
+Add titles to the different group creation / joining steps

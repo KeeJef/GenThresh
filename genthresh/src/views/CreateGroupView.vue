@@ -140,7 +140,8 @@ export default defineComponent({
         },
       ];
 
-      this.socketStore.socketObject = io.connect("http://localhost:8000");
+      //this.socketStore.socketObject = io.connect("http://localhost:8000");
+      this.socketStore.socketObject = io.connect(this.socketStore.baseURL+":"+this.socketStore.ioPort)
 
       //connect to server
 

@@ -1,17 +1,27 @@
 <template>
   <TitleCard title="Lobby" />
   <div class="pb-5 flex justify-center">
-    <mainButton id="main button" @click="modalToggle=!modalToggle" title="💌 Invite users" />
-    <modalPopup
-      v-if="modalToggle"
-      @modalClose="this.modalToggle = false"
-    >
-  <div class="text-center pb-2 text-xl">Copy this link to invite users</div> 
-  <div class="text-2xl rounded-lg bg-white px-3 py-2 mb-3 sm:text-3xl">genthresh.com/j?{{this.groupInfoStore.groupID}}</div>
-  <div class="flex justify-center"><button @click="copyLink" class="transition-colors duration-500 ease-in-out bg-green-400 rounded-md px-8 py-2 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-green-600 w-4/5">Copy</button></div>
+    <mainButton
+      id="main button"
+      @click="modalToggle = !modalToggle"
+      title="💌 Invite users"
+    />
+    <modalPopup v-if="modalToggle" @modalClose="this.modalToggle = false">
+      <div class="text-center pb-2 text-xl">Copy this link to invite users</div>
+      <div class="text-2xl rounded-lg bg-white px-3 py-2 mb-3 sm:text-3xl">
+        {{ this.socketStore.baseURL }}/j?{{ this.groupInfoStore.groupID }}
+      </div>
+      <div class="flex justify-center">
+        <button
+          @click="copyLink"
+          class="transition-colors duration-500 ease-in-out bg-green-400 rounded-md px-8 py-2 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-green-600 w-4/5"
+        >
+          Copy
+        </button>
+      </div>
 
-  <div></div>
-  </modalPopup>
+      <div></div>
+    </modalPopup>
   </div>
   <div class="flex justify-center text-3xl pb-4">
     <div>
@@ -62,15 +72,27 @@ export default defineComponent({
   methods: {
     copyLink() {
       navigator.clipboard.writeText(
-        "genthresh.com/j?" + this.groupInfoStore.groupID
+        this.socketStore.baseURL +
+          ":" +
+          this.socketStore.httpPort +
+          "/j?" +
+          this.groupInfoStore.groupID
       );
       this.toast.success("Copied to clipboard");
     },
   },
+
+  mounted() {
+
+    this.socketStore.socketObject.on("test", () => {
+      console.log("test");
+    });
+    
+  },
   components: {
     TitleCard,
     mainButton,
-    modalPopup
+    modalPopup,
   },
 });
 </script>

@@ -28,8 +28,17 @@ server.on('connection', function (socket) {
 
    });
 
-   socket.on('setUsername', function (data) {
-      console.log("User Joined Room " + data.roomname + " with name " + data.namewanted);
+   socket.on('join', function (data) {
+      console.log("User Joined Room " + data.groupID + " with name " + data.username);
+
+      try {
+         socket.join(data.groupID);
+         server.sockets.in(data.groupID).emit('test', { userlist: "test" });
+         //this is working, work from this point
+      } catch (error) {
+         socket.emit("roomJoinFailed", error);
+         return
+      }
 
       for (let index = 0; index < userArrays.length; index++) {
          const element = userArrays[index];
