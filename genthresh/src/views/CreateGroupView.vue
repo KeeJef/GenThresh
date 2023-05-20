@@ -147,7 +147,13 @@ export default defineComponent({
 
       this.socketStore.socketObject.on("connect", () => {
 
-      this.socketStore.socketObject.emit('create',this.groupInfoStore.groupID)
+      this.socketStore.socketObject.emit('create',{groupID: this.groupInfoStore.groupID,
+          username: this.userInfoStore.username,
+          pubKey: this.userInfoStore.pubKey,
+          emoji: this.userInfoStore.emoji,
+          threshold: this.groupInfoStore.threshold,
+          numberOfSigners: this.groupInfoStore.numberOfSigners
+        })
       this.$router.push("lobby");
 
       });

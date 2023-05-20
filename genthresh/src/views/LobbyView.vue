@@ -39,6 +39,8 @@
       <div
         class="w-full h-16 border-2 rounded-xl border-yellow-700 xl:w-1/5 xl:h-56"
       >
+        <div v-for="member in this.groupInfoStore.memberList" :key="member">{{member.username }}</div>
+
         <div class="flex justify-center relative text-2xl -top-10">Members</div>
       </div>
     </div>
@@ -82,10 +84,12 @@ export default defineComponent({
     },
   },
 
-  mounted() {
+  async mounted() {
 
-    this.socketStore.socketObject.on("test", () => {
-      console.log("test");
+    await this.socketStore.socketObject.on("roomInfo", (roomData) => {
+      this.groupInfoStore.numberOfSigners = roomData.numberOfSigners;
+      this.groupInfoStore.threshold = roomData.threshold;
+      this.groupInfoStore.memberList = roomData.members;
     });
     
   },

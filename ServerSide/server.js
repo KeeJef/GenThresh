@@ -13,47 +13,38 @@ server.on('connection', function (socket) {
    
    console.log('A user connected');
 
-   socket.on('create', function (roomID) {
+   socket.on('create', function (data) {
 
-      if (rooms[roomID] == roomID) {
+      if (rooms[data.groupID] == data.groupID) {
          "Room Already Exists"
          return
       }
 
-      console.log("a new room was created with the name " + roomID)
-      socket.join(roomID);
+      socket.join(data.groupID);
+      console.log("a new room was created with the name " + data.groupID + " by user " + data.username)
+      
 
-      var roomObject = { RoomName: roomID, members: [] };
-      rooms[roomID]=roomObject
-
+      var roomObject = { RoomName: data.groupID, threshold: data.threshold, numberOfSigners:data.numberOfSigners , members: [] };
+      rooms[data.groupID]=roomObject
+      rooms[data.groupID].members.push({username: data.username, pubKey: data.pubKey, emoji: data.emoji});
    });
 
    socket.on('join', function (data) {
-      console.log("User Joined Room " + data.groupID + " with name " + data.username);
 
       try {
+         if (rooms[data.groupID] == undefined) {
+            throw "Room Does Not Exist"
+         }
          socket.join(data.groupID);
-         server.sockets.in(data.groupID).emit('test', { userlist: "test" });
-         //this is working, work from this point
+         console.log("a user joined the room " + data.groupID + " with the name " + data.username)
+
+         rooms[data.groupID].members.push({username: data.username, pubKey: data.pubKey, emoji: data.emoji});
+         server.sockets.in(data.groupID).emit('roomInfo', rooms[data.groupID] );
+
       } catch (error) {
          socket.emit("roomJoinFailed", error);
          return
       }
-
-      for (let index = 0; index < userArrays.length; index++) {
-         const element = userArrays[index];
-         element.existingroom = false
-
-         if (element.RoomName == data.roomname) {
-
-            userObject = {name: data.namewanted, socketid: data.socketid, readyStatus: false, isLeader: data.isLeader, publicKey:data.publicKey, signers:data.signersNumber, threshold:data.thresholdNumber, roomFullStatus: false }
-            element.members.push(userObject);
-            return
-         }
-
-      }
-
-
 
    });
 
@@ -116,6 +107,8 @@ server.on('connection', function (socket) {
 
    });
 
+
+   //Fix disconnect function
 
    socket.on('disconnect', function () {
 
