@@ -26,7 +26,7 @@ server.on('connection', function (socket) {
 
       var roomObject = { RoomName: data.groupID, threshold: data.threshold, numberOfSigners:data.numberOfSigners , members: [] };
       rooms[data.groupID]=roomObject
-      rooms[data.groupID].members.push({username: data.username, pubKey: data.pubKey, emoji: data.emoji});
+      rooms[data.groupID].members.push({username: data.username,admin: true, pubKey: data.pubKey, emoji: data.emoji, socketid: socket.id});
    });
 
    socket.on('join', function (data) {
@@ -38,7 +38,7 @@ server.on('connection', function (socket) {
          socket.join(data.groupID);
          console.log("a user joined the room " + data.groupID + " with the name " + data.username)
 
-         rooms[data.groupID].members.push({username: data.username, pubKey: data.pubKey, emoji: data.emoji});
+         rooms[data.groupID].members.push({username: data.username, pubKey: data.pubKey, emoji: data.emoji, socketid: socket.id});
          server.sockets.in(data.groupID).emit('roomInfo', rooms[data.groupID] );
 
       } catch (error) {
@@ -112,35 +112,31 @@ server.on('connection', function (socket) {
 
    socket.on('disconnect', function () {
 
-      for (let index1 = 0; index1 < userArrays.length; index1++) {
-         const membersArray = userArrays[index1].members;
+      //remove user from roomsObject and if room is completely empty remove room from roomsObject
+      //after removal occurs re-emit the userlist to the room
+      //element.socketid == socket.id
 
-         for (let index2 = 0; index2 < membersArray.length; index2++) {
-            const element = membersArray[index2];
+      for (const key in rooms) {
+         const element = rooms[key];
 
-            if (element.socketid == socket.id) {
-               console.log("Removed User " + userArrays[index1].members[index2].name)
-               userArrays[index1].members.splice(index2, 1);
+         for (let index2 = 0; index2 < element.members.length; index2++) {
+            const element2 = element.members[index2];
 
-               if (userArrays[index1].members.length == 0) {
-                  console.log("Removed Empty Room " + userArrays[index1].RoomName)
-                  userArrays.splice(index1, 1)
+            if (element2.socketid == socket.id) {
+               rooms[key].members.splice(index2, 1);
+               console.log("user " + element2.username + " was removed from room " + key)
+
+               if (rooms[key].members.length == 0) {
+                  delete rooms[key];
+                  console.log("room " + key + " was deleted because it was empty")
                   return
                }
 
-               if (userArrays[index1].existingroom == true) {
-                  server.sockets.in(userArrays[index1].RoomName).emit('getLoadedUsers', { userlist: userArrays[index1].members });
-               }else{
-                  server.sockets.in(userArrays[index1].RoomName).emit('getUsers', { userlist: userArrays[index1].members });
-               }
-
-               
+               server.sockets.in(key).emit('roomInfo', rooms[key] );
 
             }
-
-
          }
-
+         
       }
 
    });

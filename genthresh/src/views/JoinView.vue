@@ -116,15 +116,13 @@ export default defineComponent({
 
       this.socketStore.socketObject.on("connect", () => {
       //use join function to join group send groupID, username, pubKey, emoji
-      
+        this.$router.push("lobby");
         this.socketStore.socketObject.emit("join", {
           groupID: this.groupInfoStore.groupID,
           username: this.userInfoStore.username,
           pubKey: this.userInfoStore.pubKey,
           emoji: this.userInfoStore.emoji,
         });
-        //redirect to lobby
-      this.$router.push("lobby");
 
       });
 
