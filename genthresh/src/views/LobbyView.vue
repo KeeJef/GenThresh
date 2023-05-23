@@ -29,19 +29,21 @@
       {{ this.groupInfoStore.threshold }}
     </div>
   </div>
-  <div class="w-[90%] mx-auto xl:w-[70%] pt-10">
+  <div class="w-[90%] mx-auto xl:w-[70%] pt-5">
     <div
       class="flex flex-col-reverse justify-center gap-y-10 gap-2 xl:flex-row"
     >
-      <div class="w-full h-56 border-2 rounded-xl border-yellow-700 xl:w-4/5">
-        <div class="flex justify-center relative text-2xl -top-10">Message</div>
+      <div class="w-full xl:w-3/4">
+        <div class="flex justify-center relative text-2xl pb-3">Message</div> 
+        <div class="w-full h-56 border-2 rounded-xl border-yellow-700"></div>
       </div>
-      <div
-        class="w-full h-16 border-2 rounded-xl border-yellow-700 xl:w-1/5 xl:h-56"
-      >
-        <div v-for="member in this.groupInfoStore.memberList" :key="member">{{member.username }}</div>
-
-        <div class="flex justify-center relative text-2xl -top-10">Members</div>
+      <div class="w-full xl:w-1/4">
+        <div class="flex justify-center relative text-2xl pb-3">Members</div>
+        <div class="flex justify-center w-full h-fit border-2 rounded-xl border-yellow-700 xl:h-56">
+          <div class="flex justify-center items-center m-2 py-3.5 px-4 h-fit bg-[#16C60C] rounded-lg text-white font-bold text-2xl" v-for="member in this.groupInfoStore.memberList" :key="member">
+            {{member.emoji + member.username }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -85,13 +87,11 @@ export default defineComponent({
   },
 
   async mounted() {
-
     await this.socketStore.socketObject.on("roomInfo", (roomData) => {
       this.groupInfoStore.numberOfSigners = roomData.numberOfSigners;
       this.groupInfoStore.threshold = roomData.threshold;
       this.groupInfoStore.memberList = roomData.members;
     });
-    
   },
   components: {
     TitleCard,

@@ -59,7 +59,6 @@ import ThresholdSelector from "@/components/ThresholdSelector";
 import mainButton from "@/components/mainButton";
 import keyImportOrGenerateVue from "@/components/keyImportOrGenerate";
 import EditableArea from "@/components/EditableArea";
-import { emojiList } from "../composables/emojiList.js";
 import { io } from "socket.io-client";
 import { useSocket, useUserInfo, useGroupInfo } from "@/store/index";
 import { useToast } from "vue-toastification";
@@ -125,9 +124,7 @@ export default defineComponent({
       this.userInfoStore.privKey = this.privKey;
       this.userInfoStore.pubKey = this.pubKey;
       this.userInfoStore.username = this.name;
-      this.userInfoStore.emoji =
-        emojiList[Math.floor(Math.random() * emojiList.length)];
-
+      this.userInfoStore.emoji = "👑"
       this.groupInfoStore.threshold = this.threshold;
       this.groupInfoStore.numberOfSigners = this.maxNumber;
       //generate random 3 number group id
@@ -135,8 +132,8 @@ export default defineComponent({
       this.groupInfoStore.memberList = [
         {
           username: this.name,
-          emoji: this.userInfoStore.emoji,
           pubKey: this.pubKey,
+          emoji: this.userInfoStore.emoji,
         },
       ];
 

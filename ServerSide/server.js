@@ -114,7 +114,6 @@ server.on('connection', function (socket) {
 
       //remove user from roomsObject and if room is completely empty remove room from roomsObject
       //after removal occurs re-emit the userlist to the room
-      //element.socketid == socket.id
 
       for (const key in rooms) {
          const element = rooms[key];
