@@ -23,7 +23,7 @@
   <div class="flex justify-center text-4xl pb-2">Signatures</div>
 
   <div class="flex justify-center mb-4">
-      <EditableArea @click="placeholder" v-model="message" class="w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"></EditableArea>
+      <EditableArea placeholderValue="Enter signatures separated by commas like: 89c969...e9bbbc,b5f8be...0ebb53" v-model="message" class="w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"></EditableArea>
     </div>
 
   <div v-if="signatureDisplay">
@@ -60,8 +60,6 @@ export default defineComponent({
       hover: false,
       aggregatedSignature: "",
       signatureDisplay: false,
-      message:
-        "Enter signatures separated by commas like: 89c969...e9bbbc,b5f8be...0ebb53",
     };
   },
 
@@ -72,14 +70,6 @@ export default defineComponent({
     TextDisplay
   },
   methods: {
-    placeholder() {
-      if (
-        this.message ==
-        "Enter signatures separated by commas like: 89c969...e9bbbc,b5f8be...0ebb53"
-      ) {
-        this.message = "";
-      }
-    },
 
     processSignatures(event) {
       var rawFileData = event.target.files[0];

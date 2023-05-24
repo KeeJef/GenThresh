@@ -1,5 +1,5 @@
 <template>
-    <contenteditable tag="div" :contenteditable="isEditable" v-model="message" :noNL="true" :noHTML="true" @keydown.enter="enterPressed" />
+    <contenteditable :placeholder=this.placeholderValue tag="div" :contenteditable="isEditable" v-model="message" :noNL="true" :noHTML="true" @keydown.enter="enterPressed" />
 </template>
    
   <script>
@@ -8,6 +8,9 @@
     components : {
       contenteditable
     }, // Not needed it registered globally
+    props: {
+      placeholderValue: String
+    },
     data() {
       return {
         isEditable: true,
@@ -22,3 +25,14 @@
     }
   }
   </script>
+
+<style>
+
+[contenteditable=true]:empty:before{
+  content: attr(placeholder);
+  color: grey;
+  pointer-events: none;
+  display: block; /* For Firefox */
+}
+
+</style>

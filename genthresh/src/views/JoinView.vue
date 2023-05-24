@@ -16,7 +16,7 @@
     </div>
   </div>
 
-  <div
+  <div 
     ref="enterName"
     class="opacity-10 pointer-events-none select-none pb-32"
     :class="{ '!opacity-100 pointer-events-auto select-auto': enterName }"
@@ -26,6 +26,7 @@
       <EditableArea
         v-model="name"
         @enterPressed="startGroup"
+        @keydown.enter.prevent
         class="w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"
       ></EditableArea>
     </div>
@@ -101,6 +102,9 @@ export default defineComponent({
     async startGroup() {
       if (!this.name) {
         this.toast.error("Please enter a name");
+        return;
+      }else if(this.name.length > 10){
+        this.toast.error("Name must be less than 10 characters");
         return;
       }
       this.userInfoStore.privKey = this.privKey;
