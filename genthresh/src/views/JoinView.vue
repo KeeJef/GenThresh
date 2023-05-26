@@ -6,10 +6,11 @@
     class="opacity-10 pointer-events-none select-none pb-10"
     :class="{ '!opacity-100 pointer-events-auto select-auto': importKey }"
   >
+    <div class="flex justify-center py-8 text-3xl font-bold">Select Keys</div>
     <keyImportOrGenerateVue
       @privKey="this.privKey = $event"
       @pubKey="this.pubKey = $event"
-      @keysImportedStatus="this.keysImported = $event"
+      @keysPresentStatus="this.keysPresent = $event"
     ></keyImportOrGenerateVue>
     <div class="flex justify-center pt-10">
       <mainButton @click="scrollToName" title="⏭️ Next" />
@@ -21,10 +22,11 @@
     class="opacity-10 pointer-events-none select-none pb-32"
     :class="{ '!opacity-100 pointer-events-auto select-auto': enterName }"
   >
-    <div class="flex justify-center text-2xl pb-2">Name</div>
+  <div class="flex justify-center py-8 text-3xl font-bold">Select Name</div>
     <div class="flex justify-center mb-4">
       <EditableArea
         v-model="name"
+        placeholderValue="Enter name..."
         @enterPressed="startGroup"
         @keydown.enter.prevent
         class="w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"
@@ -61,7 +63,7 @@ export default defineComponent({
 
   data() {
     return {
-      keysImported: false,
+      keysPresent: false,
       privKey: "",
       pubKey: "",
       importKey: true,
@@ -87,7 +89,7 @@ export default defineComponent({
       this.$refs.importKey.scrollIntoView({});
     },
     async scrollToName() {
-      if (!this.keysImported) {
+      if (!this.keysPresent) {
         this.toast.error("Please import keys");
         return;
       }

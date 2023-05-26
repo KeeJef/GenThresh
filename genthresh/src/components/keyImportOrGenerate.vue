@@ -1,8 +1,9 @@
 <template>
     <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
-      <label for="files" class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl cursor-pointer hover:bg-purple-600 min-w-[290px] sm:min-w-0">⬆️💾 Import Key</label>
+      <mainButton v-if="!privKey" @click="generateKey" title="🔑 Generate Keys" />
+      <mainButton v-if="keysGenerated" @click="saveFile" title="💾 Save Keys" />
+      <label v-if="!keysGenerated" for="files" class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl cursor-pointer hover:bg-purple-600 min-w-[290px] sm:min-w-0">⬆️💾 Import Key</label>
       <input @change="processKey" id="files" class="hidden" type="file">
-      <mainButton v-if="!privKey" @click="$router.push('generate')" title="🔑 Generate Keys" />
     </div>
 
     <div v-if="this.signed" class="flex justify-center text-2xl pb-2">Signature</div>
@@ -11,14 +12,13 @@
         <p>Public Key:</p>
       </template>
     </TextDisplay>
-      
-    
-  
 
   </template>
   
   <script>
   import { defineComponent } from "vue";
+  import helpers from '@/helperFunctions/helperFunctions.js'
+
   
   // Components
   import mainButton from "@/components/mainButton";
@@ -33,9 +33,14 @@
   },
     data() {
     return {
-      keysImported:false,
+      keysPresent:false,
       privKey:"",
-      pubKey:""
+      pubKey:"",
+      keyOutput : {
+        publicKey: "",
+        privateKey: "",
+      },
+      keysGenerated : false 
     };
   },
   methods: {
@@ -52,11 +57,14 @@
           try {
           this.privKey = JSON.parse(rawFileData).privateKey
           this.pubKey = JSON.parse(rawFileData).publicKey
-          this.keysImported = true
+          this.keysPresent = true
 
-          this.$emit('keysImportedStatus', this.keysImported)
+          
           this.$emit('pubKey', this.pubKey)
           this.$emit('privKey', this.privKey)
+
+          this.keysPresent = true
+          this.$emit('keysPresentStatus', this.keysPresent)
 
           this.toast.success("Key Imported Successfully");
           } catch (error) {
@@ -65,6 +73,32 @@
           
       }
    },
+
+   generateKey() {
+      // Generate Randomness and convert into BLS key
+      var array = new Uint8Array(32);
+      var privateKey = crypto.getRandomValues(array);
+      this.pubKey = helpers.bufferToHex(helpers.generatePubKey(privateKey));
+      this.privKey = helpers.bufferToHex(privateKey);
+
+      this.keyOutput = {
+        publicKey: this.pubKey,
+        privateKey: this.privKey
+      };
+
+      
+      this.$emit('pubKey', this.pubKey)
+      this.$emit('privKey', this.privKey)
+
+      this.keysGenerated = true
+      this.keysPresent = true
+      this.$emit('keysPresentStatus', this.keysPresent)
+    },
+
+    saveFile() {
+      helpers.saveFile(JSON.stringify(this.keyOutput));
+      this.toast.success("Saved Keypair");
+    },
 
   },
   
