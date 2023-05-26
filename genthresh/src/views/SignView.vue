@@ -1,8 +1,9 @@
 <template>
     <TitleCard title="Sign"/>
     <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
-      <mainButton v-if="!privKey" title="🔑 Generate Keys" />
-      <label for="files" class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl cursor-pointer hover:bg-purple-600 min-w-[290px] sm:min-w-0">⬆️💾 Import Key</label>
+      <mainButton @click="generateKey" v-if="!privKey" title="🔑 Generate Keys" />
+      <mainButton @click="saveFile" v-if="keysGenerated" title="💾 Save Keys" />
+      <label v-if="!keysGenerated" for="files" class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl cursor-pointer hover:bg-purple-600 min-w-[290px] sm:min-w-0">⬆️💾 Import Key</label>
       <input @change="processKey" id="files" class="hidden" type="file">
       <mainButton v-if="keysImported || privKey" @click="signMessage" title="✍️ Sign" />
     </div>
@@ -49,7 +50,12 @@
       signed:false,
       message:"",
       signature:"",
-      privKey:""
+      privKey:"",
+      keysGenerated:false,
+      keyOutput: {
+        publicKey: "",
+        privateKey: "",
+      },
     };
   },
   methods: {
@@ -94,13 +100,20 @@
    generateKey() {
       // Generate Randomness and convert into BLS key
       var array = new Uint8Array(32);
-      var privKey = crypto.getRandomValues(array);
-      this.publicKeyHex = helpers.bufferToHex(helpers.generatePubKey(privKey));
-      this.privateKeyHex = helpers.bufferToHex(privKey);
+      var privateKey = crypto.getRandomValues(array);
+      var publicKeyHex = helpers.bufferToHex(helpers.generatePubKey(privateKey));
+      var privateKeyHex = helpers.bufferToHex(privateKey);
       this.keyOutput = {
-        publicKey: this.publicKeyHex,
-        privateKey: this.privateKeyHex,
+        publicKey: publicKeyHex,
+        privateKey: privateKeyHex,
       };
+      this.privKey = privateKeyHex
+      this.keysGenerated = true
+    },
+
+    saveFile() {
+      helpers.saveFile(JSON.stringify(this.keyOutput));
+      this.toast.success("Saved Keypair");
     },
 
   },

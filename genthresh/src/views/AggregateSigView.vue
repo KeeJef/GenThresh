@@ -86,7 +86,7 @@ export default defineComponent({
 
     async aggregateSignatures(){
 
-      if (this.message == "" || this.message == "Enter signatures separated by commas like: 89c969...e9bbbc,b5f8be...0ebb53") {
+      if (this.message == "" || this.message == null) {
         this.toast.error("Invalid Signatures: Please enter signatures to aggregate");
         return
       }

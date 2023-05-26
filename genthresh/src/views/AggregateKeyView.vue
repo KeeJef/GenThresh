@@ -24,9 +24,9 @@
 
   <div class="flex justify-center mb-4">
     <EditableArea
-      @click="placeholder"
       v-model="message"
       :noHTML="false"
+      placeholderValue="Enter keys separated by commas like: addf63...b5dcac,b91413...664e9a"
       class="w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"
     ></EditableArea>
   </div>
@@ -49,7 +49,7 @@ import helpers from "@/helperFunctions/helperFunctions.js";
 import { useToast } from "vue-toastification";
 
 export default defineComponent({
-  name: "AggregateView",
+  name: "AggregateKeyView",
   setup() {
     const toast = useToast();
     return { toast };
@@ -60,8 +60,7 @@ export default defineComponent({
       hover: false,
       aggregatedKey: "",
       keyDisplay: false,
-      message:
-        "Enter keys separated by commas like: addf63...b5dcac,b91413...664e9a",
+      message: "",
     };
   },
 
@@ -72,12 +71,6 @@ export default defineComponent({
     TextDisplay,
   },
   methods: {
-    placeholder() {
-      if (this.message =="Enter keys separated by commas like: addf63...b5dcac,b91413...664e9a") {
-        this.message = "";
-      }
-    },
-
     processKeys(event) {
       var rawFileData = event.target.files[0];
 
@@ -92,11 +85,7 @@ export default defineComponent({
     },
 
     async aggregateKeys() {
-      if (
-        this.message == "" ||
-        this.message ==
-          "Enter keys separated by commas like: addf63...b5dcac,b91413...664e9a"
-      ) {
+      if (this.message == "" || this.message == null) {
         this.toast.error("Invalid keys: Please enter valid keys");
         return;
       }
@@ -104,20 +93,18 @@ export default defineComponent({
       var keyArray = this.message.split(",");
 
       try {
-      var hexAggregateKey = await helpers.aggKey(keyArray);
-      this.aggregatedKey = await helpers.bufferToHex(hexAggregateKey);
+        var hexAggregateKey = await helpers.aggKey(keyArray);
+        this.aggregatedKey = await helpers.bufferToHex(hexAggregateKey);
       } catch (error) {
-
         this.toast.error("Error aggregating keys: " + error.message);
-        return
-        
+        return;
       }
 
-      this.toast.success("Signatures aggregated successfully");
+      this.toast.success("Keys aggregated successfully");
       this.keyDisplay = true;
 
-      await this.$nextTick()
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+      await this.$nextTick();
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
     },
   },
 });
