@@ -2,9 +2,15 @@
   <TitleCard title="Lobby" />
   <div class="pb-5 flex justify-center">
     <mainButton
-      id="main button"
+    v-if="!numberOfSignersReached"
       @click="modalToggle = !modalToggle"
       title="💌 Invite users"
+      class="mr-1"
+    />
+    <mainButton
+      v-if="numberOfSignersReached"
+      @click="saveGroupInfo()"
+      title="💾 Save Group Info"
     />
     <modalPopup v-if="modalToggle" @modalClose="this.modalToggle = false">
       <div class="text-center pb-2 text-xl">Copy this link to invite users</div>
@@ -35,10 +41,7 @@
     >
       <div class="w-full md:w-3/4">
         <div class="flex justify-center relative text-2xl pb-3">Message</div>
-        <div
-          id="Members Display"
-          class="w-full h-56 border-2 rounded-xl border-yellow-700"
-        ></div>
+        <EditableArea :isEditable="isEditAllowed" v-model="message" :placeholderValue="placeholderText" class="h-56 w-full break-words border-2 rounded-xl border-yellow-700 text-2xl p-8"></EditableArea>
       </div>
       <div class="w-full md:w-1/4">
         <div class="flex justify-center relative text-2xl pb-3">Members</div>
@@ -63,8 +66,10 @@
 import { defineComponent } from "vue";
 import { useSocket, useUserInfo, useGroupInfo } from "@/store/index";
 import { useToast } from "vue-toastification";
+import EditableArea from "@/components/EditableArea.vue";
 import modalPopup from "@/components/modalPopup.vue";
 import mainButton from "@/components/mainButton.vue";
+import helpers from "@/helperFunctions/helperFunctions.js";
 
 // Components
 import TitleCard from "@/components/TitleCard.vue";
@@ -81,8 +86,38 @@ export default defineComponent({
   data() {
     return {
       modalToggle: false,
+      message: "",
+      numberOfSignersReached: false,
+      frozenGroupInfo: {},
     };
+    
   },
+  computed: {
+    isGroupFull() {
+      return this.groupInfoStore.memberList.length == this.groupInfoStore.numberOfSigners;
+    },
+    remainingSigners() {
+      return this.groupInfoStore.numberOfSigners - this.groupInfoStore.memberList.length;
+    },
+    placeholderText() {
+      if (this.userInfoStore.admin) {
+        return this.isGroupFull ? 'Enter message to sign...' : `Waiting for ${this.remainingSigners} more signers to join...`;
+      }
+      return this.isGroupFull ? 'Waiting for admin to send message...' : `Waiting for ${this.remainingSigners} more signers to join...`;
+    },
+    isEditAllowed() {
+      return this.userInfoStore.admin ? this.isGroupFull : false;
+    },
+  },
+  watch: {
+    isGroupFull() {
+      if (this.isGroupFull) {
+        this.numberOfSignersReached = true;
+        //copy group info to frozenGroupInfo
+        this.frozenGroupInfo = JSON.parse(JSON.stringify(this.groupInfoStore));
+      }
+    },
+    },
   methods: {
     copyLink() {
       navigator.clipboard.writeText(
@@ -94,6 +129,18 @@ export default defineComponent({
       );
       this.toast.success("Copied to clipboard");
     },
+    saveGroupInfo(){
+      var jsonObject = {
+        "threshold": this.groupInfoStore.threshold,
+        "numberOfSigners": this.groupInfoStore.numberOfSigners,
+        "signingKeys": {},
+        "aggregateKey": this.groupInfoStore.aggregateKey,
+      }
+
+      helpers.saveFile(JSON.stringify(jsonObject));
+      this.toast.success("Saved Keypair");
+
+    }
   },
 
   async mounted() {
@@ -107,6 +154,7 @@ export default defineComponent({
     TitleCard,
     mainButton,
     modalPopup,
+    EditableArea,
   },
 });
 </script>

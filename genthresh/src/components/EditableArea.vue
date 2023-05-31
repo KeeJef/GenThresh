@@ -9,11 +9,14 @@
       contenteditable
     }, // Not needed it registered globally
     props: {
-      placeholderValue: String
+      placeholderValue: String,
+      isEditable: {
+      type: Boolean,
+      default: true
+    }
     },
     data() {
       return {
-        isEditable: true,
         message: ""
       }
     },
@@ -28,7 +31,7 @@
 
 <style>
 
-[contenteditable=true]:empty:before{
+[contenteditable]:empty:before{
   content: attr(placeholder);
   color: grey;
   pointer-events: none;

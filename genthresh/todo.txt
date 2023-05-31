@@ -1,2 +1,0 @@
-Allow generation of keys when creating and joining group 
-Add titles to the different group creation / joining steps

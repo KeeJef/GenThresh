@@ -114,15 +114,10 @@ export default defineComponent({
       this.userInfoStore.username = this.name;
       this.userInfoStore.emoji =
         emojiList[Math.floor(Math.random() * emojiList.length)];
+      this.userInfoStore.admin = false;
 
-      //this.socketStore.socketObject = io.connect("http://localhost:8000");
-      this.socketStore.socketObject = io.connect(this.socketStore.baseURL+":"+this.socketStore.ioPort)
 
-      //connect to server
-
-      this.socketStore.socketObject.on("connect", () => {
       //use join function to join group send groupID, username, pubKey, emoji
-        this.$router.push("lobby");
         this.socketStore.socketObject.emit("join", {
           groupID: this.groupInfoStore.groupID,
           username: this.userInfoStore.username,
@@ -130,11 +125,21 @@ export default defineComponent({
           emoji: this.userInfoStore.emoji,
         });
 
-      });
+    },
+  },
+  async mounted(){
+    //read groupID from url after ? and set it in groupInfoStore
+    this.groupInfoStore.groupID = this.$route.href.split("?")[1];
+    this.socketStore.socketObject = io.connect(this.socketStore.baseURL+":"+this.socketStore.ioPort)
 
-      this.toastError = false;
-      // catch connection error 
-      this.socketStore.socketObject.on("connect_error", (err) => {
+    this.socketStore.socketObject.on("connect", () => {
+    });
+
+    await this.socketStore.socketObject.on("roomJoinSuccess", () => {
+      this.$router.push("lobby");
+    });
+
+    await this.socketStore.socketObject.on("connect_error", (err) => {
         //only show toast once per connection error
         if (!this.toastError) {
           this.toast.error("Error connecting to server:" + err.message);
@@ -142,11 +147,10 @@ export default defineComponent({
         }
       });
 
-    },
-  },
-  mounted(){
-    //read groupID from url after ? and set it in groupInfoStore
-    this.groupInfoStore.groupID = this.$route.href.split("?")[1];
+    await this.socketStore.socketObject.on("roomJoinFailed", (error) => {
+      this.toast.error(error);
+    });
+
   }
 });
 </script>

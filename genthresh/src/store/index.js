@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 export const useUserInfo = defineStore({
   id: "userInfo",
   state: () => {
-    return {username: String, pubKey: String, privKey: String, emoji : String};
+    return {username: String, pubKey: String, privKey: String, emoji : String, admin: Boolean};
   },
   getters: {},
   actions: {},

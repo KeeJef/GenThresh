@@ -133,6 +133,7 @@ export default defineComponent({
       this.userInfoStore.pubKey = this.pubKey;
       this.userInfoStore.username = this.name;
       this.userInfoStore.emoji = "👑";
+      this.userInfoStore.admin = true;
       this.groupInfoStore.threshold = this.threshold;
       this.groupInfoStore.numberOfSigners = this.maxNumber;
       //generate random 3 number group id

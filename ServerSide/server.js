@@ -33,8 +33,13 @@ server.on('connection', function (socket) {
 
       try {
          if (rooms[data.groupID] == undefined) {
-            throw "Room Does Not Exist"
+            throw "Room does not exist"
          }
+         if (rooms[data.groupID].members.length == rooms[data.groupID].numberOfSigners) {
+            throw "Room is full"
+         }
+         socket.emit("roomJoinSuccess");
+
          socket.join(data.groupID);
          console.log("a user joined the room " + data.groupID + " with the name " + data.username)
 
