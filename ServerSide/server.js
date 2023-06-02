@@ -67,48 +67,11 @@ server.on('connection', function (socket) {
 
    });
 
-   socket.on('readyUp', function (data) {
 
-      for (let index1 = 0; index1 < userArrays.length; index1++) {
-         room = userArrays[index1];
+   socket.on('updateInfo', function (data) {
 
-         if (room.RoomName == data.roomname) {
-
-          for (let index = 0; index < room.members.length; index++) {
-
-            if (room.members[index].socketid == socket.id) {
-               userArrays[index1].members[index].readyStatus = true
-               server.sockets.in(data.roomname).emit('getUsers', { userlist: userArrays[index1].members }); //dont fire get users in existing group
-               return
-            }
-            
-          }
-
-         }
-         
-
-      }
-
-   });
-
-   socket.on('roomFull', function (data) {
-
-      for (let index1 = 0; index1 < userArrays.length; index1++) {
-         room = userArrays[index1];
-
-         if (room.RoomName == data.roomname) {
-
-          for (let index = 0; index < room.members.length; index++) {
-
-            room.members[index].roomFullStatus = true
-
-            }
-         
-            server.sockets.in(data.roomname).emit('getUsers', { userlist: userArrays[index1].members });
-            
-          }
-
-         }
+      rooms[data.groupID].message = data.message;
+      server.sockets.in(data.groupID).emit('roomInfo', rooms[data.groupID] );
 
    });
 

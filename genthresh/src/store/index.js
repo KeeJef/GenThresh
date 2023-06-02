@@ -12,7 +12,7 @@ export const useUserInfo = defineStore({
 export const useGroupInfo = defineStore({
   id: "groupInfo",
   state: () => {
-    return { threshold: Number, numberOfSigners: Number, groupID: String, memberList: Array};
+    return { threshold: Number, numberOfSigners: Number, groupID: String, memberList: Array, message : String};
   },
   getters: {},
   actions: {},

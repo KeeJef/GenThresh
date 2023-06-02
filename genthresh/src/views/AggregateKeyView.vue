@@ -27,7 +27,7 @@
       v-model="message"
       :noHTML="false"
       placeholderValue="Enter keys separated by commas like: addf63...b5dcac,b91413...664e9a"
-      class="w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"
+      class="h-52 overflow-auto w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"
     ></EditableArea>
   </div>
 

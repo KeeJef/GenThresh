@@ -1,5 +1,5 @@
 <template>
-    <contenteditable :placeholder=this.placeholderValue tag="div" :contenteditable="isEditable" v-model="message" :noNL="true" :noHTML="true" @keydown.enter="enterPressed" />
+    <contenteditable :placeholder=this.placeholderValue tag="div" :contenteditable="isEditable" v-model="message" :noNL="true" :noHTML="true" @keydown.enter="enterPressed"></contenteditable>
 </template>
    
   <script>

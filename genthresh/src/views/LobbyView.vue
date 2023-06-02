@@ -2,13 +2,12 @@
   <TitleCard title="Lobby" />
   <div class="pb-5 flex justify-center">
     <mainButton
-    v-if="!numberOfSignersReached"
       @click="modalToggle = !modalToggle"
       title="💌 Invite users"
       class="mr-1"
     />
     <mainButton
-      v-if="numberOfSignersReached"
+      v-if="false"
       @click="saveGroupInfo()"
       title="💾 Save Group Info"
     />
@@ -40,14 +39,22 @@
       class="flex flex-col-reverse justify-center gap-y-10 gap-2 md:flex-row"
     >
       <div class="w-full md:w-3/4">
-        <div class="flex justify-center relative text-2xl pb-3">Message</div>
-        <EditableArea :isEditable="isEditAllowed" v-model="message" :placeholderValue="placeholderText" class="h-56 w-full break-words border-2 rounded-xl border-yellow-700 text-2xl p-8"></EditableArea>
+        <div class="flex justify-center text-2xl pb-3">Message</div>
+
+          <EditableArea
+            :isEditable="isEditAllowed"
+            v-model="this.groupInfoStore.message"
+            :placeholderValue="placeholderText"
+            class="overflow-auto h-56 w-full break-words border-2 rounded-xl border-yellow-700 text-2xl p-8"
+          >
+          </EditableArea>
+          <mainButton @click="sendMessage()" class="mt-5" v-if="isEditAllowed" title="📨 Send"></mainButton>
       </div>
       <div class="w-full md:w-1/4">
-        <div class="flex justify-center relative text-2xl pb-3">Members</div>
+        <div class="flex justify-center text-2xl pb-3">Members</div>
         <div
           class="flex place-content-start overflow-y-auto overflow-x-auto flex-nowrap w-full h-fit border-2 p-2 rounded-xl border-yellow-700 md:h-56 md:justify-center md:overflow-x-auto md:flex-wrap"
-          style="scrollbar-width: none; -ms-overflow-style: none;"
+          style="scrollbar-width: none; -ms-overflow-style: none"
         >
           <div
             class="flex whitespace-nowrap justify-center items-center m-0.5 py-3.5 px-4 h-fit bg-[#16C60C] rounded-lg text-white font-bold text-2xl"
@@ -86,38 +93,36 @@ export default defineComponent({
   data() {
     return {
       modalToggle: false,
-      message: "",
-      numberOfSignersReached: false,
-      frozenGroupInfo: {},
+      messageSent : false,
     };
-    
   },
   computed: {
     isGroupFull() {
-      return this.groupInfoStore.memberList.length == this.groupInfoStore.numberOfSigners;
+      return (
+        this.groupInfoStore.memberList.length ==
+        this.groupInfoStore.numberOfSigners
+      );
     },
     remainingSigners() {
-      return this.groupInfoStore.numberOfSigners - this.groupInfoStore.memberList.length;
+      return (
+        this.groupInfoStore.numberOfSigners -
+        this.groupInfoStore.memberList.length
+      );
     },
     placeholderText() {
       if (this.userInfoStore.admin) {
-        return this.isGroupFull ? 'Enter message to sign...' : `Waiting for ${this.remainingSigners} more signers to join...`;
+        return this.isGroupFull
+          ? "Enter message to sign..."
+          : `Waiting for ${this.remainingSigners} more signers to join...`;
       }
-      return this.isGroupFull ? 'Waiting for admin to send message...' : `Waiting for ${this.remainingSigners} more signers to join...`;
+      return this.isGroupFull
+        ? "Waiting for admin to send message..."
+        : `Waiting for ${this.remainingSigners} more signers to join...`;
     },
     isEditAllowed() {
-      return this.userInfoStore.admin ? this.isGroupFull : false;
+      return this.userInfoStore.admin && !this.messageSent ? this.isGroupFull : false;
     },
   },
-  watch: {
-    isGroupFull() {
-      if (this.isGroupFull) {
-        this.numberOfSignersReached = true;
-        //copy group info to frozenGroupInfo
-        this.frozenGroupInfo = JSON.parse(JSON.stringify(this.groupInfoStore));
-      }
-    },
-    },
   methods: {
     copyLink() {
       navigator.clipboard.writeText(
@@ -129,25 +134,45 @@ export default defineComponent({
       );
       this.toast.success("Copied to clipboard");
     },
-    saveGroupInfo(){
-      var jsonObject = {
-        "threshold": this.groupInfoStore.threshold,
-        "numberOfSigners": this.groupInfoStore.numberOfSigners,
-        "signingKeys": {},
-        "aggregateKey": this.groupInfoStore.aggregateKey,
+    saveGroupInfo() {
+      //
+    },
+
+    sendMessage(){
+
+      if (this.groupInfoStore.message == "") {
+        this.toast.error("Please enter a message");
+        return;
       }
 
-      helpers.saveFile(JSON.stringify(jsonObject));
-      this.toast.success("Saved Keypair");
+      this.socketStore.socketObject.emit("updateInfo", {
+        message: this.groupInfoStore.message,
+        groupID: this.groupInfoStore.groupID,
+      });
 
-    }
+      this.messageSent = true;
+
+    },
+
+    async aggregateKeys(keyArray) {
+      try {
+        var hexAggregateKey = await helpers.aggKey(keyArray);
+        var aggregatedKey = await helpers.bufferToHex(hexAggregateKey);
+        return aggregatedKey;
+      } catch (error) {
+        this.toast.error("Error aggregating keys: " + error.message);
+        return;
+      }
+    },
   },
 
   async mounted() {
+    this.groupInfoStore.message = ""
     await this.socketStore.socketObject.on("roomInfo", (roomData) => {
       this.groupInfoStore.numberOfSigners = roomData.numberOfSigners;
       this.groupInfoStore.threshold = roomData.threshold;
       this.groupInfoStore.memberList = roomData.members;
+      this.groupInfoStore.message = roomData.message;
     });
   },
   components: {
@@ -159,13 +184,13 @@ export default defineComponent({
 });
 </script>
 <style>
-    /* Hide scrollbar for Chrome, Safari and Opera */
-    .flex::-webkit-scrollbar {
-        display: none;
-    }
+/* Hide scrollbar for Chrome, Safari and Opera */
+.flex::-webkit-scrollbar {
+  display: none;
+}
 
-    /* Hide scrollbar for IE and Edge */
-    .flex {
-        -ms-overflow-style: none;
-    }
+/* Hide scrollbar for IE and Edge */
+.flex {
+  -ms-overflow-style: none;
+}
 </style>

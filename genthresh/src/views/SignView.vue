@@ -15,7 +15,7 @@
   
     <div class="flex justify-center text-2xl pb-2">Message</div>
     <div class="flex justify-center mb-4">
-      <EditableArea v-model="message" placeholderValue="Add a message to sign..." class="h-52 w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"></EditableArea>
+      <EditableArea v-model="message" placeholderValue="Add a message to sign..." class="h-52 w-4/5 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 overflow-auto xl:w-3/5"></EditableArea>
     </div>
 
     <div v-if="this.signed" class="flex justify-center text-2xl pb-2">Signature</div>
