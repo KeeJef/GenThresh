@@ -41,14 +41,19 @@
       <div class="w-full md:w-3/4">
         <div class="flex justify-center text-2xl pb-3">Message</div>
 
-          <EditableArea
-            :isEditable="isEditAllowed"
-            v-model="this.groupInfoStore.message"
-            :placeholderValue="placeholderText"
-            class="overflow-auto h-56 w-full break-words border-2 rounded-xl border-yellow-700 text-2xl p-8"
-          >
-          </EditableArea>
-          <mainButton @click="sendMessage()" class="mt-5" v-if="isEditAllowed" title="📨 Send"></mainButton>
+        <EditableArea
+          :isEditable="isEditAllowed"
+          v-model="this.groupInfoStore.message"
+          :placeholderValue="placeholderText"
+          class="overflow-auto h-56 w-full break-words border-2 rounded-xl border-yellow-700 text-2xl p-8"
+        >
+        </EditableArea>
+        <mainButton
+          @click="sendMessage()"
+          class="mt-5"
+          v-if="isEditAllowed"
+          title="📨 Send"
+        ></mainButton>
       </div>
       <div class="w-full md:w-1/4">
         <div class="flex justify-center text-2xl pb-3">Members</div>
@@ -67,6 +72,15 @@
       </div>
     </div>
   </div>
+  <div v-if="this.groupInfoStore.message && !this.userInfoStore.admin" class="flex justify-center pt-3">
+    <mainButton @click="sendMessage" class="mr-1" title="Sign ✔️"></mainButton>
+    <mainButton title="Reject❌"></mainButton>
+  </div>
+  <div v-if="this.groupInfoStore.message"  class="flex justify-center p-5">
+    <div class="w-3/4">
+      <progressIndicator :threshold=this.groupInfoStore.threshold :numberOfSigners="this.groupInfoStore.numberOfSigners" :actualSigners="this.groupInfoStore.signatureArray.length" ></progressIndicator>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -74,6 +88,7 @@ import { defineComponent } from "vue";
 import { useSocket, useUserInfo, useGroupInfo } from "@/store/index";
 import { useToast } from "vue-toastification";
 import EditableArea from "@/components/EditableArea.vue";
+import progressIndicator from "@/components/progressIndicator.vue";
 import modalPopup from "@/components/modalPopup.vue";
 import mainButton from "@/components/mainButton.vue";
 import helpers from "@/helperFunctions/helperFunctions.js";
@@ -93,7 +108,7 @@ export default defineComponent({
   data() {
     return {
       modalToggle: false,
-      messageSent : false,
+      messageSent: false,
     };
   },
   computed: {
@@ -120,7 +135,9 @@ export default defineComponent({
         : `Waiting for ${this.remainingSigners} more signers to join...`;
     },
     isEditAllowed() {
-      return this.userInfoStore.admin && !this.messageSent ? this.isGroupFull : false;
+      return this.userInfoStore.admin && !this.messageSent
+        ? this.isGroupFull
+        : false;
     },
   },
   methods: {
@@ -138,20 +155,37 @@ export default defineComponent({
       //
     },
 
-    sendMessage(){
-
+    async sendMessage() {
       if (this.groupInfoStore.message == "") {
         this.toast.error("Please enter a message");
         return;
       }
 
-      this.socketStore.socketObject.emit("updateInfo", {
+      var signedMessage = await this.signMessage(this.groupInfoStore.message);
+
+      this.socketStore.socketObject.emit("sendMessage", {
+        signature: signedMessage,
+        adminStatus: this.userInfoStore.admin,
+        pubKey: this.userInfoStore.pubKey,
         message: this.groupInfoStore.message,
         groupID: this.groupInfoStore.groupID,
       });
 
       this.messageSent = true;
+    },
 
+    async signMessage(message) {
+      try {
+        var bufferSignature = await helpers.signMessage(
+          this.userInfoStore.privKey,
+          message
+        );
+      } catch (error) {
+        this.toast.error("Error signing message: " + error.message);
+        return;
+      }
+      var signature = helpers.bufferToHex(bufferSignature);
+      return signature;
     },
 
     async aggregateKeys(keyArray) {
@@ -164,15 +198,30 @@ export default defineComponent({
         return;
       }
     },
+
+    async aggregateSignatures(signatureArray) {
+      try {
+        var hexAggregateSignature = await helpers.aggSig(signatureArray);
+        var aggregatedSignature = await helpers.bufferToHex(
+          hexAggregateSignature
+        );
+        return aggregatedSignature;
+      } catch (error) {
+        this.toast.error("Error aggregating signatures: " + error.message);
+        return;
+      }
+    },
   },
 
   async mounted() {
-    this.groupInfoStore.message = ""
+    this.groupInfoStore.message = "";
     await this.socketStore.socketObject.on("roomInfo", (roomData) => {
       this.groupInfoStore.numberOfSigners = roomData.numberOfSigners;
       this.groupInfoStore.threshold = roomData.threshold;
       this.groupInfoStore.memberList = roomData.members;
       this.groupInfoStore.message = roomData.message;
+      this.groupInfoStore.signatureArray = roomData.signatureArray;
+
     });
   },
   components: {
@@ -180,6 +229,7 @@ export default defineComponent({
     mainButton,
     modalPopup,
     EditableArea,
+    progressIndicator,
   },
 });
 </script>

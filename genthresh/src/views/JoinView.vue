@@ -132,7 +132,7 @@ export default defineComponent({
     this.groupInfoStore.groupID = this.$route.href.split("?")[1];
     this.socketStore.socketObject = io.connect(this.socketStore.baseURL+":"+this.socketStore.ioPort)
 
-    this.socketStore.socketObject.on("connect", () => {
+    await this.socketStore.socketObject.on("connect", () => {
     });
 
     await this.socketStore.socketObject.on("roomJoinSuccess", () => {
