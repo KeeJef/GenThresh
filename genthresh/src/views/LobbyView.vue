@@ -72,15 +72,22 @@
       </div>
     </div>
   </div>
-  <div v-if="this.groupInfoStore.message && !this.userInfoStore.admin" class="flex justify-center pt-3">
+  <div v-if="this.groupInfoStore.message && !this.userInfoStore.admin && !this.rejected" class="flex justify-center pt-3">
     <mainButton @click="sendMessage" class="mr-1" title="Sign ✔️"></mainButton>
-    <mainButton title="Reject❌"></mainButton>
+    <mainButton @click="this.rejected = true" title="Reject❌"></mainButton>
   </div>
-  <div v-if="this.groupInfoStore.message"  class="flex justify-center p-5">
+  <div v-if="messageSent"  class="flex justify-center p-5">
     <div class="w-3/4">
       <progressIndicator :threshold=this.groupInfoStore.threshold :numberOfSigners="this.groupInfoStore.numberOfSigners" :actualSigners="this.groupInfoStore.signatureArray.length" ></progressIndicator>
     </div>
   </div>
+
+  <div>
+ <div class="flex justify-center text-3xl pb-4 w-[90%] mx-auto md:w-[70%]">
+  Threshold Signature
+ </div>
+ <textDisplay></textDisplay>
+ </div>
 </template>
 
 <script>
@@ -95,6 +102,7 @@ import helpers from "@/helperFunctions/helperFunctions.js";
 
 // Components
 import TitleCard from "@/components/TitleCard.vue";
+import TextDisplay from "@/components/TextDisplay.vue";
 
 export default defineComponent({
   name: "LobbyView",
@@ -109,6 +117,7 @@ export default defineComponent({
     return {
       modalToggle: false,
       messageSent: false,
+      rejected: false,
     };
   },
   computed: {
@@ -222,6 +231,10 @@ export default defineComponent({
       this.groupInfoStore.message = roomData.message;
       this.groupInfoStore.signatureArray = roomData.signatureArray;
 
+      if(this.groupInfoStore.message != "" && this.groupInfoStore.message != undefined) {
+        this.messageSent = true;
+      }
+
     });
   },
   components: {
@@ -230,6 +243,7 @@ export default defineComponent({
     modalPopup,
     EditableArea,
     progressIndicator,
+    TextDisplay,
   },
 });
 </script>
