@@ -72,22 +72,33 @@
       </div>
     </div>
   </div>
-  <div v-if="this.groupInfoStore.message && !this.userInfoStore.admin && !this.rejected" class="flex justify-center pt-3">
+  <div
+    v-if="
+      this.groupInfoStore.message && !this.userInfoStore.admin && !this.rejected
+    "
+    class="flex justify-center pt-3"
+  >
     <mainButton @click="sendMessage" class="mr-1" title="Sign ✔️"></mainButton>
     <mainButton @click="this.rejected = true" title="Reject❌"></mainButton>
   </div>
-  <div v-if="messageSent"  class="flex justify-center p-5">
+  <div v-if="this.groupInfoStore.signingStarted" class="flex justify-center w-[90%] mx-auto md:w-[70%] p-5">
     <div class="w-3/4">
-      <progressIndicator :threshold=this.groupInfoStore.threshold :numberOfSigners="this.groupInfoStore.numberOfSigners" :actualSigners="this.groupInfoStore.signatureArray.length" ></progressIndicator>
+      <progressIndicator
+        :threshold="this.groupInfoStore.threshold"
+        :numberOfSigners="this.groupInfoStore.numberOfSigners"
+        :actualSigners="this.groupInfoStore.signatureArray.length"
+      ></progressIndicator>
     </div>
   </div>
 
-  <div>
- <div class="flex justify-center text-3xl pb-4 w-[90%] mx-auto md:w-[70%]">
-  Threshold Signature
- </div>
- <textDisplay></textDisplay>
- </div>
+  <div v-if="this.groupInfoStore.signingStarted" class="w-[90%] mx-auto md:w-[70%] py-5">
+    <div class="flex justify-center text-3xl pb-5">
+      Threshold Signature
+    </div>
+    <div class="overflow-auto min-h-36 w-full break-words border-2 rounded-xl border-yellow-700 text-2xl p-8">
+      {{ this.thresholdJSON }}
+    </div>
+  </div>
 </template>
 
 <script>
@@ -102,7 +113,6 @@ import helpers from "@/helperFunctions/helperFunctions.js";
 
 // Components
 import TitleCard from "@/components/TitleCard.vue";
-import TextDisplay from "@/components/TextDisplay.vue";
 
 export default defineComponent({
   name: "LobbyView",
@@ -116,8 +126,8 @@ export default defineComponent({
   data() {
     return {
       modalToggle: false,
-      messageSent: false,
       rejected: false,
+      thresholdJSON: {},
     };
   },
   computed: {
@@ -144,7 +154,7 @@ export default defineComponent({
         : `Waiting for ${this.remainingSigners} more signers to join...`;
     },
     isEditAllowed() {
-      return this.userInfoStore.admin && !this.messageSent
+      return this.userInfoStore.admin && !this.groupInfoStore.signingStarted
         ? this.isGroupFull
         : false;
     },
@@ -180,7 +190,22 @@ export default defineComponent({
         groupID: this.groupInfoStore.groupID,
       });
 
-      this.messageSent = true;
+    },
+
+    async aggregateData(){
+      
+      var signatureArray = this.groupInfoStore.signatureArray.map((item) => {
+        return item.signature;
+      });
+      var keyArray = this.groupInfoStore.signatureArray.map((item) => {
+        return item.publicKey;
+      });
+
+      var aggregatedKey = await this.aggregateKeys(keyArray);
+      var aggregatedSignature = await this.aggregateSignatures(signatureArray);
+
+      this.thresholdJSON = {aggregateKey : aggregatedKey, aggregateSignature : aggregatedSignature, message: this.groupInfoStore.message}
+
     },
 
     async signMessage(message) {
@@ -230,9 +255,10 @@ export default defineComponent({
       this.groupInfoStore.memberList = roomData.members;
       this.groupInfoStore.message = roomData.message;
       this.groupInfoStore.signatureArray = roomData.signatureArray;
+      this.groupInfoStore.signingStarted = roomData.signingStarted;
 
-      if(this.groupInfoStore.message != "" && this.groupInfoStore.message != undefined) {
-        this.messageSent = true;
+      if (this.groupInfoStore.signingStarted) {
+        this.aggregateData()
       }
 
     });
@@ -243,7 +269,6 @@ export default defineComponent({
     modalPopup,
     EditableArea,
     progressIndicator,
-    TextDisplay,
   },
 });
 </script>

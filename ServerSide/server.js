@@ -91,7 +91,7 @@ server.on("connection", function (socket) {
 
   socket.on("sendMessage", function (data) {
     //process signature and public key
-
+    rooms[data.groupID].signingStarted = true;
     if (data.adminStatus == true) {
       rooms[data.groupID].message = data.message;
     }
@@ -131,18 +131,5 @@ server.on("connection", function (socket) {
         }
       }
     }
-  });
-
-  socket.on("msg", function (data) {
-    //Send message to everyone
-    server.sockets
-      .in(data.roomid)
-      .emit("newmsg", {
-        msg: data.message,
-        publicKey: data.publicKey,
-        signature: data.signature,
-        leaderstatus: data.leaderstatus,
-        arrayPosition: data.arrayPosition,
-      });
   });
 });
