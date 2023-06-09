@@ -73,7 +73,7 @@
 .slider {
   -webkit-appearance: none;
   height: 15px;
-  
+  border-radius: 0.3rem;
   background: #e4e3e3;
   outline: none;
   opacity: 1;

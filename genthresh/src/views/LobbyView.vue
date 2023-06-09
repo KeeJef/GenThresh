@@ -76,13 +76,13 @@
     v-if="
       this.groupInfoStore.message && !this.userInfoStore.admin && !this.rejected
     "
-    class="flex justify-center pt-3"
+    class="flex justify-center gap-1 pt-3"
   >
-    <mainButton @click="sendMessage" class="mr-1" title="Sign ✔️"></mainButton>
-    <mainButton @click="this.rejected = true" title="Reject❌"></mainButton>
+    <button @click="sendMessage" class="transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600 min-w-[150px] sm:min-w-0">Sign ✔️</button>
+    <button @click="this.rejected = true" class="transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600 min-w-[150px] sm:min-w-0">Reject❌</button>
   </div>
-  <div v-if="this.groupInfoStore.signingStarted" class="flex justify-center w-[90%] mx-auto md:w-[70%] p-5">
-    <div class="w-3/4">
+  <div v-if="this.groupInfoStore.signingStarted" class="flex justify-center w-[90%] mx-auto md:w-[70%] py-5">
+    <div class="w-full">
       <progressIndicator
         :threshold="this.groupInfoStore.threshold"
         :numberOfSigners="this.groupInfoStore.numberOfSigners"
@@ -179,7 +179,7 @@ export default defineComponent({
         this.toast.error("Please enter a message");
         return;
       }
-
+      this.rejected = true;
       var signedMessage = await this.signMessage(this.groupInfoStore.message);
 
       this.socketStore.socketObject.emit("sendMessage", {

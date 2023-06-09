@@ -1,11 +1,11 @@
 <template>
   <div class="relative">
-    <div style="width: 100%" class="absolute bg-yellow-400 h-9"></div>
+    <div style="width: 100%" class="absolute bg-yellow-400 h-9 rounded-lg"></div>
 
     <div class="relative">
       <div
         :style="{ width: this.maxNumber + '%' }"
-        class="absolute bg-purple-400 h-9"
+        class="absolute bg-purple-400 h-9 rounded-lg"
       >
         <div class="relative shrink-0 flex justify-end bottom-12 left-5">
           <div
@@ -23,7 +23,7 @@
     <div class="relative">
       <div
         :style="{ width: this.threshold + '%' }"
-        class="absolute bg-purple-600 h-9"
+        class="absolute bg-purple-600 h-9 rounded-lg"
       >
         <div class="relative flex justify-end bottom-12 left-5">
           <div class="flex relative rounded-md py-1.5 px-3 bg-purple-600 z-0">

@@ -68,6 +68,7 @@ import { io } from "socket.io-client";
 import { useSocket, useUserInfo, useGroupInfo } from "@/store/index";
 import { useToast } from "vue-toastification";
 import { nextTick } from "vue";
+import { getActivePinia } from "pinia"
 
 export default defineComponent({
   name: "CreateGroupView",
@@ -99,6 +100,13 @@ export default defineComponent({
     mainButton,
     keyImportOrGenerateVue,
     EditableArea,
+  },
+  mounted() {
+    //clear all state data from this store index
+
+// map through that list and use the **$reset** fn to reset the state
+getActivePinia()._s.forEach(store => store.$reset());
+
   },
   methods: {
     async scrollToImport() {

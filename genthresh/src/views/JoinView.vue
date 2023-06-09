@@ -50,6 +50,7 @@ import { io } from "socket.io-client";
 import { useSocket, useUserInfo, useGroupInfo } from "@/store/index";
 import { useToast } from "vue-toastification";
 import { nextTick } from "vue";
+import { getActivePinia } from "pinia"
 
 export default defineComponent({
   name: "JoinView",
@@ -128,6 +129,8 @@ export default defineComponent({
     },
   },
   async mounted(){
+    //reset all stores
+    getActivePinia()._s.forEach(store => store.$reset());
     //read groupID from url after ? and set it in groupInfoStore
     this.groupInfoStore.groupID = this.$route.href.split("?")[1];
     this.socketStore.socketObject = io.connect(this.socketStore.baseURL+":"+this.socketStore.ioPort)
