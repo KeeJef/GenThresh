@@ -45,6 +45,7 @@
           :isEditable="isEditAllowed"
           v-model="this.groupInfoStore.message"
           :placeholderValue="placeholderText"
+          @keydown.enter.prevent="sendMessage()"
           class="overflow-auto h-56 w-full break-words border-2 rounded-xl border-yellow-700 text-2xl p-8"
         >
         </EditableArea>
@@ -72,32 +73,77 @@
       </div>
     </div>
   </div>
+
   <div
-    v-if="
-      this.groupInfoStore.message && !this.userInfoStore.admin && !this.rejected
-    "
-    class="flex justify-center gap-1 pt-3"
+    v-if="this.groupInfoStore.signingStarted"
+    class="flex justify-center text-3xl pt-5"
   >
-    <button @click="sendMessage" class="transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600 min-w-[150px] sm:min-w-0">Sign ✔️</button>
-    <button @click="this.rejected = true" class="transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600 min-w-[150px] sm:min-w-0">Reject❌</button>
+    Signing Information
   </div>
-  <div v-if="this.groupInfoStore.signingStarted" class="flex justify-center w-[90%] mx-auto md:w-[70%] py-5">
-    <div class="w-full">
-      <progressIndicator
-        :threshold="this.groupInfoStore.threshold"
-        :numberOfSigners="this.groupInfoStore.numberOfSigners"
-        :actualSigners="this.groupInfoStore.signatureArray.length"
-      ></progressIndicator>
+  <div
+    v-if="this.groupInfoStore.signingStarted"
+    class="border-2 rounded-xl border-yellow-700 mt-5 overflow-auto w-[90%] mx-auto md:w-[70%]"
+  >
+    <div class="flex justify-center mx-3 my-6">
+      <div class="w-full">
+        <progressIndicator
+          :threshold="this.groupInfoStore.threshold"
+          :numberOfSigners="this.groupInfoStore.numberOfSigners"
+          :actualSigners="this.groupInfoStore.signatureArray.length"
+        ></progressIndicator>
+      </div>
+    </div>
+
+    <div
+      v-if="
+        this.groupInfoStore.message &&
+        !this.userInfoStore.admin &&
+        !this.rejected
+      "
+      class="flex justify-center gap-1 pb-3"
+    >
+      <button
+        @click="sendMessage"
+        class="transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600 min-w-[150px] sm:min-w-0"
+      >
+        Sign ✔️
+      </button>
+      <button
+        @click="this.rejected = true"
+        class="transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600 min-w-[150px] sm:min-w-0"
+      >
+        Reject❌
+      </button>
     </div>
   </div>
 
-  <div v-if="this.groupInfoStore.signingStarted" class="w-[90%] mx-auto md:w-[70%] py-5">
-    <div class="flex justify-center text-3xl pb-5">
-      Threshold Signature
-    </div>
-    <div class="overflow-auto min-h-36 w-full break-words border-2 rounded-xl border-yellow-700 text-2xl p-8">
+  <div
+    v-if="this.groupInfoStore.signingStarted"
+    class="w-[90%] mx-auto md:w-[70%] py-5"
+  >
+    <div class="flex justify-center text-3xl pb-5">Threshold Signature</div>
+    <div
+      class="overflow-auto min-h-36 w-full break-words border-2 rounded-xl border-yellow-700 text-2xl p-8"
+    >
       {{ this.thresholdJSON }}
     </div>
+  </div>
+  <div
+    v-if="this.groupInfoStore.signingStarted"
+    class="flex justify-center gap-1 pb-10"
+  >
+    <button
+      @click="saveSignatureInfo()"
+      class="transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600 min-w-[150px] sm:min-w-0"
+    >
+      Save Signature 💾✍️
+    </button>
+    <button
+      @click="saveGroupInfo()"
+      class="transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600 min-w-[150px] sm:min-w-0"
+    >
+      Save Group Info 💾👨‍👩‍👧‍👦
+    </button>
   </div>
 </template>
 
@@ -143,6 +189,9 @@ export default defineComponent({
         this.groupInfoStore.memberList.length
       );
     },
+    signaturesCount() {
+      return this.groupInfoStore.signatureArray.length;
+    },
     placeholderText() {
       if (this.userInfoStore.admin) {
         return this.isGroupFull
@@ -159,6 +208,13 @@ export default defineComponent({
         : false;
     },
   },
+  watch:{
+    signaturesCount(newVal) {
+      if (newVal === this.groupInfoStore.threshold) {
+        this.toast.success("Threshold of signatures reached!");
+      }
+    }
+  },
   methods: {
     copyLink() {
       navigator.clipboard.writeText(
@@ -171,7 +227,25 @@ export default defineComponent({
       this.toast.success("Copied to clipboard");
     },
     saveGroupInfo() {
-      //
+      var keyArray = this.groupInfoStore.memberList.map((item) => {
+        return {
+          publicKey: item.pubKey,
+          username: item.username,
+          memberIndex: item.memberIndex,
+        };
+      });
+
+      helpers.saveFile(JSON.stringify(keyArray), "GROUPINFO", ".JSON");
+      this.toast.success("Saved Keypair");
+    },
+
+    saveSignatureInfo() {
+      helpers.saveFile(
+        JSON.stringify(this.thresholdJSON),
+        "GROUPINFO",
+        ".JSON"
+      );
+      this.toast.success("Saved Keypair");
     },
 
     async sendMessage() {
@@ -189,23 +263,28 @@ export default defineComponent({
         message: this.groupInfoStore.message,
         groupID: this.groupInfoStore.groupID,
       });
-
     },
 
-    async aggregateData(){
-      
+    async aggregateData() {
       var signatureArray = this.groupInfoStore.signatureArray.map((item) => {
         return item.signature;
       });
       var keyArray = this.groupInfoStore.signatureArray.map((item) => {
         return item.publicKey;
       });
+      var signerArray = this.groupInfoStore.signatureArray.map((item) => {
+        return item.signerIndex;
+      });
 
       var aggregatedKey = await this.aggregateKeys(keyArray);
       var aggregatedSignature = await this.aggregateSignatures(signatureArray);
 
-      this.thresholdJSON = {aggregateKey : aggregatedKey, aggregateSignature : aggregatedSignature, message: this.groupInfoStore.message}
-
+      this.thresholdJSON = {
+        aggregateKey: aggregatedKey,
+        aggregateSignature: aggregatedSignature,
+        message: this.groupInfoStore.message,
+        signersByMemberIndex: signerArray,
+      };
     },
 
     async signMessage(message) {
@@ -248,7 +327,10 @@ export default defineComponent({
   },
 
   async mounted() {
+    
+
     this.groupInfoStore.message = "";
+
     await this.socketStore.socketObject.on("roomInfo", (roomData) => {
       this.groupInfoStore.numberOfSigners = roomData.numberOfSigners;
       this.groupInfoStore.threshold = roomData.threshold;
@@ -258,9 +340,8 @@ export default defineComponent({
       this.groupInfoStore.signingStarted = roomData.signingStarted;
 
       if (this.groupInfoStore.signingStarted) {
-        this.aggregateData()
+        this.aggregateData();
       }
-
     });
   },
   components: {

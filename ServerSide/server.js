@@ -39,6 +39,7 @@ server.on("connection", function (socket) {
       pubKey: data.pubKey,
       emoji: data.emoji,
       socketid: socket.id,
+      memberIndex : 0,
     });
   });
 
@@ -68,7 +69,9 @@ server.on("connection", function (socket) {
         pubKey: data.pubKey,
         emoji: data.emoji,
         socketid: socket.id,
+        memberIndex : rooms[data.groupID].members.length,
       });
+
       server.sockets.in(data.groupID).emit("roomInfo", rooms[data.groupID]);
     } catch (error) {
       socket.emit("roomJoinFailed", error);
@@ -96,9 +99,20 @@ server.on("connection", function (socket) {
       rooms[data.groupID].message = data.message;
     }
 
+    var signerIndex
+
+    for (let index = 0; index < rooms[data.groupID].members.length; index++) {
+      const element = rooms[data.groupID].members[index];
+      if (data.pubKey == element.pubKey) {
+        signerIndex = element.memberIndex
+        break
+      }
+      }
+
       rooms[data.groupID].signatureArray.push({
          signature: data.signature,
-         publicKey: data.pubKey,});
+         publicKey: data.pubKey,
+         signerIndex : signerIndex});
 
     server.sockets.in(data.groupID).emit("roomInfo", rooms[data.groupID]);
   });

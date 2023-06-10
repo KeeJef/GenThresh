@@ -70,7 +70,7 @@ export default defineComponent({
       this.toast.success("Copied to Clipboard");
     },
     saveFile() {
-      helpers.saveFile(JSON.stringify(this.keyOutput));
+      helpers.saveFile(JSON.stringify(this.keyOutput),"BLSKEY",".JSON");
       this.toast.success("Saved Keypair");
     },
   },
