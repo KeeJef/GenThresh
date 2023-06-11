@@ -103,9 +103,7 @@ export default defineComponent({
   },
   mounted() {
     //clear all state data from this store index
-
-// map through that list and use the **$reset** fn to reset the state
-getActivePinia()._s.forEach(store => store.$reset());
+    getActivePinia()._s.forEach(store => store.$reset());
 
   },
   methods: {

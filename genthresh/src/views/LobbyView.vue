@@ -13,8 +13,16 @@
     />
     <modalPopup v-if="modalToggle" @modalClose="this.modalToggle = false">
       <div class="text-center pb-2 text-xl">Copy this link to invite users</div>
-      <div class="text-2xl rounded-lg bg-white px-3 py-2 mb-3 sm:text-3xl">
+      <div class="text-2xl rounded-lg bg-white px-3 py-2 mb-2 sm:text-3xl">
         {{ this.socketStore.baseURL }}/j?{{ this.groupInfoStore.groupID }}
+      </div>
+      <div class="flex justify-center mb-2">
+        <qrcode-vue
+        class="p-2 bg-white rounded-lg"
+          :value="this.socketStore.baseURL + '/j?' + this.groupInfoStore.groupID"
+          :size="200"
+          level="H"
+        />
       </div>
       <div class="flex justify-center">
         <button
@@ -29,7 +37,11 @@
     </modalPopup>
   </div>
   <div class="flex justify-center text-3xl pb-4">
-    <div>
+    <div
+      v-if="
+        this.groupInfoStore.numberOfSigners && this.groupInfoStore.threshold
+      "
+    >
       Signers: {{ this.groupInfoStore.numberOfSigners }} Threshold:
       {{ this.groupInfoStore.threshold }}
     </div>
@@ -156,12 +168,21 @@ import progressIndicator from "@/components/progressIndicator.vue";
 import modalPopup from "@/components/modalPopup.vue";
 import mainButton from "@/components/mainButton.vue";
 import helpers from "@/helperFunctions/helperFunctions.js";
+import QrcodeVue from "qrcode.vue";
 
 // Components
 import TitleCard from "@/components/TitleCard.vue";
 
 export default defineComponent({
   name: "LobbyView",
+  components: {
+    TitleCard,
+    mainButton,
+    modalPopup,
+    EditableArea,
+    progressIndicator,
+    QrcodeVue,
+  },
   setup() {
     const socketStore = useSocket();
     const userInfoStore = useUserInfo();
@@ -208,12 +229,12 @@ export default defineComponent({
         : false;
     },
   },
-  watch:{
+  watch: {
     signaturesCount(newVal) {
       if (newVal === this.groupInfoStore.threshold) {
         this.toast.success("Threshold of signatures reached!");
       }
-    }
+    },
   },
   methods: {
     copyLink() {
@@ -235,15 +256,15 @@ export default defineComponent({
         };
       });
 
-      helpers.saveFile(JSON.stringify(keyArray), "GROUPINFO", ".JSON");
+      helpers.saveFile(JSON.stringify(keyArray), "GroupInfo", ".json");
       this.toast.success("Saved Keypair");
     },
 
     saveSignatureInfo() {
       helpers.saveFile(
         JSON.stringify(this.thresholdJSON),
-        "GROUPINFO",
-        ".JSON"
+        "SignatureInfo",
+        ".json"
       );
       this.toast.success("Saved Keypair");
     },
@@ -327,10 +348,14 @@ export default defineComponent({
   },
 
   async mounted() {
-    
+    if (this.socketStore.socketObject == null) {
+      //handle case where user refreshes page or gets to this screen without going through the join process
+      this.$router.push("/");
+    }
 
     this.groupInfoStore.message = "";
 
+    //all data comes through room info
     await this.socketStore.socketObject.on("roomInfo", (roomData) => {
       this.groupInfoStore.numberOfSigners = roomData.numberOfSigners;
       this.groupInfoStore.threshold = roomData.threshold;
@@ -339,17 +364,11 @@ export default defineComponent({
       this.groupInfoStore.signatureArray = roomData.signatureArray;
       this.groupInfoStore.signingStarted = roomData.signingStarted;
 
+      //if signing has started, try to aggregate data every time a new room update is received
       if (this.groupInfoStore.signingStarted) {
         this.aggregateData();
       }
     });
-  },
-  components: {
-    TitleCard,
-    mainButton,
-    modalPopup,
-    EditableArea,
-    progressIndicator,
   },
 });
 </script>
