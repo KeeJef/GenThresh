@@ -256,7 +256,7 @@ export default defineComponent({
         };
       });
 
-      helpers.saveFile(JSON.stringify(keyArray), "GroupInfo", ".json");
+      helpers.saveFile(JSON.stringify({numberOfSigners:this.groupInfoStore.numberOfSigners, groupThreshold: this.groupInfoStore.threshold, keyArray:keyArray}), "GroupInfo", ".json");
       this.toast.success("Saved Keypair");
     },
 
@@ -370,6 +370,11 @@ export default defineComponent({
       }
     });
   },
+
+  beforeUnmount() {
+    this.socketStore.socketObject.disconnect();
+  }
+  
 });
 </script>
 <style>

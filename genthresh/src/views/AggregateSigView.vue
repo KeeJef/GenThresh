@@ -79,9 +79,11 @@ export default defineComponent({
 
       // here we tell the reader what to do when it's done reading...
       reader.onload = (readerEvent) => {
-        var rawFileData = readerEvent.target.result; // this is the content!
+        //trim the newlines and spaces
+        rawFileData = readerEvent.target.result.replace(/\s/g, '');
         this.message = rawFileData
       };
+      event.target.value = null;
     },
 
     async aggregateSignatures(){

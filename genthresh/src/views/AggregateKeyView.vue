@@ -15,7 +15,13 @@
         class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600"
         >⬆️💾 Import Keys</label
       >
-      <input @change="processKeys" id="files" class="hidden" type="file" />
+      <input
+        @change="processKeys"
+        id="files"
+        class="hidden"
+        type="file"
+        multiple
+      />
     </div>
     <mainButton @click="aggregateKeys" title="💫 Aggregate Keys" />
   </div>
@@ -72,16 +78,25 @@ export default defineComponent({
   },
   methods: {
     processKeys(event) {
-      var rawFileData = event.target.files[0];
+      let files = event.target.files;
+      let publicKeys = [];
+      let filesProcessed = 0;
 
-      var reader = new FileReader();
-      reader.readAsText(rawFileData, "UTF-8");
-
-      // here we tell the reader what to do when it's done reading...
-      reader.onload = (readerEvent) => {
-        var rawFileData = readerEvent.target.result; // this is the content!
-        this.message = rawFileData;
-      };
+      // Read and process each file
+      for (let i = 0; i < files.length; i++) {
+        let reader = new FileReader();
+        reader.onload = (readerEvent) => {
+          // Parse the content of the file as JSON
+          let fileData = JSON.parse(readerEvent.target.result);
+          publicKeys.push(fileData.publicKey);
+          filesProcessed++;
+          if (filesProcessed === files.length) {
+            this.message = publicKeys.join(",");
+          }
+        };
+        // Read each file as text
+        reader.readAsText(files[i], "UTF-8");
+      }
     },
 
     async aggregateKeys() {

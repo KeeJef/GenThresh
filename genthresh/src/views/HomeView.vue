@@ -8,6 +8,7 @@
     <mainButton title="👨‍👩‍👧‍👦 Group Sign" @click="$router.push('create-group')"/>
     <mainButton title="💫 Aggregate" @click="$router.push('aggregate')"/>
     <mainButton title="👀 Verify" @click="$router.push('verify')"/>
+    <mainButton title="👨‍👩‍👧‍👦 Verify Group" @click="$router.push('verify-group')"  />
   </div>
 
   <TextDisplay class="text-center pb-5"
