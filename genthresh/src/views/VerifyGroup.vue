@@ -1,9 +1,9 @@
 <template>
-  <TitleCard title="Verify" />
+  <TitleCard title="Verify Group" />
   <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
     <label
       for="groupFiles"
-      class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600"
+      class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl text-center hover:bg-purple-600"
       >⬆️👨‍👩‍👧‍👦 Import Group</label
     >
     <input
@@ -15,7 +15,7 @@
 
     <label
       for="signatureFiles"
-      class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600"
+      class="select-none transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl text-center hover:bg-purple-600"
       >⬆️✍️ Import Signatures</label
     >
     <input
@@ -30,6 +30,7 @@
 
   <div class="flex justify-center mb-4">
     <EditableArea
+      placeholderValue="Import or enter group info..."
       v-model="groupInfo"
       :noHTML="false"
       class="overflow-auto w-4/5 h-32 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"
@@ -40,6 +41,7 @@
 
   <div class="flex justify-center mb-4">
     <EditableArea
+      placeholderValue="Import or enter a group signature..."
       v-model="signatureInfo"
       :noHTML="false"
       class="overflow-auto w-4/5 h-32 break-words border-2 rounded-xl border-yellow-800 text-2xl p-8 xl:w-3/5"
@@ -47,11 +49,11 @@
   </div>
 
   <div v-if="signatureChecked">
-    <div v-if="isValid" class="flex justify-center text-4xl pb-2">
+    <div v-if="isValid" class="flex justify-center text-4xl pb-2 text-center">
       {{ signatureStatus }}
     </div>
-    <div v-if="!isValid" class="flex justify-center text-4xl pb-2">
-      Invalid Signature/Data ❌ {{ signatureStatus }}
+    <div v-if="!isValid" class="flex justify-center text-4xl pb-2 text-center">
+      Invalid Signature ❌ {{ signatureStatus }}
     </div>
   </div>
 

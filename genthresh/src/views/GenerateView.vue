@@ -1,5 +1,5 @@
 <template>
-  <TitleCard title="Generate" />
+  <TitleCard title="Generate Keys" />
   <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
     <mainButton @click="generateKey" title="🔑 Generate Keys" />
     <mainButton @click="saveFile" title="💾 Save Keys" />

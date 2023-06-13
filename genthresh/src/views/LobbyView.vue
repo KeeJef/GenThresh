@@ -48,7 +48,7 @@
   </div>
   <div class="w-[90%] mx-auto md:w-[70%] pt-5">
     <div
-      class="flex flex-col-reverse justify-center gap-y-10 gap-2 md:flex-row"
+      class="flex flex-col-reverse justify-center gap-y-4 gap-x-2 md:flex-row"
     >
       <div class="w-full md:w-3/4">
         <div class="flex justify-center text-2xl pb-3">Message</div>
@@ -58,12 +58,12 @@
           v-model="this.groupInfoStore.message"
           :placeholderValue="placeholderText"
           @keydown.enter.prevent="sendMessage()"
-          class="overflow-auto h-56 w-full break-words border-2 rounded-xl border-yellow-700 text-2xl p-8"
+          class="overflow-auto h-56 w-full break-words border-2 rounded-xl border-yellow-700 text-2xl p-8 mb-5"
         >
         </EditableArea>
         <mainButton
           @click="sendMessage()"
-          class="mt-5"
+          class="my-5"
           v-if="isEditAllowed"
           title="📨 Send"
         ></mainButton>
@@ -142,20 +142,16 @@
   </div>
   <div
     v-if="this.groupInfoStore.signingStarted"
-    class="flex justify-center gap-1 pb-10"
+    class="flex justify-center gap-1 pb-10 px-5"
   >
     <button
       @click="saveSignatureInfo()"
       class="transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600 min-w-[150px] sm:min-w-0"
-    >
-      Save Signature 💾✍️
-    </button>
+    >💾✍️ Save Signature</button>
     <button
       @click="saveGroupInfo()"
       class="transition-colors duration-500 ease-in-out bg-purple-400 rounded-md p-3 text-white font-sans font-semibold text-3xl shadow-xl hover:bg-purple-600 min-w-[150px] sm:min-w-0"
-    >
-      Save Group Info 💾👨‍👩‍👧‍👦
-    </button>
+    >💾👨‍👩‍👧‍👦 Save Group Info</button>
   </div>
 </template>
 

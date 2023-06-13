@@ -47,7 +47,7 @@
       Valid Signature✔️
     </div>
     <div v-if="!isValid" class="flex justify-center text-4xl my-4">
-      Invalid Signature/Data ❌
+      Invalid Signature ❌
     </div>
   </div>
   <mainButton @click="validate" class="mb-10 mt-6" title="👀 Verify" />

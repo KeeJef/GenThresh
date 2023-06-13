@@ -19,11 +19,6 @@ const routes = [
     component: () => import(/* webpackChunkName: "sign" */ '../views/SignView.vue')
   },
   {
-    path: '/aggregate',
-    name: 'aggregate',
-    component: () => import(/* webpackChunkName: "aggregate" */ '../views/AggregateView.vue')
-  },
-  {
     path: '/aggregate-keys',
     name: 'aggregate-keys',
     component: () => import(/* webpackChunkName: "aggregate-keys" */ '../views/AggregateKeyView.vue')

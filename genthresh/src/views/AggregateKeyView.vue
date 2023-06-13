@@ -1,5 +1,5 @@
 <template>
-  <TitleCard title="Aggregate" />
+  <TitleCard title="Aggregate Keys" />
   <div class="flex flex-wrap flex-row justify-center gap-1 pb-5 mx-10">
     <div class="flex justify-center relative">
       <div
