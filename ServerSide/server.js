@@ -1,9 +1,9 @@
 const io = require("socket.io")({
   cors: {
-    origin: "http://localhost:8080",
+    origin: "https://genthresh.com",
   },
 });
-server = io.listen(8000);
+server = io.listen(12982);
 console.log("server started");
 
 rooms = {}; //This is all being stored in memory which is bad

@@ -22,7 +22,7 @@ export const useGroupInfo = defineStore({
 export const useSocket = defineStore({
   id: "socketObject",
   state: () => {
-    return {socketObject: null, baseURL: "http://localhost", httpPort: "8080", ioPort: "8000" };
+    return {socketObject: null, baseURL: "https://genthresh.com", httpPort: "", ioPort: "" };
   },
   getters: {},
   actions: {},
