@@ -13,7 +13,7 @@
     />
     <modalPopup v-if="modalToggle" @modalClose="this.modalToggle = false">
       <div class="text-center pb-2 text-xl">Copy this link to invite users</div>
-      <div class="text-2xl rounded-lg bg-white px-3 py-2 mb-2 sm:text-3xl">
+      <div class="text-lg rounded-lg bg-white px-3 py-2 mb-2 sm:text-3xl">
         {{ this.socketStore.baseURL }}/j?{{ this.groupInfoStore.groupID }}
       </div>
       <div class="flex justify-center mb-2">
