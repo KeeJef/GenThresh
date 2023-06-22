@@ -90,7 +90,7 @@ export default defineComponent({
       importKey: false,
       enterName: false,
       name: "",
-      toastError: false,
+      connected: false,
     };
   },
 
@@ -104,6 +104,18 @@ export default defineComponent({
   mounted() {
     //clear all state data from this store index
     getActivePinia()._s.forEach(store => store.$reset());
+
+    this.socketStore.socketObject = io.connect(
+        this.socketStore.baseURL + ":" + this.socketStore.ioPort
+      );
+
+    this.socketStore.socketObject.on("connect", () => {
+      this.connected = true;
+    }),
+
+    this.socketStore.socketObject.on("connect_error", (err) => {
+      console.log(err);
+      });
 
   },
   methods: {
@@ -134,7 +146,11 @@ export default defineComponent({
       } else if (this.name.length > 10) {
         this.toast.error("Name must be less than 10 characters");
         return;
+      }else if (!this.connected) {
+        this.toast.error("Not connected to server, please check console for error");
+        return;
       }
+      
       this.userInfoStore.privKey = this.privKey;
       this.userInfoStore.pubKey = this.pubKey;
       this.userInfoStore.username = this.name;
@@ -152,14 +168,7 @@ export default defineComponent({
         },
       ];
 
-      //this.socketStore.socketObject = io.connect("http://localhost:8000");
-      this.socketStore.socketObject = io.connect(
-        this.socketStore.baseURL + ":" + this.socketStore.ioPort
-      );
-
       //connect to server
-
-      this.socketStore.socketObject.on("connect", () => {
         this.$router.push("lobby");
         this.socketStore.socketObject.emit("create", {
           groupID: this.groupInfoStore.groupID,
@@ -169,17 +178,6 @@ export default defineComponent({
           threshold: this.groupInfoStore.threshold,
           numberOfSigners: this.groupInfoStore.numberOfSigners,
         });
-      });
-
-      this.toastError = false;
-      // catch connection error
-      this.socketStore.socketObject.on("connect_error", (err) => {
-        //only show toast once per connection error
-        if (!this.toastError) {
-          this.toast.error("Error connecting to server:" + err.message);
-          this.toastError = true;
-        }
-      });
     },
   },
 });
